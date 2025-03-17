@@ -1,0 +1,789 @@
+{
+    "company_name": "PayPal Holdings Inc",
+    "company_id": 26971998,
+    "company_details": {
+        "id": 26971998,
+        "url": "https://www.linkedin.com/company/paypal-global-holdings-inc",
+        "hash": "81ad4b379a571e052fbd53e380c03a41",
+        "name": "PayPal Global Holdings Inc",
+        "website": null,
+        "size": "2-10 employees",
+        "industry": null,
+        "description": null,
+        "followers": null,
+        "founded": null,
+        "headquarters_city": null,
+        "headquarters_country": null,
+        "headquarters_state": null,
+        "headquarters_street1": null,
+        "headquarters_street2": null,
+        "headquarters_zip": null,
+        "logo_url": "https://static.licdn.com/aero-v1/sc/h/cs8pjfgyw96g44ln9r7tct85f",
+        "created": "2020-03-27 05:30:04",
+        "last_updated": "2025-02-13 00:28:47",
+        "last_response_code": 404,
+        "type": null,
+        "headquarters_new_address": null,
+        "employees_count": 6,
+        "headquarters_country_restored": null,
+        "headquarters_country_parsed": null,
+        "company_shorthand_name": "paypal-global-holdings-inc",
+        "company_shorthand_name_hash": "818530d1477d0bf04618f4fd9bc24336",
+        "canonical_url": "https://www.linkedin.com/company/paypal-global-holdings-inc",
+        "canonical_hash": "81ad4b379a571e052fbd53e380c03a41",
+        "canonical_shorthand_name": "paypal-global-holdings-inc",
+        "canonical_shorthand_name_hash": "818530d1477d0bf04618f4fd9bc24336",
+        "deleted": 1,
+        "last_updated_ux": 1739406527,
+        "source_id": 55370511,
+        "company_affiliated_collection": [],
+        "company_also_viewed_collection": [],
+        "company_crunchbase_info_collection": [],
+        "company_featured_employees_collection": [
+            {
+                "id": 42838630,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/in/genevev-belleza-8b37651a6",
+                "created": "2020-04-23 06:36:28",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 47864653,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/in/khristoffer-ray-dizon-a3757b119",
+                "created": "2020-07-27 20:34:37",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 65612943,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/in/ruchitha-katukam-22031b189",
+                "created": "2021-05-18 14:07:09",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 70073904,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/in/yuvaraj-m-514b1b164",
+                "created": "2021-07-24 16:25:34",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 77570080,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/in/nataliya-gill-45067b222",
+                "created": "2021-10-15 12:52:47",
+                "last_updated": "2021-11-16 16:37:39",
+                "deleted": 1
+            },
+            {
+                "id": 82161164,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/in/mary-bilbao-431264229",
+                "created": "2022-01-18 19:34:55",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 98044959,
+                "company_id": 26971998,
+                "url": "https://ph.linkedin.com/in/khristoffer-ray-dizon-a3757b119/en",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2022-11-19 22:39:06",
+                "deleted": 1
+            },
+            {
+                "id": 98044960,
+                "company_id": 26971998,
+                "url": "https://in.linkedin.com/in/yuvaraj-m-514b1b164",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2023-05-28 21:23:19",
+                "deleted": 1
+            },
+            {
+                "id": 98044961,
+                "company_id": 26971998,
+                "url": "https://ph.linkedin.com/in/genevev-belleza-8b37651a6",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 98044962,
+                "company_id": 26971998,
+                "url": "https://ph.linkedin.com/in/mary-bilbao-431264229",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2022-08-09 03:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 123346704,
+                "company_id": 26971998,
+                "url": "https://in.linkedin.com/in/swamy-mood-661567117",
+                "created": "2022-08-09 03:25:34",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 154369159,
+                "company_id": 26971998,
+                "url": "https://ph.linkedin.com/in/mary-bilbao-431264229",
+                "created": "2022-11-19 22:39:06",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            }
+        ],
+        "company_featured_investors_collection": [],
+        "company_funding_rounds_collection": [],
+        "company_locations_collection": [],
+        "company_similar_collection": [
+            {
+                "id": 124124738,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/paypal-com",
+                "created": "2020-03-27 05:30:04",
+                "last_updated": "2021-04-25 23:34:31",
+                "deleted": 1
+            },
+            {
+                "id": 124124739,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/paypal",
+                "created": "2020-03-27 05:30:04",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 124124740,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/paypal-financial",
+                "created": "2020-03-27 05:30:04",
+                "last_updated": "2020-05-28 05:40:58",
+                "deleted": 1
+            },
+            {
+                "id": 124124741,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/discover-financial-services",
+                "created": "2020-03-27 05:30:04",
+                "last_updated": "2020-05-28 05:40:58",
+                "deleted": 1
+            },
+            {
+                "id": 159504514,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/cognitive-bi-inc",
+                "created": "2020-05-28 05:40:58",
+                "last_updated": "2020-07-27 20:34:37",
+                "deleted": 1
+            },
+            {
+                "id": 159504515,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/perfect-digital-media-resources-p-ltd",
+                "created": "2020-05-28 05:40:58",
+                "last_updated": "2020-07-27 20:34:37",
+                "deleted": 1
+            },
+            {
+                "id": 159504516,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/cognitive-big-data-systems-llc",
+                "created": "2020-05-28 05:40:58",
+                "last_updated": "2020-07-27 20:34:37",
+                "deleted": 1
+            },
+            {
+                "id": 159504517,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/mylnb",
+                "created": "2020-05-28 05:40:58",
+                "last_updated": "2020-07-27 20:34:37",
+                "deleted": 1
+            },
+            {
+                "id": 159504518,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/blackbuck-insights",
+                "created": "2020-05-28 05:40:58",
+                "last_updated": "2020-07-27 20:34:37",
+                "deleted": 1
+            },
+            {
+                "id": 159504519,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/cognizant-technology-solutions-us-corporation",
+                "created": "2020-05-28 05:40:58",
+                "last_updated": "2020-07-27 20:34:37",
+                "deleted": 1
+            },
+            {
+                "id": 159504520,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/foodmate-us-inc-",
+                "created": "2020-05-28 05:40:58",
+                "last_updated": "2020-07-27 20:34:37",
+                "deleted": 1
+            },
+            {
+                "id": 159504521,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/us-banccorp",
+                "created": "2020-05-28 05:40:58",
+                "last_updated": "2020-07-27 20:34:37",
+                "deleted": 1
+            },
+            {
+                "id": 194173973,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/centurylink",
+                "created": "2020-07-27 20:34:37",
+                "last_updated": "2020-10-08 03:19:33",
+                "deleted": 1
+            },
+            {
+                "id": 194173974,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/compagnie-financiere-de-la-risle",
+                "created": "2020-07-27 20:34:37",
+                "last_updated": "2020-11-20 08:41:02",
+                "deleted": 1
+            },
+            {
+                "id": 194173975,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/energiedienst-holding-ag-tankstelle",
+                "created": "2020-07-27 20:34:37",
+                "last_updated": "2020-11-20 08:41:02",
+                "deleted": 1
+            },
+            {
+                "id": 194173976,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/vz-holding-ag",
+                "created": "2020-07-27 20:34:37",
+                "last_updated": "2020-08-24 18:43:50",
+                "deleted": 1
+            },
+            {
+                "id": 194173977,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/energiedienst-holding-ag-reg",
+                "created": "2020-07-27 20:34:37",
+                "last_updated": "2020-09-22 16:11:40",
+                "deleted": 1
+            },
+            {
+                "id": 194173978,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/straumann-holding-ag-reg",
+                "created": "2020-07-27 20:34:37",
+                "last_updated": "2020-10-08 03:19:33",
+                "deleted": 1
+            },
+            {
+                "id": 194173980,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/compagnie-financiere-richelieu",
+                "created": "2020-07-27 20:34:37",
+                "last_updated": "2020-08-24 18:43:50",
+                "deleted": 1
+            },
+            {
+                "id": 194173981,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/swissquote-group-holding-sa",
+                "created": "2020-07-27 20:34:37",
+                "last_updated": "2020-08-24 18:43:50",
+                "deleted": 1
+            },
+            {
+                "id": 215119483,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/paypal-giving-fund-uk",
+                "created": "2020-08-24 18:43:50",
+                "last_updated": "2020-09-22 16:11:40",
+                "deleted": 1
+            },
+            {
+                "id": 215119484,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/visa",
+                "created": "2020-08-24 18:43:50",
+                "last_updated": "2021-02-19 00:34:39",
+                "deleted": 1
+            },
+            {
+                "id": 215119485,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/unmissable-ltd",
+                "created": "2020-08-24 18:43:50",
+                "last_updated": "2020-11-20 08:41:02",
+                "deleted": 1
+            },
+            {
+                "id": 236723871,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/paypal-giving-fund",
+                "created": "2020-09-22 16:11:40",
+                "last_updated": "2020-12-14 16:56:20",
+                "deleted": 1
+            },
+            {
+                "id": 236723872,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/bitcoin-of-america",
+                "created": "2020-09-22 16:11:40",
+                "last_updated": "2020-11-20 08:41:02",
+                "deleted": 1
+            },
+            {
+                "id": 244044818,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/confinity",
+                "created": "2020-10-08 03:19:33",
+                "last_updated": "2020-11-20 08:41:02",
+                "deleted": 1
+            },
+            {
+                "id": 244044819,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/confinity-tech-services",
+                "created": "2020-10-08 03:19:33",
+                "last_updated": "2020-11-20 08:41:02",
+                "deleted": 1
+            },
+            {
+                "id": 283207614,
+                "company_id": 26971998,
+                "url": "https://in.linkedin.com/company/draggital",
+                "created": "2020-11-20 08:41:02",
+                "last_updated": "2021-04-25 23:34:31",
+                "deleted": 1
+            },
+            {
+                "id": 283207615,
+                "company_id": 26971998,
+                "url": "https://in.linkedin.com/company/symentix",
+                "created": "2020-11-20 08:41:02",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 283207616,
+                "company_id": 26971998,
+                "url": "https://in.linkedin.com/company/saniot",
+                "created": "2020-11-20 08:41:02",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 283207617,
+                "company_id": 26971998,
+                "url": "https://in.linkedin.com/company/ufxstudio",
+                "created": "2020-11-20 08:41:02",
+                "last_updated": "2021-04-25 23:34:31",
+                "deleted": 1
+            },
+            {
+                "id": 283207618,
+                "company_id": 26971998,
+                "url": "https://in.linkedin.com/company/zabrizon",
+                "created": "2020-11-20 08:41:02",
+                "last_updated": "2021-04-25 23:34:31",
+                "deleted": 1
+            },
+            {
+                "id": 283207619,
+                "company_id": 26971998,
+                "url": "https://hk.linkedin.com/company/hauzen",
+                "created": "2020-11-20 08:41:02",
+                "last_updated": "2021-04-25 23:34:31",
+                "deleted": 1
+            },
+            {
+                "id": 324148537,
+                "company_id": 26971998,
+                "url": "https://be.linkedin.com/company/confinity",
+                "created": "2020-12-14 16:56:20",
+                "last_updated": "2021-01-20 09:11:38",
+                "deleted": 1
+            },
+            {
+                "id": 357730749,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/wilco-source",
+                "created": "2021-01-20 09:11:38",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 376377388,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/caissa-llc",
+                "created": "2021-02-19 00:34:39",
+                "last_updated": "2021-04-25 23:34:31",
+                "deleted": 1
+            },
+            {
+                "id": 405541433,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/nvidia",
+                "created": "2021-04-25 23:34:31",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 405541434,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/tesla-motors",
+                "created": "2021-04-25 23:34:31",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 405541435,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/infoworks-io",
+                "created": "2021-04-25 23:34:31",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 405541436,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/adobe",
+                "created": "2021-04-25 23:34:31",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 405541437,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/oracle",
+                "created": "2021-04-25 23:34:31",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 405541438,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/neudesic",
+                "created": "2021-04-25 23:34:31",
+                "last_updated": "2021-07-24 16:25:34",
+                "deleted": 1
+            },
+            {
+                "id": 446810033,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/paypal",
+                "created": "2021-09-01 05:22:26",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 446810034,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/nvidia",
+                "created": "2021-09-01 05:22:26",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 446810035,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/tesla-motors",
+                "created": "2021-09-01 05:22:26",
+                "last_updated": "2022-02-18 18:49:23",
+                "deleted": 1
+            },
+            {
+                "id": 446810036,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/infoworks-io",
+                "created": "2021-09-01 05:22:26",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 446810037,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/adobe",
+                "created": "2021-09-01 05:22:26",
+                "last_updated": "2022-02-18 18:49:23",
+                "deleted": 1
+            },
+            {
+                "id": 446810038,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/oracle",
+                "created": "2021-09-01 05:22:26",
+                "last_updated": "2022-02-18 18:49:23",
+                "deleted": 1
+            },
+            {
+                "id": 446810039,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/neudesic",
+                "created": "2021-09-01 05:22:26",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 446810040,
+                "company_id": 26971998,
+                "url": "https://in.linkedin.com/company/symentix",
+                "created": "2021-09-01 05:22:26",
+                "last_updated": "2022-02-18 18:49:23",
+                "deleted": 1
+            },
+            {
+                "id": 446810041,
+                "company_id": 26971998,
+                "url": "https://in.linkedin.com/company/saniot",
+                "created": "2021-09-01 05:22:26",
+                "last_updated": "2022-02-18 18:49:23",
+                "deleted": 1
+            },
+            {
+                "id": 446810042,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/wilco-source",
+                "created": "2021-09-01 05:22:26",
+                "last_updated": "2022-02-18 18:49:23",
+                "deleted": 1
+            },
+            {
+                "id": 538719689,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/geminitrust",
+                "created": "2022-02-18 18:49:23",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 538719690,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/kpmg-us",
+                "created": "2022-02-18 18:49:23",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 538719691,
+                "company_id": 26971998,
+                "url": "https://ie.linkedin.com/company/accenture",
+                "created": "2022-02-18 18:49:23",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 538719692,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/jpmorganchase",
+                "created": "2022-02-18 18:49:23",
+                "last_updated": "2022-06-28 13:34:29",
+                "deleted": 1
+            },
+            {
+                "id": 665365600,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/nvidia",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2023-02-12 06:43:20",
+                "deleted": 1
+            },
+            {
+                "id": 665365602,
+                "company_id": 26971998,
+                "url": "https://ae.linkedin.com/company/icash-alipay",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 665365604,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/worldpay-zinc",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2022-10-07 02:45:52",
+                "deleted": 1
+            },
+            {
+                "id": 665365605,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/paypal",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2022-11-19 22:39:06",
+                "deleted": 1
+            },
+            {
+                "id": 665365606,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/the-stem",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2023-02-12 06:43:20",
+                "deleted": 1
+            },
+            {
+                "id": 665365607,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/digital-ocean-organization",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2022-10-07 02:45:52",
+                "deleted": 1
+            },
+            {
+                "id": 665365608,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/dream-finders-homes",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2022-10-07 02:45:52",
+                "deleted": 1
+            },
+            {
+                "id": 665365609,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/fulgentgenetics",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2022-10-07 02:45:52",
+                "deleted": 1
+            },
+            {
+                "id": 665365610,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/skrill",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2022-10-07 02:45:52",
+                "deleted": 1
+            },
+            {
+                "id": 665365611,
+                "company_id": 26971998,
+                "url": "https://se.linkedin.com/company/zimpler",
+                "created": "2022-07-16 15:31:59",
+                "last_updated": "2022-10-07 02:45:52",
+                "deleted": 1
+            },
+            {
+                "id": 720121273,
+                "company_id": 26971998,
+                "url": "https://uk.linkedin.com/company/worldpay-zinc",
+                "created": "2022-10-07 02:45:52",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 720121274,
+                "company_id": 26971998,
+                "url": "https://au.linkedin.com/company/sipora",
+                "created": "2022-10-07 02:45:52",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 720121275,
+                "company_id": 26971998,
+                "url": "https://au.linkedin.com/company/china-payments",
+                "created": "2022-10-07 02:45:52",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 720121276,
+                "company_id": 26971998,
+                "url": "https://ca.linkedin.com/company/icash-ca",
+                "created": "2022-10-07 02:45:52",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 720121277,
+                "company_id": 26971998,
+                "url": "https://lu.linkedin.com/company/alipayplusforeurope",
+                "created": "2022-10-07 02:45:52",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 720121278,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/psr-associates-inc-",
+                "created": "2022-10-07 02:45:52",
+                "last_updated": "2023-02-12 06:43:20",
+                "deleted": 1
+            },
+            {
+                "id": 739349046,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/general-motors",
+                "created": "2022-11-19 22:39:06",
+                "last_updated": "2023-04-24 09:43:54",
+                "deleted": 1
+            },
+            {
+                "id": 774156221,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/palo-alto-networks",
+                "created": "2023-02-12 06:43:20",
+                "last_updated": "2023-04-24 09:43:54",
+                "deleted": 1
+            },
+            {
+                "id": 774156222,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/paypal",
+                "created": "2023-02-12 06:43:20",
+                "last_updated": "2023-04-24 09:43:54",
+                "deleted": 1
+            },
+            {
+                "id": 774156223,
+                "company_id": 26971998,
+                "url": "https://ug.linkedin.com/company/paypaluganda",
+                "created": "2023-02-12 06:43:20",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 812588875,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/metadigitalsolutions",
+                "created": "2023-04-24 09:43:54",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 812588876,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/candlescience",
+                "created": "2023-04-24 09:43:54",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            },
+            {
+                "id": 812588877,
+                "company_id": 26971998,
+                "url": "https://www.linkedin.com/company/psr-associates-inc-",
+                "created": "2023-04-24 09:43:54",
+                "last_updated": "2023-05-28 21:23:19",
+                "deleted": 1
+            },
+            {
+                "id": 828269473,
+                "company_id": 26971998,
+                "url": "https://uk.linkedin.com/company/transferwise-ltd",
+                "created": "2023-05-28 21:23:19",
+                "last_updated": "2023-08-12 04:28:44",
+                "deleted": 1
+            }
+        ],
+        "company_specialties_collection": [],
+        "company_stock_info_collection": [],
+        "company_updates_collection": []
+    }
+}

@@ -3,3 +3,5 @@ uvicorn
 requests
 python-multipart
 python-dotenv
+openai
+beautifulsoup4

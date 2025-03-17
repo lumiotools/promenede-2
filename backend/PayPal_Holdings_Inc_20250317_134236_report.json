@@ -1,0 +1,243 @@
+{
+  "reportGenerated": "2025-03-17T13:42:36.392917",
+  "company": "PayPal Holdings Inc",
+  "ticker": "PYPL",
+  "cik": "1633917",
+  "sections": {
+    "executiveSummary": {
+      "content": "Unable to generate executive summary: chat_with_gpt_plain() missing 1 required positional argument: 'content'"
+    },
+    "companyProfile": {
+      "firmographic": {
+        "error": "Error processing 10-K filing: Failed to download document: 403"
+      },
+      "keyFinancials": {
+        "annual": [
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2025-02-04T17:25:36-05:00",
+            "periodOfReport": "2024-12-31",
+            "accessionNo": "0001633917-25-000019"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2024-02-07T19:35:06-05:00",
+            "periodOfReport": "2023-12-31",
+            "accessionNo": "0001633917-24-000024"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2023-02-09T19:38:19-05:00",
+            "periodOfReport": "2022-12-31",
+            "accessionNo": "0001633917-23-000033"
+          }
+        ],
+        "quarterly": [
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2024-10-29T16:55:06-04:00",
+            "periodOfReport": "2024-09-30",
+            "accessionNo": "0001633917-24-000110"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2024-07-30T16:52:08-04:00",
+            "periodOfReport": "2024-06-30",
+            "accessionNo": "0001633917-24-000098"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2024-04-30T16:49:48-04:00",
+            "periodOfReport": "2024-03-31",
+            "accessionNo": "0001633917-24-000048"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2023-11-01T19:36:59-04:00",
+            "periodOfReport": "2023-09-30",
+            "accessionNo": "0001633917-23-000156"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2023-08-02T19:24:53-04:00",
+            "periodOfReport": "2023-06-30",
+            "accessionNo": "0001633917-23-000117"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2023-05-08T19:11:44-04:00",
+            "periodOfReport": "2023-03-31",
+            "accessionNo": "0001633917-23-000072"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2022-11-03T19:29:22-04:00",
+            "periodOfReport": "2022-09-30",
+            "accessionNo": "0001633917-22-000167"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2022-08-02T19:32:26-04:00",
+            "periodOfReport": "2022-06-30",
+            "accessionNo": "0001633917-22-000137"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2022-04-28T16:49:04-04:00",
+            "periodOfReport": "2022-03-31",
+            "accessionNo": "0001633917-22-000088"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2021-11-08T19:24:41-05:00",
+            "periodOfReport": "2021-09-30",
+            "accessionNo": "0001633917-21-000169"
+          },
+          {
+            "error": "Failed to download document: 403",
+            "filedAt": "2021-07-29T16:40:05-04:00",
+            "periodOfReport": "2021-06-30",
+            "accessionNo": "0001633917-21-000149"
+          }
+        ]
+      },
+      "financialMetrics": {},
+      "shareholders": {
+        "error": "Error processing DEF 14A filing: Failed to download document: 403"
+      }
+    },
+    "companyOverview": {
+      "businessModel": "",
+      "productsServices": "",
+      "customers": ""
+    },
+    "financialSummary": {
+      "annual": [
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2025-02-04T17:25:36-05:00",
+          "periodOfReport": "2024-12-31",
+          "accessionNo": "0001633917-25-000019"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2024-02-07T19:35:06-05:00",
+          "periodOfReport": "2023-12-31",
+          "accessionNo": "0001633917-24-000024"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2023-02-09T19:38:19-05:00",
+          "periodOfReport": "2022-12-31",
+          "accessionNo": "0001633917-23-000033"
+        }
+      ],
+      "quarterly": [
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2024-10-29T16:55:06-04:00",
+          "periodOfReport": "2024-09-30",
+          "accessionNo": "0001633917-24-000110"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2024-07-30T16:52:08-04:00",
+          "periodOfReport": "2024-06-30",
+          "accessionNo": "0001633917-24-000098"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2024-04-30T16:49:48-04:00",
+          "periodOfReport": "2024-03-31",
+          "accessionNo": "0001633917-24-000048"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2023-11-01T19:36:59-04:00",
+          "periodOfReport": "2023-09-30",
+          "accessionNo": "0001633917-23-000156"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2023-08-02T19:24:53-04:00",
+          "periodOfReport": "2023-06-30",
+          "accessionNo": "0001633917-23-000117"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2023-05-08T19:11:44-04:00",
+          "periodOfReport": "2023-03-31",
+          "accessionNo": "0001633917-23-000072"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2022-11-03T19:29:22-04:00",
+          "periodOfReport": "2022-09-30",
+          "accessionNo": "0001633917-22-000167"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2022-08-02T19:32:26-04:00",
+          "periodOfReport": "2022-06-30",
+          "accessionNo": "0001633917-22-000137"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2022-04-28T16:49:04-04:00",
+          "periodOfReport": "2022-03-31",
+          "accessionNo": "0001633917-22-000088"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2021-11-08T19:24:41-05:00",
+          "periodOfReport": "2021-09-30",
+          "accessionNo": "0001633917-21-000169"
+        },
+        {
+          "error": "Failed to download document: 403",
+          "filedAt": "2021-07-29T16:40:05-04:00",
+          "periodOfReport": "2021-06-30",
+          "accessionNo": "0001633917-21-000149"
+        }
+      ]
+    },
+    "organization": {
+      "leadership": {
+        "error": "Error processing DEF 14A filing: Failed to download document: 403"
+      },
+      "employeeCount": ""
+    },
+    "recentDevelopments": {
+      "developments": [
+        {
+          "error": "Error processing 8-K filing: Failed to download document: 403",
+          "filedAt": "2025-03-10T16:31:19-04:00",
+          "accessionNo": "0001193125-25-050929"
+        },
+        {
+          "error": "Error processing 8-K filing: Failed to download document: 403",
+          "filedAt": "2025-03-06T16:58:30-05:00",
+          "accessionNo": "0001193125-25-048492"
+        },
+        {
+          "error": "Error processing 8-K filing: Failed to download document: 403",
+          "filedAt": "2025-02-25T07:49:32-05:00",
+          "accessionNo": "0001193125-25-034283"
+        },
+        {
+          "error": "Error processing 8-K filing: Failed to download document: 403",
+          "filedAt": "2025-02-04T07:01:07-05:00",
+          "accessionNo": "0001633917-25-000017"
+        },
+        {
+          "error": "Error processing 8-K filing: Failed to download document: 403",
+          "filedAt": "2025-01-22T16:30:24-05:00",
+          "accessionNo": "0001193125-25-010401"
+        }
+      ]
+    },
+    "riskAreas": {
+      "error": "Error processing 10-K filing: Failed to download document: 403"
+    }
+  }
+}
