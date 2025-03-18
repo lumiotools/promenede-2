@@ -10,6 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from src.routes.company.router import companyRouter
 app = FastAPI()
 
 # Configure CORS
@@ -22,7 +23,7 @@ app.add_middleware(
 )
 
 # Include routers
-# app.include_router(upload_router,prefix="")
+app.include_router(companyRouter,prefix="/company")
 
 
 
