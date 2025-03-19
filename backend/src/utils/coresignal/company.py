@@ -1,86 +1,84 @@
 import os
 import requests
-import json
 from dotenv import load_dotenv
+import json
 
 # Load environment variables from .env file
 load_dotenv()
 
-# Get API Key from environment variable
+# Get the CORESIGNAL API key from the environment
 CORESIGNAL_API_KEY = os.getenv("CORESIGNAL_API_KEY")
 
-BASE_URL = "https://api.coresignal.com/cdapi/v1/professional_network/company"
+# Define the headers for the request
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {CORESIGNAL_API_KEY}"
+}
 
-def get_company_ids(company_name):
-    """Fetch all relevant company IDs for a given company name."""
-    headers = {
-        "Authorization": f"Bearer {CORESIGNAL_API_KEY}",
-        "Content-Type": "application/json"
-    }
+def get_company_id(website_url):
+    url = f'https://api.coresignal.com/enrichment/companies?website={website_url}&lookalikes=false'
     
-    search_url = f"{BASE_URL}/search/filter"
-    search_payload = {"name": company_name}
+    print(f"Making request to CORESIGNAL enrichment API for website: {website_url}")
     
-    response = requests.post(search_url, json=search_payload, headers=headers)
-    print("response id",response.json())
+    # Make the first API request
+    response = requests.get(url, headers=headers)
     
-    if response.status_code != 200:
-        print("Error fetching company details:", response.text)
-        return []
+    print(f"Received response status code: {response.status_code}")
     
-    try:
-        company_ids = response.json()
-        if not company_ids:
-            print(f"No company found for {company_name}")
-            return []
-        return company_ids
-    except requests.exceptions.JSONDecodeError:
-        print("Invalid JSON response received:\n", response.text)
-        return []
+    if response.status_code == 200:
+        data = response.json()
+        print("Response JSON data:", json.dumps(data, indent=4))
+        
+        if 'data' in data and 'id' in data['data']:
+            company_id = data['data']['id']
+            print(f"Company ID found: {company_id}")
+            return company_id
+        else:
+            print("No ID found in the response data.")
+            return None
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
+        return None
 
 def get_company_details(company_id):
-    """Fetch full company details using the company ID."""
-    headers = {
-        "Authorization": f"Bearer {CORESIGNAL_API_KEY}",
-    }
+    url = f'https://api.coresignal.com/cdapi/v1/multi_source/company/collect/{company_id}'
     
-    collect_url = f"{BASE_URL}/collect/{company_id}"
-    response = requests.get(collect_url, headers=headers)
+    print(f"Making request to CORESIGNAL multisource API for company ID: {company_id}")
     
-    if response.status_code != 200:
-        print(f"Error fetching details for ID {company_id}:", response.text)
-        return None
+    # Make the second API request using the company id
+    response = requests.get(url, headers=headers)
     
-    try:
-        return response.json()
-    except requests.exceptions.JSONDecodeError:
-        print(f"Invalid JSON response for ID {company_id}:\n", response.text)
-        return None
-
-if __name__ == "__main__":
-    company_name = "https://www.paypal.com/home"
-
-    # Step 1: Get all company IDs
-    company_ids = get_company_ids(company_name)
-
-    if company_ids:
-        print(f"Found {len(company_ids)} company IDs for {company_name}: {company_ids}")
-        
-        for company_id in company_ids:
-            print(f"Fetching details for Company ID: {company_id}")
-            company_data = get_company_details(company_id)
-            
-            if company_data:
-                result = {
-                    "company_name": company_name,
-                    "company_id": company_id,
-                    "company_details": company_data
-                }
-                
-                filename = f"{company_name.replace(' ', '_').lower()}_{company_id}.json"
-                with open(filename, "w", encoding="utf-8") as json_file:
-                    json.dump(result, json_file, indent=4)
-                
-                print(f"Company details saved to {filename}")
+    print(f"Received response status code: {response.status_code}")
+    
+    if response.status_code == 200:
+        company_details = response.json()
+        print("Company details response JSON:", json.dumps(company_details, indent=4))
+        return company_details
     else:
-        print("No valid company IDs found.")
+        print(f"Error: {response.status_code} - {response.text}")
+        return None
+
+def main():
+    website_url = 'https://www.paypal.com/home'
+    
+    # Step 1: Get the company ID from the enrichment API
+    company_id = get_company_id(website_url)
+    # company_id=7723781
+    
+    if company_id:
+        # Step 2: Get the company details from the multisource API
+        company_details = get_company_details(company_id)
+        print(company_details)
+        
+        if company_details:
+            # Step 3: Save the data to a JSON file
+            with open('company_details.json', 'w') as json_file:
+                json.dump(company_details, json_file, indent=4)
+            print("Company details saved to company_details.json.")
+        else:
+            print("Failed to retrieve company details.")
+    else:
+        print("Failed to retrieve company ID.")
+
+# if __name__ == "__main__":
+#     main()

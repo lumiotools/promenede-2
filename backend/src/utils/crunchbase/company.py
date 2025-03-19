@@ -35,9 +35,10 @@ def get_organization_data(company_name: str):
     # Check the response status
     if response.status_code == 200:
         # Print the response data (JSON format)
-        print("Organization Data:", response.json())
+        # print("Organization Data:", response.json())
+        return response.json()
     else:
         print(f"Error {response.status_code}: {response.text}")
 
 # Example usage: Call the function with the desired company name
-get_organization_data('PayPal')  # You can change the company name here
+# get_organization_data('PayPal')  # You can change the company name here

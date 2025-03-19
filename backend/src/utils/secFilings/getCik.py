@@ -32,10 +32,10 @@ def get_cik_by_company_name(company_name: str):
         return None
 
 # Example usage:
-company_name = "PayPal"  # Company name to search
-cik = get_cik_by_company_name(company_name)
+# company_name = "PayPal"  # Company name to search
+# cik = get_cik_by_company_name(company_name)
 
-if cik:
-    print(f"CIK for {company_name}: {str(cik).zfill(10)}")  # Zero-pad the CIK to 10 digits
-else:
-    print(f"CIK not found for {company_name}.")
+# if cik:
+#     print(f"CIK for {company_name}: {str(cik).zfill(10)}")  # Zero-pad the CIK to 10 digits
+# else:
+#     print(f"CIK not found for {company_name}.")
