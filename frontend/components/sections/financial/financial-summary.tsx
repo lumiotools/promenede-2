@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { SectionHeader } from "../ui/section-header"
-import { BarChart } from "../ui/bar-chart"
+import { SectionHeader } from "../../ui/section-header"
+import { BarChart } from "../../ui/bar-chart"
 
 interface FinancialStatement {
   cost_of_goods_sold: number
