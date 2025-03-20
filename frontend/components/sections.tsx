@@ -25,6 +25,7 @@ import ValueChainPage from "./sections/market/valueChain";
 import MarketSizePage from "./sections/market/marketSize";
 import MAStrategyPage from "./sections/maActivity/maActivity";
 import MAMapPage from "./sections/maActivity/maMap";
+import CustomerSuccessPage from "./sections/customer-success/customerSuccess";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -74,7 +75,11 @@ export function Sections() {
       </section>
       {/* <section id="ma-map-component" className="p-6">
         <MAMapPage />
+        
       </section> */}
+      <section id="customer-success-component" className="p-6">
+        <CustomerSuccessPage />
+      </section>
       <section id="ma-activity-component" className="p-6">
         <MAStrategyPage />
       </section>
