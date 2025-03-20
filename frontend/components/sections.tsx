@@ -12,6 +12,7 @@ import { CompanyTimelineTable } from './sections/company-timeline-table'
 import { ProductsServices } from './sections/product-services'
 import { ProductLaunchesTimeline } from './sections/product-launch-timeline'
 import { ProductTimelineTable } from './sections/product-timeline-table'
+import { EmployeeBreakdown } from './sections/employee-breakdown'
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -62,6 +63,9 @@ export function Sections() {
 
       <section id="product-timeline-table" className="p-6">
         <ProductTimelineTable/>
+      </section>
+      <section id="employee-breakdown" className="p-6">
+        <EmployeeBreakdown/>
       </section>
       
     </div>
