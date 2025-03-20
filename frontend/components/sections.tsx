@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React from "react";
@@ -22,6 +23,8 @@ import CompetitiveLandscapePage from "./sections/competitor/landscape";
 import MarketMapPage from "./sections/market/marketMap";
 import ValueChainPage from "./sections/market/valueChain";
 import MarketSizePage from "./sections/market/marketSize";
+import MAStrategyPage from "./sections/maActivity/maActivity";
+import MAMapPage from "./sections/maActivity/maMap";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -68,6 +71,12 @@ export function Sections() {
       </section>
       <section id="product-launch-timeline" className="p-6">
         <ProductLaunchesTimeline />
+      </section>
+      {/* <section id="ma-map-component" className="p-6">
+        <MAMapPage />
+      </section> */}
+      <section id="ma-activity-component" className="p-6">
+        <MAStrategyPage />
       </section>
       <section id="market-size-component" className="p-6">
         <MarketSizePage />
