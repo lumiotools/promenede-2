@@ -1,0 +1,53 @@
+"use client"
+
+import React from 'react'
+import ReportHeader from './reportheader'
+import { ExecutiveSummary } from './sections/executive-summary'
+import { CompanyProfile } from './sections/company-profile'
+import { CompanyOverview } from './sections/company-overview'
+import { FinancialSummary } from './sections/financial-summary'
+import { WebTraffic } from './sections/web-traffic'
+import CompanyTimeline from './sections/company-timeline'
+// import { CompanyProfile } from "./sections/company-profile"
+// import { CompanyOverview } from "./sections/company-overview"
+// import { FinancialSummary } from "./sections/financial-summary"
+
+export function Sections() {
+  return (
+    <div className="flex flex-col w-full">
+      <ReportHeader
+        title="Report A" 
+        date={new Date('2024-05-20')}
+        searchCriteria="www.paypal.com"
+        pagesViewed={10000}
+        manHoursSaved={20}
+      />
+
+      <section id="executive-summary" className="p-6">
+        <ExecutiveSummary  />
+      </section>
+
+      <section id="company-profile" className="p-6">
+        <CompanyProfile />
+      </section>
+
+      <section id="company-overview" className="p-6">
+        <CompanyOverview />
+      </section>
+
+      <section id="financial-summary" className="p-6">
+        <FinancialSummary />
+      </section>
+
+      <section id="web-traffic" className="p-6">
+        <WebTraffic />
+      </section>
+
+      <section id="web-traffic" className="p-6">
+        <CompanyTimeline/>
+      </section>
+    </div>
+  )
+}
+
+export default Sections
