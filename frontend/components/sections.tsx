@@ -15,6 +15,10 @@ import QAComponent from "./sections/qa/qa-component";
 import OpportunitiesPage from "./sections/opportunities-risks/opportunities";
 import RisksPage from "./sections/opportunities-risks/risks";
 import RegulationPage from "./sections/regulation/regulation";
+import CompetitorAnalysisPage from "./sections/competitor/competitorAnalysis";
+import PeerDevelopmentsPage from "./sections/competitor/peerDevelopments";
+import FinancialComparablesPage from "./sections/competitor/financialComparables";
+import CompetitiveLandscapePage from "./sections/competitor/landscape";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -61,6 +65,18 @@ export function Sections() {
       </section>
       <section id="product-launch-timeline" className="p-6">
         <ProductLaunchesTimeline />
+      </section>
+      <section id="competitor-landscape-component" className="p-6">
+        <CompetitiveLandscapePage />
+      </section>
+      <section id="financial-comparables-component" className="p-6">
+        <FinancialComparablesPage />
+      </section>
+      <section id="peer-developments-component" className="p-6">
+        <PeerDevelopmentsPage />
+      </section>
+      <section id="competitor-analysis-component" className="p-6">
+        <CompetitorAnalysisPage />
       </section>
       <section id="regulation-component" className="p-6">
         <RegulationPage />
