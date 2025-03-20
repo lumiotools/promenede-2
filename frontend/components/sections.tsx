@@ -14,6 +14,7 @@ import { ProductLaunchesTimeline } from "./sections/product-launch-timeline";
 import QAComponent from "./sections/qa/qa-component";
 import OpportunitiesPage from "./sections/opportunities-risks/opportunities";
 import RisksPage from "./sections/opportunities-risks/risks";
+import RegulationPage from "./sections/regulation/regulation";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -60,6 +61,9 @@ export function Sections() {
       </section>
       <section id="product-launch-timeline" className="p-6">
         <ProductLaunchesTimeline />
+      </section>
+      <section id="regulation-component" className="p-6">
+        <RegulationPage />
       </section>
       <section id="opportunities-component" className="p-6">
         <OpportunitiesPage />
