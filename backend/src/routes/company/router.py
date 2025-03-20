@@ -203,7 +203,7 @@ async def get_company_data(request: CompanyRequest):
         # 24-26. Market Info
         "market_info": {
             "size": crunchbase_data.get("market_size", {}) or {},
-            "value_chain": extract_value_chain(coresignal_data, crunchbase_data),
+            "value_chain": {},
             "market_map": extract_market_map(coresignal_data, crunchbase_data)
         },
         

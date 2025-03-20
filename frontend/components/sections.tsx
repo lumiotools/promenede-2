@@ -19,6 +19,9 @@ import CompetitorAnalysisPage from "./sections/competitor/competitorAnalysis";
 import PeerDevelopmentsPage from "./sections/competitor/peerDevelopments";
 import FinancialComparablesPage from "./sections/competitor/financialComparables";
 import CompetitiveLandscapePage from "./sections/competitor/landscape";
+import MarketMapPage from "./sections/market/marketMap";
+import ValueChainPage from "./sections/market/valueChain";
+import MarketSizePage from "./sections/market/marketSize";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -65,6 +68,15 @@ export function Sections() {
       </section>
       <section id="product-launch-timeline" className="p-6">
         <ProductLaunchesTimeline />
+      </section>
+      <section id="market-size-component" className="p-6">
+        <MarketSizePage />
+      </section>
+      <section id="value-chain-component" className="p-6">
+        <ValueChainPage />
+      </section>
+      <section id="market-map-component" className="p-6">
+        <MarketMapPage />
       </section>
       <section id="competitor-landscape-component" className="p-6">
         <CompetitiveLandscapePage />
