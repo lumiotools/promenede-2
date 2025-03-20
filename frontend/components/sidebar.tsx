@@ -1,34 +1,31 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import Link from "next/link";
-import { Search, Plus } from "lucide-react";
+import type React from "react"
+
+import { useState } from "react"
+import { Search, Plus } from "lucide-react"
 
 export function Sidebar() {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({
     Company: true,
     "Market Size Summary": false,
     "Competitive Landscape": false,
-  });
+  })
 
   const toggleItem = (item: string) => {
     setExpandedItems((prev) => ({
       ...prev,
       [item]: !prev[item],
-    }));
-  };
+    }))
+  }
+
+  // Function to handle smooth scrolling to section
 
   return (
     <div className="w-70 bg-[#000000] text-white overflow-y-auto h-screen flex-shrink-0 sidebar">
       {/* Header */}
       <div className="p-4 flex items-center gap-2">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M12 2L2 7L12 12L22 7L12 2Z"
             stroke="white"
@@ -36,25 +33,11 @@ export function Sidebar() {
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <path
-            d="M2 17L12 22L22 17"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M2 12L12 17L22 12"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
+          <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         <span className="font-semibold text-lg tracking-wide">PROMENADE</span>
-        <span className="text-xs bg-[#333] px-1.5 border py-0.5 rounded text-[#aaa]">
-          BETA
-        </span>
+        <span className="text-xs bg-[#333] px-1.5 border py-0.5 rounded text-[#aaa]">BETA</span>
       </div>
 
       {/* New Button */}
@@ -103,28 +86,13 @@ export function Sidebar() {
                 <SidebarLink href="#executive-summary" label="Overview" />
                 <SidebarLink href="#company-profile" label="Firmographic" />
                 <SidebarLink href="#business-model" label="Business Model" />
-                <SidebarLink
-                  href="#value-proposition"
-                  label="Value Proposition"
-                />
-                <SidebarLink
-                  href="#products-services"
-                  label="Products & Services"
-                />
-                <SidebarLink
-                  href="#geographic-presence"
-                  label="Geographic Presence"
-                />
+                <SidebarLink href="#value-proposition" label="Value Proposition" />
+                <SidebarLink href="#products-services" label="Products & Services" />
+                <SidebarLink href="#geographic-presence" label="Geographic Presence" />
                 <SidebarLink href="#strategy" label="Strategy" />
-                <SidebarLink
-                  href="#financial-statement"
-                  label="Financial Statement"
-                />
+                <SidebarLink href="#financial-statement" label="Financial Statement" />
                 <SidebarLink href="#key-performance" label="Key Performance" />
-                <SidebarLink
-                  href="#latest-activities"
-                  label="Latest Activities"
-                />
+                <SidebarLink href="#latest-activities" label="Latest Activities" />
                 <SidebarLink href="#key-people" label="Key People" />
               </div>
             )}
@@ -148,23 +116,11 @@ export function Sidebar() {
 
             {expandedItems["Market Size Summary"] && (
               <div className="ml-6 space-y-1 mt-1">
-                <SidebarLink
-                  href="#current-market-size"
-                  label="Current Market Size"
-                />
-                <SidebarLink
-                  href="#projected-market-size"
-                  label="Projected Market Size"
-                />
-                <SidebarLink
-                  href="#key-drivers"
-                  label="Key Drivers of Growth"
-                />
+                <SidebarLink href="#current-market-size" label="Current Market Size" />
+                <SidebarLink href="#projected-market-size" label="Projected Market Size" />
+                <SidebarLink href="#key-drivers" label="Key Drivers of Growth" />
                 <SidebarLink href="#regional-trends" label="Regional Trends" />
-                <SidebarLink
-                  href="#market-size-growth"
-                  label="Market Size Growth"
-                />
+                <SidebarLink href="#market-size-growth" label="Market Size Growth" />
                 <SidebarLink href="#market-map" label="Market Map" />
               </div>
             )}
@@ -188,18 +144,9 @@ export function Sidebar() {
 
             {expandedItems["Competitive Landscape"] && (
               <div className="ml-6 space-y-1 mt-1">
-                <SidebarLink
-                  href="#landscape-insights"
-                  label="Landscape Insights"
-                />
-                <SidebarLink
-                  href="#competitors"
-                  label="Competitors List By AI"
-                />
-                <SidebarLink
-                  href="#competitor-analysis"
-                  label="Competitor Analysis"
-                />
+                <SidebarLink href="#landscape-insights" label="Landscape Insights" />
+                <SidebarLink href="#competitors" label="Competitors List By AI" />
+                <SidebarLink href="#competitor-analysis" label="Competitor Analysis" />
                 <SidebarLink href="#value-chain" label="Value Chain" />
                 <SidebarLink href="#conclusion" label="Conclusion" />
               </div>
@@ -219,24 +166,41 @@ export function Sidebar() {
         }
       `}</style>
     </div>
-  );
+  )
 }
 
 interface SidebarLinkProps {
-  href: string;
-  label: string;
-  active?: boolean;
+  href: string
+  label: string
+  active?: boolean
 }
 
 function SidebarLink({ href, label, active = false }: SidebarLinkProps) {
+  // Extract the ID from the href
+  const id = href.replace("#", "")
+
+  // Function to handle smooth scrolling
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    const element = document.getElementById(id)
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" })
+
+      // Optional: Add active state or highlight to the section
+      // You could add a class to the element or use a state to track the active section
+    }
+  }
+
   return (
-    <Link
+    <a
       href={href}
+      onClick={handleClick}
       className={`block py-1 px-2 text-sm ${
         active ? "text-white" : "text-[#aaa]"
-      } hover:text-white hover:bg-[#1e1e1e] rounded`}
+      } hover:text-white hover:bg-[#1e1e1e] rounded cursor-pointer`}
     >
       {label}
-    </Link>
-  );
+    </a>
+  )
 }
+

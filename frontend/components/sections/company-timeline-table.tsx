@@ -18,7 +18,7 @@ export function CompanyTimelineTable() {
     async function fetchData() {
       try {
         console.log("Fetching company timeline data...")
-        const response = await fetch("/data.json")
+        const response = await fetch("/paypal.json")
 
         if (!response.ok) {
           throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`)
