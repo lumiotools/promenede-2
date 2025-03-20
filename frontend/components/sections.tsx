@@ -29,6 +29,7 @@ import CustomerSuccessPage from "./sections/customer-success/customerSuccess";
 import StrategyPage from "./sections/strategy/strategy";
 import StrategicDevelopmentTimeline from "./sections/strategy/strategicDevelopment";
 import KeyTechnologyPage from "./sections/technology/technology";
+import MarketLeadershipPage from "./sections/market-leadership/marketLeadership";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -78,6 +79,9 @@ export function Sections() {
       </section>
       <section id="strategic-development-component" className="p-6">
         <StrategicDevelopmentTimeline />
+      </section>
+      <section id="market-leadership-component" className="p-6">
+        <MarketLeadershipPage />
       </section>
       <section id="technology-component" className="p-6">
         <KeyTechnologyPage />
