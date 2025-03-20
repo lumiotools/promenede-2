@@ -30,6 +30,7 @@ import StrategyPage from "./sections/strategy/strategy";
 import StrategicDevelopmentTimeline from "./sections/strategy/strategicDevelopment";
 import KeyTechnologyPage from "./sections/technology/technology";
 import MarketLeadershipPage from "./sections/market-leadership/marketLeadership";
+import StrategicAlliancePage from "./sections/strategic-partnership/strategicPartnership";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -79,6 +80,9 @@ export function Sections() {
       </section>
       <section id="strategic-development-component" className="p-6">
         <StrategicDevelopmentTimeline />
+      </section>
+      <section id="strategic-partnership-component" className="p-6">
+        <StrategicAlliancePage />
       </section>
       <section id="market-leadership-component" className="p-6">
         <MarketLeadershipPage />
