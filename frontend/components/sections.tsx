@@ -1,16 +1,17 @@
-"use client"
+"use client";
 
-import React from 'react'
-import ReportHeader from './reportheader'
-import { ExecutiveSummary } from './sections/executive-summary'
-import { CompanyProfile } from './sections/company-profile'
-import { CompanyOverview } from './sections/company-overview'
-import { FinancialSummary } from './sections/financial-summary'
-import { WebTraffic } from './sections/web-traffic'
-import CompanyTimeline from './sections/company-timeline'
-import { CompanyTimelineTable } from './sections/company-timeline-table'
-import { ProductsServices } from './sections/product-services'
-import { ProductLaunchesTimeline } from './sections/product-launch-timeline'
+import React from "react";
+import ReportHeader from "./reportheader";
+import { ExecutiveSummary } from "./sections/executive-summary";
+import { CompanyProfile } from "./sections/company-profile";
+import { CompanyOverview } from "./sections/company-overview";
+import { FinancialSummary } from "./sections/financial-summary";
+import { WebTraffic } from "./sections/web-traffic";
+import CompanyTimeline from "./sections/company-timeline";
+import { CompanyTimelineTable } from "./sections/company-timeline-table";
+import { ProductsServices } from "./sections/product-services";
+import { ProductLaunchesTimeline } from "./sections/product-launch-timeline";
+import QAComponent from "./sections/qa/qa-component";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -19,15 +20,15 @@ export function Sections() {
   return (
     <div className="flex flex-col w-full">
       <ReportHeader
-        title="Report A" 
-        date={new Date('2024-05-20')}
+        title="Report A"
+        date={new Date("2024-05-20")}
         searchCriteria="www.paypal.com"
         pagesViewed={10000}
         manHoursSaved={20}
       />
 
       <section id="executive-summary" className="p-6">
-        <ExecutiveSummary  />
+        <ExecutiveSummary />
       </section>
 
       <section id="company-profile" className="p-6">
@@ -47,19 +48,22 @@ export function Sections() {
       </section>
 
       <section id="company-timeline" className="p-6">
-        <CompanyTimeline/>
+        <CompanyTimeline />
       </section>
       <section id="company-timeline-table" className="p-6">
-        <CompanyTimelineTable/>
+        <CompanyTimelineTable />
       </section>
       <section id="product-services" className="p-6">
-        <ProductsServices/>
+        <ProductsServices />
       </section>
       <section id="product-launch-timeline" className="p-6">
-        <ProductLaunchesTimeline/>
+        <ProductLaunchesTimeline />
+      </section>
+      <section id="qa-component" className="p-6">
+        <QAComponent />
       </section>
     </div>
-  )
+  );
 }
 
-export default Sections
+export default Sections;
