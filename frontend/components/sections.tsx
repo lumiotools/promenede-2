@@ -2,17 +2,20 @@
 
 import React from 'react'
 import ReportHeader from './reportheader'
-import { ExecutiveSummary } from './sections/executive-summary'
-import { CompanyProfile } from './sections/company-profile'
-import { CompanyOverview } from './sections/company-overview'
-import { FinancialSummary } from './sections/financial-summary'
-import { WebTraffic } from './sections/web-traffic'
-import CompanyTimeline from './sections/company-timeline'
-import { CompanyTimelineTable } from './sections/company-timeline-table'
-import { ProductsServices } from './sections/product-services'
-import { ProductLaunchesTimeline } from './sections/product-launch-timeline'
-import { ProductTimelineTable } from './sections/product-timeline-table'
-import { EmployeeBreakdown } from './sections/employee-breakdown'
+import { CompanyProfile } from './sections/company/company-profile'
+import { CompanyOverview } from './sections/company/company-overview'
+import { FinancialSummary } from './sections/financial/financial-summary'
+import { WebTraffic } from './sections/webtraffic/web-traffic'
+import CompanyTimeline from './sections/company/company-timeline'
+import { CompanyTimelineTable } from './sections/company/company-timeline-table'
+import { ProductsServices } from './sections/product/product-services'
+import { ProductLaunchesTimeline } from './sections/product/product-launch-timeline'
+import { ProductTimelineTable } from './sections/product/product-timeline-table'
+import { EmployeeBreakdown } from './sections/employee/employee-breakdown'
+import { ExecutiveSummary } from './sections/executive/executive-summary'
+import { EmployeeTrendChart } from './sections/employee/employee-trend-chart'
+import { EmployeeKeyMembers } from './sections/employee/employee-keymember'
+import { LeadershipExecutives } from './sections/employee/employee-leadership'
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -66,6 +69,15 @@ export function Sections() {
       </section>
       <section id="employee-breakdown" className="p-6">
         <EmployeeBreakdown/>
+      </section>
+      <section id="employee-trend-chart" className="p-6">
+        <EmployeeTrendChart/>
+      </section>
+      <section id="employee-keymembers" className="p-6">
+        <EmployeeKeyMembers/>
+      </section>
+      <section id="employee-leadership" className="p-6">
+        <LeadershipExecutives/>
       </section>
       
     </div>

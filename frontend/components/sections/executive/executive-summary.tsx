@@ -1,5 +1,5 @@
-import { BarChart } from "../ui/bar-chart";
-import { SectionHeader } from "../ui/section-header";
+import { BarChart } from "@/components/ui/bar-chart";
+import { SectionHeader } from "@/components/ui/section-header";
 
 export function ExecutiveSummary() {
   return (

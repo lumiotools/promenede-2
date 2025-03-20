@@ -20,7 +20,7 @@ export default function CompanyTimeline() {
   }, []);
 
   return (
-    <div className="bg-white p-10">
+    <div className="bg-white">
       <h1 className="text-4xl font-medium text-gray-700 mb-6">Company Timeline</h1>
       <div className="border-t border-gray-300 mb-6"></div>
 

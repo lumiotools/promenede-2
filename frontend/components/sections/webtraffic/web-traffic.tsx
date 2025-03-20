@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { BarChart } from "../ui/bar-chart"
+import { BarChart } from "../../ui/bar-chart"
 
 interface CountryVisit {
   country: string | null
