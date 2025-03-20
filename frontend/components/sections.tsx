@@ -26,6 +26,7 @@ import MarketSizePage from "./sections/market/marketSize";
 import MAStrategyPage from "./sections/maActivity/maActivity";
 import MAMapPage from "./sections/maActivity/maMap";
 import CustomerSuccessPage from "./sections/customer-success/customerSuccess";
+import StrategyPage from "./sections/strategy/strategy";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -73,13 +74,15 @@ export function Sections() {
       <section id="product-launch-timeline" className="p-6">
         <ProductLaunchesTimeline />
       </section>
-      {/* <section id="ma-map-component" className="p-6">
-        <MAMapPage />
-        
-      </section> */}
+      <section id="strategy-component" className="p-6">
+        <StrategyPage />
+      </section>
       <section id="customer-success-component" className="p-6">
         <CustomerSuccessPage />
       </section>
+      {/* <section id="ma-map-component" className="p-6">
+        <MAMapPage />
+      </section> */}
       <section id="ma-activity-component" className="p-6">
         <MAStrategyPage />
       </section>
