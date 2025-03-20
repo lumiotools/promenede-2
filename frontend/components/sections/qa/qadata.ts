@@ -1,4 +1,6 @@
-export const qaData: { question: string; answer: string }[] = [
+import { QAItem } from "@/types/qa";
+
+export const initialQaData: QAItem[] = [
   {
     question: "What is Apple's business model?",
     answer:
