@@ -1,87 +1,51 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { BarChart } from "../../ui/bar-chart"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import type { WebTrafficItem } from "@/types/company"
 
-interface CountryVisit {
-  country: string | null
-  percentage: number
-  percentage_monthly_change: number
+type WebTrafficTypeProps = {
+  initialData?: WebTrafficItem
 }
 
-interface MonthlyVisit {
-  total_website_visits: number
-  date: string
-}
+export default function WebTraffic({ initialData }: WebTrafficTypeProps) {
+  // Initialize state with initialData if provided
+  const [data, setData] = useState<WebTrafficItem | undefined>(initialData)
 
-interface VisitsChange {
-  current: number
-  change_monthly: number
-  change_monthly_percentage: number
-  change_quarterly: number
-  change_quarterly_percentage: number
-  change_yearly: number | null
-  change_yearly_percentage: number | null
-}
-
-interface WebTrafficData {
-  monthly_visits: number
-  visits_by_country: CountryVisit[]
-  visits_by_month: MonthlyVisit[]
-  visits_change: VisitsChange
-  bounce_rate: number
-  pages_per_visit: number
-  average_visit_duration: number
-}
-
-// Change the export function name from WebTraffic to WebTrafficFixed
-export function WebTraffic() {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [data, setData] = useState<any | null>(null)
-
+  // Fetch data if not provided as initialData
   useEffect(() => {
-    // Define hardcoded data directly in the component
-    // This ensures the component works without relying on external JSON files
-    const hardcodedData = {
-      data: {
-        yearly_data: {
-          years: ["2023", "2024", "2025"],
-          values: [800, 550, 1300],
-        },
-        country_data: {
-          countries: ["USA", "UK", "Germany", "Canada", "France"],
-          values: [45, 13, 9, 7, 6],
-        },
-      },
+    if (initialData) {
+      setData(initialData)
     }
+  }, [initialData])
 
-    setData(hardcodedData)
-    setLoading(false)
-  }, [])
+  console.log("WebTraffic initialData:", initialData)
 
-  if (loading) {
-    return <div className="p-6">Loading web traffic data...</div>
+  // Check if data is available
+  if (!data || !data.visits_by_month || !data.visits_by_country) {
+    return (
+      <div className="space-y-6 bg-white p-6">
+        <h1 className="text-4xl font-medium text-[#475467] mb-6">Web Traffic</h1>
+        <div className="border-t border-[#e5e7eb] mb-6"></div>
+        <div className="p-6 text-center text-[#475467]">No web traffic data available</div>
+      </div>
+    )
   }
 
-  if (error || !data) {
-    return <div className="p-6 text-red-500">{error || "No data available"}</div>
-  }
+  // Format monthly visits data for the chart
+  const monthlyVisitsData = data.visits_by_month
+    .slice(0, 12)
+    .map((item) => ({
+      month: new Date(item.date).toLocaleString("default", { month: "short", year: "2-digit" }),
+      visits: item.total_website_visits / 1000000, // Convert to millions
+    }))
+    .reverse() // Reverse to show oldest to newest
 
-  // Based on the structure of our hardcoded data
-  const yearlyData = data?.data?.yearly_data || { years: [], values: [] }
-  const countryData = data?.data?.country_data || { countries: [], values: [] }
-
-  // Format data for the BarChart component
-  const momTrendChartData = {
-    labels: yearlyData.years || [],
-    values: yearlyData.values || [],
-  }
-
-  const trafficByCountryChartData = {
-    labels: countryData.countries || [],
-    values: countryData.values || [],
-  }
+  // Format country data for the chart
+  const countryVisitsData = data.visits_by_country.map((item) => ({
+    country: item.country || "Unknown",
+    percentage: item.percentage,
+  }))
 
   return (
     <div className="space-y-6 bg-white">
@@ -90,18 +54,37 @@ export function WebTraffic() {
       <div className="border-t border-[#e5e7eb] mb-6"></div>
 
       {/* Charts */}
-      <div className="grid grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div>
           <h3 className="text-[#475467] font-medium mb-4">MoM Trend (12 months)</h3>
           <div className="bg-[#f9fafb] p-6 rounded-md">
             <div className="h-[300px]">
-              <BarChart
-                data={momTrendChartData}
-                color="#002169"
-                height={200}
-                yAxisLabel="USD (billion)"
-                maxValue={1500}
-              />
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={monthlyVisitsData}
+                  margin={{
+                    top: 10,
+                    right: 30,
+                    left: 20,
+                    bottom: 30,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fill: "#475467", fontSize: 12 }} tickMargin={10} />
+                  <YAxis
+                    tick={{ fill: "#475467", fontSize: 12 }}
+                    tickFormatter={(value) => `${value}M`}
+                    label={{
+                      value: "Visits (millions)",
+                      angle: -90,
+                      position: "insideLeft",
+                      style: { textAnchor: "middle", fill: "#475467", fontSize: 12 },
+                    }}
+                  />
+                  <Tooltip formatter={(value) => [`${value}M`, "Traffic"]} labelStyle={{ color: "#475467" }} />
+                  <Bar dataKey="visits" fill="#002169" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
@@ -110,17 +93,38 @@ export function WebTraffic() {
           <h3 className="text-[#475467] font-medium mb-4">Traffic by Country</h3>
           <div className="bg-[#f9fafb] p-6 rounded-md">
             <div className="h-[300px]">
-              <BarChart
-                data={trafficByCountryChartData}
-                color="#002169"
-                height={200}
-                yAxisLabel="USD (billion)"
-                maxValue={1500}
-              />
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={countryVisitsData}
+                  margin={{
+                    top: 10,
+                    right: 30,
+                    left: 80,
+                    bottom: 10,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="country" tick={{ fill: "#475467", fontSize: 12 }} tickMargin={10} />
+                  <YAxis
+                    tick={{ fill: "#475467", fontSize: 12 }}
+                    tickFormatter={(value) => `${value}M`}
+                    label={{
+                      value: "Visits (millions)",
+                      angle: -90,
+                      position: "insideLeft",
+                      style: { textAnchor: "middle", fill: "#475467", fontSize: 12 },
+                    }}
+                  />
+                  <Tooltip formatter={(value) => [`${value}%`, "Traffic"]} labelStyle={{ color: "#475467" }} />
+                  <Bar dataKey="percentage" fill="#002169" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
       </div>
+
+   
 
       <div className="text-xs text-[#8097a2] italic">Source: 1.PromenadeAI, 2.Crunchbase</div>
     </div>

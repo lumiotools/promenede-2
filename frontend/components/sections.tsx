@@ -22,13 +22,11 @@ import KeyTechnologyPage from "./sections/technology/technology";
 import MarketLeadershipPage from "./sections/market-leadership/marketLeadership";
 import StrategicAlliancePage from "./sections/strategic-partnership/strategicPartnership";
 import ReportHeader from './reportheader'
-import { CompanyProfile } from './sections/company/company-profile'
-import { CompanyOverview } from './sections/company/company-overview'
 import { FinancialSummary } from './sections/financial/financial-summary'
-import { WebTraffic } from './sections/webtraffic/web-traffic'
+import  WebTraffic  from './sections/webtraffic/web-traffic'
 import {CompanyTimeline} from './sections/company/company-timeline'
 import { CompanyTimelineTable } from './sections/company/company-timeline-table'
-import { ProductsServices } from './sections/product/product-services'
+import  ProductsServices  from './sections/product/product-services'
 import { ProductLaunchesTimeline } from './sections/product/product-launch-timeline'
 import { ProductTimelineTable } from './sections/product/product-timeline-table'
 import { EmployeeBreakdown } from './sections/employee/employee-breakdown'
@@ -41,9 +39,8 @@ import { EmployeeReviewImprovements } from './sections/employee/employee-review-
 import { EmployeeReviewsTable } from './sections/employee/employee-review-table';
 import {GroupStructure} from './sections/group/groupstructure';
 import { CompanyData } from "@/types/apiResponse";
-// import { CompanyProfile } from "./sections/company-profile"
-// import { CompanyOverview } from "./sections/company-overview"
-// import { FinancialSummary } from "./sections/financial-summary"
+import CompanyOverview from "./sections/company/company-overview";
+import CompanyProfile from "./sections/company/company-profile";
 type SectionsProps = {
   searchResults?: CompanyData;
 };
@@ -63,11 +60,11 @@ export function Sections({ searchResults }: SectionsProps) {
       </section>
 
       <section id="company-profile" className="p-6">
-        <CompanyProfile />
+        <CompanyProfile  initialData={searchResults?.company_profile}/>
       </section>
 
       <section id="company-overview" className="p-6">
-        <CompanyOverview />
+        <CompanyOverview initialData={searchResults?.company_overview}/>
       </section>
 
       <section id="financial-summary" className="p-6">
@@ -75,22 +72,19 @@ export function Sections({ searchResults }: SectionsProps) {
       </section>
 
       <section id="web-traffic" className="p-6">
-        <WebTraffic />
+        <WebTraffic initialData={searchResults?.web_traffic}/>
       </section>
       <section id="group-structure" className="p-6">
         <GroupStructure/>
       </section>
-
-      
-
       <section id="company-timeline" className="p-6">
         <CompanyTimeline />
       </section>
       <section id="company-timeline-table" className="p-6">
-        <CompanyTimelineTable />
+        <CompanyTimelineTable initialData={searchResults?.company_timeline} />
       </section>
       <section id="product-services" className="p-6">
-        <ProductsServices />
+        <ProductsServices initialData={searchResults?.products_services}/>
       </section>
       <section id="product-launch-timeline" className="p-6">
         <ProductLaunchesTimeline />

@@ -1,62 +1,39 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Edit, Save, X, Plus, Trash2 } from 'lucide-react'
+import { useState, useEffect } from "react"
+import { Edit, Save, X, Plus, Trash2 } from "lucide-react"
+import type { TimelineEvent } from "@/types/company"
 
-interface TimelineEvent {
-  date: string
-  event: string | null
-  description: string
+type CompanyTimelineTableProps = {
+  initialData?: TimelineEvent | TimelineEvent[] | null
 }
 
-export function CompanyTimelineTable() {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [data, setData] = useState<TimelineEvent[] | null>(null)
+export function CompanyTimelineTable({ initialData }: CompanyTimelineTableProps) {
+  // More robust conversion that handles null values
+  const getInitialDataArray = () => {
+    if (!initialData) return []
+    if (Array.isArray(initialData)) return initialData
+    // Handle the case where initialData is an object but might be empty
+    if (typeof initialData === "object") {
+      // Check if the object has the required properties
+      if ("date" in initialData && "description" in initialData) {
+        return [initialData]
+      }
+    }
+    console.log("Couldn't convert initialData to array, using empty array")
+    return []
+  }
+
+  const [data, setData] = useState<TimelineEvent[]>(getInitialDataArray())
   const [editData, setEditData] = useState<TimelineEvent[] | null>(null)
   const [isEditing, setIsEditing] = useState(false)
 
+  // Update data when initialData changes
   useEffect(() => {
-    async function fetchData() {
-      try {
-        console.log("Fetching company timeline data...")
-        const response = await fetch("/paypal.json")
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`)
-        }
-
-        const jsonData = await response.json()
-
-        // Check if timeline data exists
-        if (jsonData?.data?.company_timeline && Array.isArray(jsonData.data.company_timeline)) {
-          // Filter out events with null event property
-          const timelineEvents = jsonData.data.company_timeline
-            .filter((item: any) => item.event !== null)
-            .map((item: any) => ({
-              date: item.date,
-              event: item.event,
-              description: item.description || "",
-            }))
-
-          setData(timelineEvents)
-        } else {
-          // Use fallback data if timeline data is not available
-          setData([])
-        }
-      } catch (error) {
-        console.error("Error fetching timeline data:", error)
-        setError("Failed to load timeline data")
-
-        // Set fallback data
-        setData([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [])
+    const newDataArray = getInitialDataArray()
+    console.log("useEffect updating data:", newDataArray)
+    setData(newDataArray)
+  }, [initialData])
 
   // Format date to MM/YY format
   const formatDate = (dateString: string) => {
@@ -107,7 +84,7 @@ export function CompanyTimelineTable() {
     if (!editData) return
 
     const newEditData = [...editData]
-    if (field === 'event') {
+    if (field === "event") {
       newEditData[index][field] = value || null
     } else {
       // @ts-ignore - Type mismatch for string fields
@@ -121,9 +98,9 @@ export function CompanyTimelineTable() {
     if (!editData) return
 
     const newEvent: TimelineEvent = {
-      date: new Date().toISOString().split('T')[0],
-      event: "",
-      description: ""
+      date: new Date().toISOString().split("T")[0],
+      event: null,
+      description: "",
     }
 
     setEditData([...editData, newEvent])
@@ -138,18 +115,8 @@ export function CompanyTimelineTable() {
     setEditData(newEditData)
   }
 
-  if (loading) {
-    return <div className="p-6">Loading company timeline data...</div>
-  }
-
-  if (error && !data) {
-    return <div className="p-6 text-red-500">{error}</div>
-  }
 
   // Ensure data is available
-  if (!data || data.length === 0) {
-    return <div className="p-6">No company timeline data available</div>
-  }
 
   // Use editData when in editing mode, otherwise use data
   const displayData = isEditing ? editData : data
@@ -166,26 +133,17 @@ export function CompanyTimelineTable() {
           <h2 className="text-base font-medium text-[#475467]">Company Timeline</h2>
           {isEditing ? (
             <div className="flex gap-2">
-              <button 
-                onClick={saveChanges} 
-                className="text-green-600 hover:text-green-800 flex items-center gap-1"
-              >
+              <button onClick={saveChanges} className="text-green-600 hover:text-green-800 flex items-center gap-1">
                 <Save className="h-4 w-4" />
                 <span className="text-xs">Save</span>
               </button>
-              <button 
-                onClick={cancelEditing} 
-                className="text-red-600 hover:text-red-800 flex items-center gap-1"
-              >
+              <button onClick={cancelEditing} className="text-red-600 hover:text-red-800 flex items-center gap-1">
                 <X className="h-4 w-4" />
                 <span className="text-xs">Cancel</span>
               </button>
             </div>
           ) : (
-            <button 
-              onClick={startEditing} 
-              className="text-[#8097a2] hover:text-[#475467]"
-            >
+            <button onClick={startEditing} className="text-[#8097a2] hover:text-[#475467]">
               <Edit className="h-4 w-4" />
             </button>
           )}
@@ -212,7 +170,7 @@ export function CompanyTimelineTable() {
                         type="date"
                         className="w-full p-1 border border-gray-300 rounded"
                         value={event.date}
-                        onChange={(e) => updateField(index, 'date', e.target.value)}
+                        onChange={(e) => updateField(index, "date", e.target.value)}
                       />
                     ) : (
                       formatDate(event.date)
@@ -224,10 +182,10 @@ export function CompanyTimelineTable() {
                         type="text"
                         className="w-full p-1 border border-gray-300 rounded"
                         value={event.event || ""}
-                        onChange={(e) => updateField(index, 'event', e.target.value)}
+                        onChange={(e) => updateField(index, "event", e.target.value)}
                       />
                     ) : (
-                      event.event
+                      event.event || "NA"
                     )}
                   </td>
                   <td className="py-3 px-4 text-[#475467]">
@@ -236,18 +194,15 @@ export function CompanyTimelineTable() {
                         type="text"
                         className="w-full p-1 border border-gray-300 rounded"
                         value={event.description}
-                        onChange={(e) => updateField(index, 'description', e.target.value)}
+                        onChange={(e) => updateField(index, "description", e.target.value)}
                       />
                     ) : (
-                      event.description
+                      event.description || "NA"
                     )}
                   </td>
                   {isEditing && (
                     <td className="py-3 px-4 text-center">
-                      <button 
-                        onClick={() => removeTimelineEvent(index)}
-                        className="text-red-500 hover:text-red-700"
-                      >
+                      <button onClick={() => removeTimelineEvent(index)} className="text-red-500 hover:text-red-700">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
@@ -256,9 +211,11 @@ export function CompanyTimelineTable() {
               ))}
 
               {/* Add empty rows to match the design if needed */}
-              {!isEditing && displayData && displayData.length < 5 &&
+              {!isEditing &&
+                displayData &&
+                displayData.length < 5 &&
                 Array.from({ length: 5 - displayData.length }).map((_, index) => (
-                  <tr key={`empty-${index}`}>
+                  <tr key={`empty-${index}`} className={index % 2 === 0 ? "bg-white" : "bg-[#f9fafb]"}>
                     <td className="py-3 px-4 border-r border-[#e5e7eb]"></td>
                     <td className="py-3 px-4 border-r border-[#e5e7eb]"></td>
                     <td className="py-3 px-4 border-r border-[#e5e7eb]"></td>
@@ -287,3 +244,4 @@ export function CompanyTimelineTable() {
     </div>
   )
 }
+

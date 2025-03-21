@@ -1,48 +1,73 @@
-"use client";
+"use client"
 
-import Image from "next/image";
-import { Edit, SaveIcon, XIcon } from "lucide-react";
-import { useState } from "react";
-import { companyProfile } from "./companydata";
-import { Button } from "@/components/ui/button";
+import { Edit, Save, X } from "lucide-react"
+import { useEffect, useState } from "react"
+import type { CompanyOverviewItem } from "@/types/company"
 
-export function CompanyOverview() {
-  const initialData = companyProfile.companyOverview;
-  const [data, setData] = useState(initialData);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState(initialData);
+type CompanyOverViewProps = {
+  initialData?: CompanyOverviewItem
+}
+
+export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
+  // Initialize state with initialData if provided, otherwise use defaultData
+  const [data, setData] = useState<CompanyOverviewItem | undefined>(initialData)
+  const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [editData, setEditData] = useState<CompanyOverviewItem | undefined>(initialData)
+  // Fetch data if not provided as initialData
+  useEffect(() => {
+    if (initialData) {
+      setData(initialData)
+    }
+  }, [initialData])
+
 
   const startEditing = (): void => {
-    setIsEditing(true);
-    setEditData(JSON.parse(JSON.stringify(data)));
-  };
+    setIsEditing(true)
+    // Create a deep copy of the data for editing
+    setEditData(data ? structuredClone(data) : createEmptyData())
+  }
+
+  const createEmptyData = (): CompanyOverviewItem => {
+    return {
+      business_model: "",
+      products_brands: [],
+      customers: [],
+    }
+  }
 
   const cancelEditing = (): void => {
-    setIsEditing(false);
-  };
+    setIsEditing(false)
+  }
 
   const saveChanges = (): void => {
-    setData(editData);
-    setIsEditing(false);
-  };
+    if (editData) {
+      setData(editData)
+      setIsEditing(false)
+      console.log("Saved data:", editData)
+    }
+  }
 
-  const updateField = (field: keyof typeof editData, value: string): void => {
-    setEditData({
-      ...editData,
-      [field]: value,
-    });
-  };
+  const updateField = (field: keyof CompanyOverviewItem, value: any): void => {
+    if (editData) {
+      setEditData({
+        ...editData,
+        [field]: value,
+      })
+    }
+  }
 
-  const updateProductsBrands = (index: number, value: string): void => {
-    const updatedProducts = [...editData.productsBrands];
-    updatedProducts[index] = { ...updatedProducts[index], value };
-    setEditData({
-      ...editData,
-      productsBrands: updatedProducts,
-    });
-  };
+  const updateproducts_brands = (index: number, value: string): void => {
+    if (editData && editData.products_brands) {
+      const updatedProducts = [...editData.products_brands]
+      updatedProducts[index] = { ...updatedProducts[index], value }
+      setEditData({
+        ...editData,
+        products_brands: updatedProducts,
+      })
+    }
+  }
 
-  const firstSentence = companyProfile.firmographic.description.split(".")[0] + ".";
+  // Sample description - in a real app, this would come from the API
 
   return (
     <div className="w-full max-w-full bg-white">
@@ -53,13 +78,10 @@ export function CompanyOverview() {
       <div className="grid grid-cols-2 gap-6 mb-6">
         {/* Left Column - Company Image */}
         <div>
-          <Image
+          <img
             src="/companyoverview.png"
             alt="Company Overview"
-            width={600}
-            height={350}
             className="w-full h-auto rounded-md border border-[#e5e7eb]"
-            priority={true}
           />
         </div>
 
@@ -69,13 +91,15 @@ export function CompanyOverview() {
             <h2 className="text-base font-medium text-[#475467]">Overview</h2>
             {isEditing ? (
               <div className="flex gap-2">
-              <Button onClick={saveChanges} className="bg-[#156082] hover:bg-[#092a38] text-white">
-                <SaveIcon className="mr-2 h-4 w-4" /> Save
-              </Button>
-              <Button onClick={cancelEditing} variant="outline" className="border-[#ced7db] text-[#445963]">
-                <XIcon className="mr-2 h-4 w-4" /> Cancel
-              </Button>
-            </div>
+                <button onClick={saveChanges} className="text-green-600 hover:text-green-800 flex items-center gap-1">
+                  <Save className="h-4 w-4" />
+                  <span className="text-xs">Save</span>
+                </button>
+                <button onClick={cancelEditing} className="text-red-600 hover:text-red-800 flex items-center gap-1">
+                  <X className="h-4 w-4" />
+                  <span className="text-xs">Cancel</span>
+                </button>
+              </div>
             ) : (
               <button onClick={startEditing} className="text-[#8097a2]">
                 <Edit className="h-4 w-4" />
@@ -102,40 +126,54 @@ export function CompanyOverview() {
               <div className="py-3 px-4 border-b border-[#e5e7eb] h-[164px] overflow-auto">
                 {isEditing ? (
                   <input
-                    className="border p-1 w-full"
-                    value={editData.businessModel}
-                    onChange={(e) => updateField("businessModel", e.target.value)}
+                    className="border p-1 w-full rounded-md"
+                    value={editData?.business_model || ""}
+                    onChange={(e) => updateField("business_model", e.target.value)}
                   />
                 ) : (
-                  <p className="text-sm">{data.businessModel || "N.A"}</p>
+                  <p className="text-sm">{data?.business_model || "N/A"}</p>
                 )}
               </div>
               <div className="py-3 px-4 border-b border-[#e5e7eb] h-[164px] overflow-auto">
                 {isEditing ? (
-                  <textarea
-                    className="border p-1 w-full"
-                    value={editData.customers.join(", ")}
-                    onChange={(e) => updateField("customers", e.target.value.split(", "))}
-                  />
+                  <div className="space-y-2">
+                    <div className="mb-2">
+                      {editData?.products_brands && editData.products_brands.length > 0 ? (
+                        editData.products_brands.map((product, index) => (
+                          <input
+                            key={index}
+                            className="border p-1 w-full rounded-md mb-1"
+                            value={product.value}
+                            onChange={(e) => updateproducts_brands(index, e.target.value)}
+                          />
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-500">No products/brands available</p>
+                      )}
+                    </div>
+                  </div>
+                ) : data?.products_brands && data.products_brands.length > 0 ? (
+                  <ul className="text-sm list-disc pl-4 space-y-1 mb-4">
+                    {data.products_brands.map((product, index) => (
+                      <li key={index}>{product.value}</li>
+                    ))}
+                  </ul>
                 ) : (
-                  <p className="text-sm">{data.customers.join(", ") || "N.A"}</p>
+                  <p className="text-sm text-gray-500 mb-4">No products/brands available</p>
                 )}
               </div>
               <div className="py-3 px-4 h-[164px] overflow-auto">
-                <ul className="text-sm list-disc pl-4 space-y-1">
-                  {editData.productsBrands.map((product, index) =>
-                    isEditing ? (
-                      <input
-                        key={index}
-                        className="border p-1 w-full mb-1"
-                        value={product.value}
-                        onChange={(e) => updateProductsBrands(index, e.target.value)}
-                      />
-                    ) : (
-                      <li key={index}>{product.value}</li>
-                    )
-                  )}
-                </ul>
+                {isEditing ? (
+                  <textarea
+                    className="border p-1 w-full rounded-md"
+                    value={editData?.customers?.join(", ") || ""}
+                    onChange={(e) => updateField("customers", e.target.value.split(", "))}
+                  />
+                ) : (
+                  <p className="text-sm">
+                    {data?.customers && data.customers.length > 0 ? data.customers.join(", ") : "N/A"}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -144,5 +182,8 @@ export function CompanyOverview() {
 
       <div className="text-xs text-[#8097a2] italic">Source: 1.PromenadeAI, 2.Crunchbase</div>
     </div>
-  );
+  )
 }
+
+
+

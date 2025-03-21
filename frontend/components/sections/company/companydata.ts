@@ -1,122 +1,1402 @@
-export interface RevenueRange {
-    annualRevenueRangeFrom: number | null;
-    annualRevenueRangeTo: number | null;
-    annualRevenueRangeCurrency: string;
-  }
-  
-  export interface ProductService {
-    uuid: string;
-    value: string;
-  }
-  
-  export interface Firmographic {
-    name: string;
-    legalName: string;
-    incorporationDate: string;
-    hqAddress: string;
-    hqCity: string | null;
-    hqState: string | null;
-    hqCountry: string;
-    industry: string;
-    type: string;
-    revenueRange: {
-      source4AnnualRevenueRange: RevenueRange | null;
-      source6AnnualRevenueRange: RevenueRange;
-    };
-    employeesCount: number;
-    productsServices: ProductService[];
-    description: string;
-  }
-  
-  export interface IncomeStatement {
-    period: string;
-    revenue: number;
-  }
-  
-  export interface RevenueGrowth {
-    value: number;
-    previousPeriod: string;
-    currentPeriod: string;
-  }
-  
-  export interface KeyFinancials {
-    incomeStatements: IncomeStatement[];
-    revenueGrowth: RevenueGrowth[];
-  }
-  
-  export interface CompanyOverview {
-    businessModel: string;
-    productsBrands: ProductService[];
-    customers: string[];
-  }
-  
-  export interface CompanyProfile {
-    firmographic: Firmographic;
-    keyFinancials: KeyFinancials;
-    companyOverview: CompanyOverview;
-  }
-  
-  export const companyProfile: CompanyProfile = {
+import { Company } from "@/types/company";
+
+export const company_profile: Company = {
+  executive_summary:
+    "Apple is a company that offers a wide range of products including iPhone, iPad, Apple Watch, Mac, and Apple TV. They also provide accessories, entertainment, and expert device support.",
+  company_profile: {
     firmographic: {
       name: "Apple",
-      legalName: "Apple Inc.",
-      incorporationDate: "1976-04-01",
-      hqAddress: "Cupertino, California, United States",
-      hqCity: "Cupertino",
-      hqState: "California",
-      hqCountry: "United States",
+      legal_name: "Apple Inc.",
+      incorporation_date: "1976-04-01",
+      hq_address: "Cupertino, California, United States",
+      hq_city: "Cupertino",
+      hq_state: "California",
+      hq_country: "United States",
       industry: "Computers and Electronics Manufacturing",
       type: "Public Company",
-      revenueRange: {
-        source4AnnualRevenueRange: {
-          annualRevenueRangeFrom: 10000000000.0,
-          annualRevenueRangeTo: null,
-          annualRevenueRangeCurrency: "$",
+      revenue_range: {
+        source_4_annual_revenue_range: {
+          annual_revenue_range_from: 10000000000.0,
+          annual_revenue_range_to: null,
+          annual_revenue_range_currency: "$",
         },
-        source6AnnualRevenueRange: {
-          annualRevenueRangeFrom: 1000000000.0,
-          annualRevenueRangeTo: null,
-          annualRevenueRangeCurrency: "$",
+        source_6_annual_revenue_range: {
+          annual_revenue_range_from: 1000000000.0,
+          annual_revenue_range_to: null,
+          annual_revenue_range_currency: "$",
         },
       },
-      employeesCount: 172119,
-      productsServices: [
-        { uuid: "c4d8caf3-5fe7-359b-f9f2-2d708378e4ee", value: "Artificial Intelligence (AI)" },
-        { uuid: "89da20c4-f7c5-1b6c-6ec6-ca4c272df3c9", value: "Consumer Electronics" },
-        { uuid: "bf395a9a-618c-0264-3a2b-b18d8dc56fff", value: "Hardware" },
-        { uuid: "8814acc5-9b6a-4f53-28e3-a41c22d6477b", value: "Mobile Devices" },
-        { uuid: "d9dda577-abfe-5a6b-0dc5-f5680bc376b0", value: "Operating Systems" },
-        { uuid: "11d12f9b-9b5b-1a7b-6b03-86f76910b094", value: "Wearables" },
+      employees_count: 172119,
+      products_services: [
+        {
+          uuid: "c4d8caf3-5fe7-359b-f9f2-2d708378e4ee",
+          value: "Artificial Intelligence (AI)",
+          image_id: "930c72a5a7b544999596ac1c0dc8b549",
+          permalink: "artificial-intelligence",
+          entity_def_id: "category",
+        },
+        {
+          uuid: "89da20c4-f7c5-1b6c-6ec6-ca4c272df3c9",
+          value: "Consumer Electronics",
+          image_id: "311c44bf2b7a49d2abbc26f2349af2ab",
+          permalink: "consumer-electronics",
+          entity_def_id: "category",
+        },
+        {
+          uuid: "bf395a9a-618c-0264-3a2b-b18d8dc56fff",
+          value: "Hardware",
+          image_id: "4d034f01b65848a3afef132ad74bafaf",
+          permalink: "hardware",
+          entity_def_id: "category",
+        },
+        {
+          uuid: "8814acc5-9b6a-4f53-28e3-a41c22d6477b",
+          value: "Mobile Devices",
+          image_id: "ce9ac3abd18e4640a3dfac233f0b27d8",
+          permalink: "mobile-devices",
+          entity_def_id: "category",
+        },
+        {
+          uuid: "d9dda577-abfe-5a6b-0dc5-f5680bc376b0",
+          value: "Operating Systems",
+          image_id: "917ae5cca1774b0887bcd840263d57ee",
+          permalink: "operating-systems",
+          entity_def_id: "category",
+        },
+        {
+          uuid: "11d12f9b-9b5b-1a7b-6b03-86f76910b094",
+          value: "Wearables",
+          image_id: "2ab6ecd5e0d340c6b88f569f056f3d53",
+          permalink: "wearables",
+          entity_def_id: "category",
+        },
       ],
       description:
-        "We’re a diverse collective of thinkers and doers, continually reimagining what’s possible to help us all do what we love in new ways.",
+        "We’re a diverse collective of thinkers and doers, continually reimagining what’s possible to help us all do what we love in new ways. And the same innovation that goes into our products also applies to our practices — strengthening our commitment to leave the world better than we found it. This is where your work can make a difference in people’s lives. Including your own. Apple is an equal opportunity employer that is committed to inclusion and diversity. Visit apple.com/careers to learn more.",
     },
-    keyFinancials: {
-      incomeStatements: [
-        { period: "Q1, 2022", revenue: 123945000000.0 },
-        { period: "Q2, 2022", revenue: 97278000000.0 },
-        { period: "FY, 2022", revenue: 394328000000.0 },
+    key_financials: {
+      income_statements: [
+        {
+          cost_of_goods_sold: 69702000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 41488000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.3347291137197951,
+          earnings_per_share: 2.1,
+          gross_profit: 54243000000.0,
+          gross_profit_margin: 0.43763766186615033,
+          income_tax_expense: 6611000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 34630000000.0,
+          period_display_end_date: "Q1, 2022",
+          period_end_date: "2021-12-25",
+          period_type: "q1",
+          pre_tax_profit: 41241000000.0,
+          revenue: 123945000000.0,
+          total_operating_expense: 12755000000.0,
+        },
+        {
+          cost_of_goods_sold: 54719000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 29979000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.30817862209338187,
+          earnings_per_share: 1.52,
+          gross_profit: 42559000000.0,
+          gross_profit_margin: 0.437498715022924,
+          income_tax_expense: 5129000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 25010000000.0,
+          period_display_end_date: "Q2, 2022",
+          period_end_date: "2022-03-26",
+          period_type: "q2",
+          pre_tax_profit: 30139000000.0,
+          revenue: 97278000000.0,
+          total_operating_expense: 12580000000.0,
+        },
+        {
+          cost_of_goods_sold: 47074000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 23076000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.2781615014645789,
+          earnings_per_share: 1.2,
+          gross_profit: 35885000000.0,
+          gross_profit_margin: 0.4325630733253776,
+          income_tax_expense: 3624000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 19442000000.0,
+          period_display_end_date: "Q3, 2022",
+          period_end_date: "2022-06-25",
+          period_type: "q3",
+          pre_tax_profit: 23066000000.0,
+          revenue: 82959000000.0,
+          total_operating_expense: 12809000000.0,
+        },
+        {
+          cost_of_goods_sold: 223546000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 119437000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.30288744395528594,
+          earnings_per_share: 6.11,
+          gross_profit: 170782000000.0,
+          gross_profit_margin: 0.43309630561360085,
+          income_tax_expense: 19300000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 99803000000.0,
+          period_display_end_date: "FY, 2022",
+          period_end_date: "2022-09-24",
+          period_type: "fiscal_year",
+          pre_tax_profit: 119103000000.0,
+          revenue: 394328000000.0,
+          total_operating_expense: 51345000000.0,
+        },
+        {
+          cost_of_goods_sold: 66822000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 36016000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.30742441572630896,
+          earnings_per_share: 1.88,
+          gross_profit: 50332000000.0,
+          gross_profit_margin: 0.42962254809908323,
+          income_tax_expense: 5625000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 29998000000.0,
+          period_display_end_date: "Q1, 2023",
+          period_end_date: "2022-12-31",
+          period_type: "q1",
+          pre_tax_profit: 35623000000.0,
+          revenue: 117154000000.0,
+          total_operating_expense: 14316000000.0,
+        },
+        {
+          cost_of_goods_sold: 52860000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 28318000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.2985996878822388,
+          earnings_per_share: 1.52,
+          gross_profit: 41976000000.0,
+          gross_profit_margin: 0.44261672782487665,
+          income_tax_expense: 4222000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 24160000000.0,
+          period_display_end_date: "Q2, 2023",
+          period_end_date: "2023-04-01",
+          period_type: "q2",
+          pre_tax_profit: 28382000000.0,
+          revenue: 94836000000.0,
+          total_operating_expense: 13658000000.0,
+        },
+        {
+          cost_of_goods_sold: 45384000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 22998000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.2811594557257601,
+          earnings_per_share: 1.26,
+          gross_profit: 36413000000.0,
+          gross_profit_margin: 0.44516302553883397,
+          income_tax_expense: 2852000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 19881000000.0,
+          period_display_end_date: "Q3, 2023",
+          period_end_date: "2023-07-01",
+          period_type: "q3",
+          pre_tax_profit: 22733000000.0,
+          revenue: 81797000000.0,
+          total_operating_expense: 13415000000.0,
+        },
+        {
+          cost_of_goods_sold: 214137000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 114301000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.2982141226502472,
+          earnings_per_share: 6.13,
+          gross_profit: 169148000000.0,
+          gross_profit_margin: 0.4413112957720756,
+          income_tax_expense: 16741000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 96995000000.0,
+          period_display_end_date: "FY, 2023",
+          period_end_date: "2023-09-30",
+          period_type: "fiscal_year",
+          pre_tax_profit: 113736000000.0,
+          revenue: 383285000000.0,
+          total_operating_expense: 54847000000.0,
+        },
+        {
+          cost_of_goods_sold: 64720000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 40373000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.337637466025507,
+          earnings_per_share: 2.18,
+          gross_profit: 54855000000.0,
+          gross_profit_margin: 0.4587497386577462,
+          income_tax_expense: 6407000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 33916000000.0,
+          period_display_end_date: "Q1, 2024",
+          period_end_date: "2023-12-30",
+          period_type: "q1",
+          pre_tax_profit: 40323000000.0,
+          revenue: 119575000000.0,
+          total_operating_expense: 14482000000.0,
+        },
+        {
+          cost_of_goods_sold: 48482000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 27900000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.30742785362467356,
+          earnings_per_share: 1.53,
+          gross_profit: 42271000000.0,
+          gross_profit_margin: 0.46578074554009236,
+          income_tax_expense: 4422000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 23636000000.0,
+          period_display_end_date: "Q2, 2024",
+          period_end_date: "2024-03-30",
+          period_type: "q2",
+          pre_tax_profit: 28058000000.0,
+          revenue: 90753000000.0,
+          total_operating_expense: 14371000000.0,
+        },
+        {
+          cost_of_goods_sold: 46099000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 25352000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.29555708406682446,
+          earnings_per_share: 1.4,
+          gross_profit: 39678000000.0,
+          gross_profit_margin: 0.462571551814589,
+          income_tax_expense: 4046000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 21448000000.0,
+          period_display_end_date: "Q3, 2024",
+          period_end_date: "2024-06-29",
+          period_type: "q3",
+          pre_tax_profit: 25494000000.0,
+          revenue: 85777000000.0,
+          total_operating_expense: 14326000000.0,
+        },
+        {
+          cost_of_goods_sold: 210352000000.0,
+          cost_of_goods_sold_currency: "$",
+          ebit: 123216000000.0,
+          ebitda: null,
+          ebitda_margin: null,
+          ebit_margin: 0.31510222870075566,
+          earnings_per_share: 6.08,
+          gross_profit: 180683000000.0,
+          gross_profit_margin: 0.4620634981523393,
+          income_tax_expense: 29749000000.0,
+          interest_expense: null,
+          interest_income: null,
+          net_income: 93736000000.0,
+          period_display_end_date: "FY, 2024",
+          period_end_date: "2024-09-28",
+          period_type: "fiscal_year",
+          pre_tax_profit: 123485000000.0,
+          revenue: 391035000000.0,
+          total_operating_expense: 57467000000.0,
+        },
       ],
-      revenueGrowth: [
-        { value: -21.52, previousPeriod: "2021-12-25", currentPeriod: "2022-03-26" },
-        { value: 375.33, previousPeriod: "2022-06-25", currentPeriod: "2022-09-24" },
+      operating_revenue: [
+        {
+          value: 391035000000.0,
+          currency: "USD",
+          date: "2024-09-28",
+        },
+        {
+          value: 85777000000.0,
+          currency: "USD",
+          date: "2024-06-29",
+        },
+        {
+          value: 90753000000.0,
+          currency: "USD",
+          date: "2024-03-30",
+        },
+      ],
+      operating_profit: [
+        {
+          value: 123216000000.0,
+          currency: "USD",
+          date: "2024-09-28",
+        },
+        {
+          value: 25352000000.0,
+          currency: "USD",
+          date: "2024-06-29",
+        },
+        {
+          value: 27900000000.0,
+          currency: "USD",
+          date: "2024-03-30",
+        },
+      ],
+      ebitda: [
+        {
+          value: null,
+          currency: "USD",
+          date: "2024-09-28",
+        },
+        {
+          value: null,
+          currency: "USD",
+          date: "2024-06-29",
+        },
+        {
+          value: null,
+          currency: "USD",
+          date: "2024-03-30",
+        },
+      ],
+      net_income: [
+        {
+          value: 93736000000.0,
+          currency: "USD",
+          date: "2024-09-28",
+        },
+        {
+          value: 21448000000.0,
+          currency: "USD",
+          date: "2024-06-29",
+        },
+        {
+          value: 23636000000.0,
+          currency: "USD",
+          date: "2024-03-30",
+        },
+      ],
+      per: {
+        value: 38.43256548831337,
+        closing_price: 233.6699981689453,
+        eps: 6.08,
+        date: "2024-10-29",
+      },
+      revenue_growth: [
+        {
+          value: -21.52,
+          previous_period: "2021-12-25",
+          current_period: "2022-03-26",
+        },
+        {
+          value: -14.72,
+          previous_period: "2022-03-26",
+          current_period: "2022-06-25",
+        },
+        {
+          value: 375.33,
+          previous_period: "2022-06-25",
+          current_period: "2022-09-24",
+        },
+        {
+          value: -70.29,
+          previous_period: "2022-09-24",
+          current_period: "2022-12-31",
+        },
+        {
+          value: -19.05,
+          previous_period: "2022-12-31",
+          current_period: "2023-04-01",
+        },
+        {
+          value: -13.75,
+          previous_period: "2023-04-01",
+          current_period: "2023-07-01",
+        },
+        {
+          value: 368.58,
+          previous_period: "2023-07-01",
+          current_period: "2023-09-30",
+        },
+        {
+          value: -68.8,
+          previous_period: "2023-09-30",
+          current_period: "2023-12-30",
+        },
+        {
+          value: -24.1,
+          previous_period: "2023-12-30",
+          current_period: "2024-03-30",
+        },
+        {
+          value: -5.48,
+          previous_period: "2024-03-30",
+          current_period: "2024-06-29",
+        },
+        {
+          value: 355.87,
+          previous_period: "2024-06-29",
+          current_period: "2024-09-28",
+        },
       ],
     },
-    companyOverview: {
-      businessModel: "B2C",
-      productsBrands: [
-        { uuid: "c4d8caf3-5fe7-359b-f9f2-2d708378e4ee", value: "Artificial Intelligence (AI)" },
-        { uuid: "89da20c4-f7c5-1b6c-6ec6-ca4c272df3c9", value: "Consumer Electronics" },
-        { uuid: "bf395a9a-618c-0264-3a2b-b18d8dc56fff", value: "Hardware" },
-      ],
-      customers: [
-        "electronics",
-        "computers electronics and technology > consumer electronics (in united states)",
-        "apple",
-        "iphone",
-        "ipad",
-        "mac",
-      ],
+    shareholders: [],
+  },
+  company_overview: {
+    business_model: "B2C",
+    products_brands: [
+      {
+        uuid: "c4d8caf3-5fe7-359b-f9f2-2d708378e4ee",
+        value: "Artificial Intelligence (AI)",
+        image_id: "930c72a5a7b544999596ac1c0dc8b549",
+        permalink: "artificial-intelligence",
+        entity_def_id: "category",
+      },
+      {
+        uuid: "89da20c4-f7c5-1b6c-6ec6-ca4c272df3c9",
+        value: "Consumer Electronics",
+        image_id: "311c44bf2b7a49d2abbc26f2349af2ab",
+        permalink: "consumer-electronics",
+        entity_def_id: "category",
+      },
+      {
+        uuid: "bf395a9a-618c-0264-3a2b-b18d8dc56fff",
+        value: "Hardware",
+        image_id: "4d034f01b65848a3afef132ad74bafaf",
+        permalink: "hardware",
+        entity_def_id: "category",
+      },
+      {
+        uuid: "8814acc5-9b6a-4f53-28e3-a41c22d6477b",
+        value: "Mobile Devices",
+        image_id: "ce9ac3abd18e4640a3dfac233f0b27d8",
+        permalink: "mobile-devices",
+        entity_def_id: "category",
+      },
+      {
+        uuid: "d9dda577-abfe-5a6b-0dc5-f5680bc376b0",
+        value: "Operating Systems",
+        image_id: "917ae5cca1774b0887bcd840263d57ee",
+        permalink: "operating-systems",
+        entity_def_id: "category",
+      },
+      {
+        uuid: "11d12f9b-9b5b-1a7b-6b03-86f76910b094",
+        value: "Wearables",
+        image_id: "2ab6ecd5e0d340c6b88f569f056f3d53",
+        permalink: "wearables",
+        entity_def_id: "category",
+      },
+    ],
+    customers: [
+      "electronics",
+      "computers electronics and technology > consumer electronics (in united states)",
+      "innovative product development",
+      "world-class operations",
+      "retail",
+      "telephone support",
+      "apple",
+      "iphone",
+      "mac",
+      "ipad",
+      "apple watch",
+      "manufacturing-industrial",
+      "technology",
+      "application-software",
+      "consumer-electronics",
+      "consumer-software",
+      "wearables",
+      "artificial intelligence (ai)",
+      "consumer electronics",
+      "hardware",
+      "mobile devices",
+      "operating systems",
+    ],
+    description_enriched:
+      "Apple is a company that offers a wide range of products including iPhone, iPad, Apple Watch, Mac, and Apple TV. They also provide accessories, entertainment, and expert device support.",
+  },
+  company_timeline: [
+    {
+      date: "1976",
+      event: "Company founded",
+      description: "Apple was founded",
     },
-  };
+    {
+      date: "1977-05-15",
+      event: "Raised 80000 $ in Seed Round - Apple",
+      description: "Led by ",
+    },
+    {
+      date: "1978-05-04",
+      event: "Raised 150000 $ in Seed Round - Apple",
+      description: "Led by Sequoia Capital",
+    },
+    {
+      date: "1980-12-12",
+      event: "Initial Public Offering (IPO)",
+      description: "Share price: 22 USD",
+    },
+    {
+      date: "1988-03-03",
+      event: "Acquired Network Innovations",
+      description: "Price: None None",
+    },
+    {
+      date: "1988-06-08",
+      event: "Acquired Orion Network Systems",
+      description: "Price: None None",
+    },
+    {
+      date: "1988-06-29",
+      event: "Acquired Styleware",
+      description: "Price: None None",
+    },
+    {
+      date: "1988-07-13",
+      event: "Acquired Nashoba Systems",
+      description: "Price: None None",
+    },
+    {
+      date: "1989-04-01",
+      event: "Acquired Coral Software",
+      description: "Price: None None",
+    },
+    {
+      date: "1996-12-20",
+      event: "Acquired Next Frontier",
+      description: "Price: 4.0E8 $",
+    },
+    {
+      date: "1997-08-01",
+      event: "Raised 150000000 $ in Post-IPO Equity - Apple",
+      description: "Led by Microsoft",
+    },
+    {
+      date: "1997-09-02",
+      event: "Acquired Power Computing",
+      description: "Price: 1.0E8 $",
+    },
+    {
+      date: "1999-11-02",
+      event: "Acquired Raycer Graphics",
+      description: "Price: None None",
+    },
+    {
+      date: "2000-01-07",
+      event: "Acquired NetSelector",
+      description: "Price: None None",
+    },
+    {
+      date: "2001-03-13",
+      event: "Acquired PowerSchool",
+      description: "Price: None None",
+    },
+    {
+      date: "2001-04-01",
+      event: "Acquired Blue Fish Labs",
+      description: "Price: None None",
+    },
+    {
+      date: "2001-07-09",
+      event: "Acquired Blue Spruce Technologies",
+      description: "Price: None None",
+    },
+    {
+      date: "2002-02-07",
+      event: "Acquired Nothing Real",
+      description: "Price: None None",
+    },
+    {
+      date: "2002-04-04",
+      event: "Acquired Zayante",
+      description: "Price: None None",
+    },
+    {
+      date: "2002-06-20",
+      event: "Acquired Propel Software",
+      description: "Price: None None",
+    },
+    {
+      date: "2002-06-21",
+      event: "Acquired Prismo Graphics",
+      description: "Price: None None",
+    },
+    {
+      date: "2002-07-01",
+      event: "Acquired Emagic",
+      description: "Price: None None",
+    },
+    {
+      date: "2003-03-23",
+      event: "Acquired SchemaSoft",
+      description: "Price: None None",
+    },
+    {
+      date: "2005-01-22",
+      event: "Acquired Fingerworks",
+      description: "Price: None None",
+    },
+    {
+      date: "2006-10-16",
+      event: "Acquired Silicon Color",
+      description: "Price: None None",
+    },
+    {
+      date: "2006-12-05",
+      event: "Acquired Proximity",
+      description: "Price: None None",
+    },
+    {
+      date: "2008-04-23",
+      event: "Acquired PA Semi",
+      description: "Price: None None",
+    },
+    {
+      date: "2009-07-01",
+      event: "Acquired Placebase",
+      description: "Price: None None",
+    },
+    {
+      date: "2009-12-05",
+      event: "Acquired Lala",
+      description: "Price: 1.7E7 $",
+    },
+    {
+      date: "2010-01-01",
+      event: "Acquired RareLight",
+      description: "Price: None None",
+    },
+    {
+      date: "2010-01-05",
+      event: "Acquired Quattro Wireless",
+      description: "Price: 2.75E8 $",
+    },
+    {
+      date: "2010-04-27",
+      event: "Acquired Intrinsity",
+      description: "Price: 1.21E8 $",
+    },
+    {
+      date: "2010-04-28",
+      event: "Acquired Siri",
+      description: "Price: None None",
+    },
+    {
+      date: "2010-07-01",
+      event: "Acquired imsense",
+      description: "Price: None None",
+    },
+    {
+      date: "2010-07-01",
+      event: "Acquired Poly9",
+      description: "Price: None None",
+    },
+    {
+      date: "2010-09-20",
+      event: "Acquired Polar Rose",
+      description: "Price: 2.9E7 $",
+    },
+    {
+      date: "2011-10-29",
+      event: "Acquired C3 Technologies",
+      description: "Price: None None",
+    },
+    {
+      date: "2011-12-13",
+      event: "Acquired Anobit Technologies",
+      description: "Price: 4.5E8 $",
+    },
+    {
+      date: "2012-02-23",
+      event: "Acquired Chomp",
+      description: "Price: None None",
+    },
+    {
+      date: "2012-05-30",
+      event: "Acquired Redmatica",
+      description: "Price: None None",
+    },
+    {
+      date: "2012-07-02",
+      event: "Acquired MOG",
+      description: "Price: None None",
+    },
+    {
+      date: "2012-07-27",
+      event: "Acquired AuthenTec",
+      description: "Price: 3.56E8 $",
+    },
+    {
+      date: "2012-10-18",
+      event: "Acquired Particle",
+      description: "Price: None None",
+    },
+    {
+      date: "2012-11-12",
+      event: "Acquired Color Labs",
+      description: "Price: 7000000.0 $",
+    },
+    {
+      date: "2013-03-24",
+      event: "Acquired WiFiSLAM",
+      description: "Price: 2.0E7 $",
+    },
+    {
+      date: "2013-07-01",
+      event: "Acquired Catch.com",
+      description: "Price: None None",
+    },
+    {
+      date: "2013-07-18",
+      event: "Acquired PrimeSense",
+      description: "Price: 3.45E8 $",
+    },
+    {
+      date: "2013-07-19",
+      event: "Acquired HopStop.com",
+      description: "Price: 1.0E9 $",
+    },
+    {
+      date: "2013-07-19",
+      event: "Acquired Locationary",
+      description: "Price: None None",
+    },
+    {
+      date: "2013-08-01",
+      event: "Acquired Passif Semiconductor",
+      description: "Price: None None",
+    },
+    {
+      date: "2013-08-13",
+      event: "Acquired Matcha",
+      description: "Price: None None",
+    },
+    {
+      date: "2013-08-22",
+      event: "Acquired Embark1",
+      description: "Price: None None",
+    },
+    {
+      date: "2013-08-28",
+      event: "Acquired AlgoTrim",
+      description: "Price: None None",
+    },
+    {
+      date: "2013-10-04",
+      event: "Acquired Cue",
+      description: "Price: 5.0E7 $",
+    },
+    {
+      date: "2013-12-01",
+      event: "Acquired Acunu",
+      description: "Price: None None",
+    },
+    {
+      date: "2013-12-02",
+      event: "Acquired Topsy Labs",
+      description: "Price: 2.0E8 $",
+    },
+    {
+      date: "2013-12-23",
+      event: "Acquired BroadMap",
+      description: "Price: None None",
+    },
+    {
+      date: "2014-01-06",
+      event: "Acquired SnappyLabs",
+      description: "Price: None None",
+    },
+    {
+      date: "2014-02-21",
+      event: "Acquired Burstly",
+      description: "Price: None None",
+    },
+    {
+      date: "2014-04-04",
+      event: "Acquired Novauris",
+      description: "Price: None None",
+    },
+    {
+      date: "2014-05-02",
+      event: "Acquired LuxVue Technology",
+      description: "Price: None None",
+    },
+    {
+      date: "2014-05-28",
+      event: "Acquired Beats",
+      description: "Price: 3.0E9 $",
+    },
+    {
+      date: "2014-06-06",
+      event: "Acquired Spotsetter",
+      description: "Price: None None",
+    },
+    {
+      date: "2014-07-25",
+      event: "Acquired Booklamp",
+      description: "Price: None None",
+    },
+    {
+      date: "2014-07-28",
+      event: "Acquired Concept.io",
+      description: "Price: 3.0E7 $",
+    },
+    {
+      date: "2014-09-23",
+      event: "Acquired Prss",
+      description: "Price: None None",
+    },
+    {
+      date: "2014-11-03",
+      event: "Acquired Union Bay Networks",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-01-21",
+      event: "Acquired Semetric",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-02-24",
+      event: "Acquired Camel Audio",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-03-24",
+      event: "Acquired FoundationDB",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-04-07",
+      event: "Acquired OttoCat",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-04-08",
+      event: "Acquired Dryft",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-04-14",
+      event: "Acquired Linx Imaging",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-05-18",
+      event: "Acquired Coherent Navigation",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-05-28",
+      event: "Acquired metaio",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-06-26",
+      event: "Acquired Privaris",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-09-15",
+      event: "Acquired Mapsense",
+      description: "Price: 2.5E7 $",
+    },
+    {
+      date: "2015-10-02",
+      event: "Acquired VocalIQ",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-10-06",
+      event: "Acquired Perceptio",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-11-25",
+      event: "Acquired faceshift",
+      description: "Price: None None",
+    },
+    {
+      date: "2015-11-30",
+      event: "Acquired LegbaCore",
+      description: "Price: None None",
+    },
+    {
+      date: "2016-01-07",
+      event: "Acquired Emotient",
+      description: "Price: None None",
+    },
+    {
+      date: "2016-01-28",
+      event: "Acquired LearnSprout",
+      description: "Price: None None",
+    },
+    {
+      date: "2016-01-29",
+      event: "Acquired Flyby Media",
+      description: "Price: None None",
+    },
+    {
+      date: "2016-05-16",
+      event: "Raised 1000000000 $ in Post-IPO Equity - Apple",
+      description: "Led by Berkshire Hathaway",
+    },
+    {
+      date: "2016-08-05",
+      event: "Acquired Turi",
+      description: "Price: None None",
+    },
+    {
+      date: "2016-08-22",
+      event: "Acquired Gliimpse",
+      description: "Price: None None",
+    },
+    {
+      date: "2016-09-22",
+      event: "Acquired tuplejump",
+      description: "Price: None None",
+    },
+    {
+      date: "2016-12-01",
+      event: "Acquired indoor.io",
+      description: "Price: None None",
+    },
+    {
+      date: "2016-12-31",
+      event: "Acquired SourceDNA",
+      description: "Price: None None",
+    },
+    {
+      date: "2017-02-19",
+      event: "Acquired RealFace",
+      description: "Price: None None",
+    },
+    {
+      date: "2017-03-22",
+      event: "Acquired Workflow",
+      description: "Price: None None",
+    },
+    {
+      date: "2017-05-09",
+      event: "Acquired Beddit",
+      description: "Price: None None",
+    },
+    {
+      date: "2017-05-13",
+      event: "Acquired Lattice",
+      description: "Price: 2.0E8 $",
+    },
+    {
+      date: "2017-06-26",
+      event: "Acquired SMI Holding",
+      description: "Price: None None",
+    },
+    {
+      date: "2017-07-12",
+      event: "Raised None None in Private Equity Round - Apple",
+      description: "Led by ",
+    },
+    {
+      date: "2017-09-06",
+      event: "Raised 5000000000 $ in Post-IPO Debt - Apple",
+      description: "Led by ",
+    },
+    {
+      date: "2017-09-06",
+      event: "Raised 5000000 $ in Funding Round - Apple",
+      description: "Led by ",
+    },
+    {
+      date: "2017-09-29",
+      event: "Acquired Regaind",
+      description: "Price: None None",
+    },
+    {
+      date: "2017-10-24",
+      event: "Acquired PowerbyProxi",
+      description: "Price: None None",
+    },
+    {
+      date: "2017-11-09",
+      event: "Acquired InVisage Technologies",
+      description: "Price: None None",
+    },
+    {
+      date: "2017-11-21",
+      event: "Acquired Vrvana",
+      description: "Price: 3.0E7 $",
+    },
+    {
+      date: "2017-12-05",
+      event: "Acquired Pop Up Archive",
+      description: "Price: None None",
+    },
+    {
+      date: "2018-01-02",
+      event: "Acquired Buddybuild",
+      description: "Price: None None",
+    },
+    {
+      date: "2018-03-12",
+      event: "Acquired Next Issue Media",
+      description: "Price: None None",
+    },
+    {
+      date: "2018-08-29",
+      event: "Acquired Akonia Holographics",
+      description: "Price: None None",
+    },
+    {
+      date: "2018-09-24",
+      event: "Acquired Shazam",
+      description: "Price: 4.0E8 $",
+    },
+    {
+      date: "2018-10-10",
+      event: "Acquired Spektral",
+      description: "Price: 3.0E7 $",
+    },
+    {
+      date: "2018-10-11",
+      event: "Acquired Dialog Semiconductor",
+      description: "Price: 6.0E8 $",
+    },
+    {
+      date: "2018-10-15",
+      event: "Acquired Asaii",
+      description: "Price: None None",
+    },
+    {
+      date: "2018-11-20",
+      event: "Acquired Silk Labs",
+      description: "Price: None None",
+    },
+    {
+      date: "2018-12-07",
+      event: "Acquired Platoon",
+      description: "Price: None None",
+    },
+    {
+      date: "2019-01-01",
+      event: "Acquired Camerai",
+      description: "Price: None None",
+    },
+    {
+      date: "2019-02-14",
+      event: "Acquired DataTiger",
+      description: "Price: None None",
+    },
+    {
+      date: "2019-02-15",
+      event: "Acquired PullString",
+      description: "Price: 3.0E7 $",
+    },
+    {
+      date: "2019-03-13",
+      event: "Acquired Laserlike",
+      description: "Price: None None",
+    },
+    {
+      date: "2019-03-21",
+      event: "Acquired Stamplay",
+      description: "Price: 5000000.0 €",
+    },
+    {
+      date: "2019-03-25",
+      event: "Raised 15000000 $ in Post-IPO Secondary - Apple",
+      description: "Led by ",
+    },
+    {
+      date: "2019-04-10",
+      event: "Acquired Texture by Next Issue",
+      description: "Price: 4.85E8 $",
+    },
+    {
+      date: "2019-05-24",
+      event: "Acquired Tueo Health",
+      description: "Price: None None",
+    },
+    {
+      date: "2019-06-25",
+      event: "Acquired Drive.ai",
+      description: "Price: None None",
+    },
+    {
+      date: "2019-10-04",
+      event: "Acquired IKinema LTD",
+      description: "Price: None None",
+    },
+    {
+      date: "2019-12-13",
+      event: "Acquired Spectral Edge",
+      description: "Price: None None",
+    },
+    {
+      date: "2020-01-15",
+      event: "Acquired Xnor.ai",
+      description: "Price: 2.0E8 $",
+    },
+    {
+      date: "2020-03-31",
+      event: "Acquired The Dark Sky Company",
+      description: "Price: None None",
+    },
+    {
+      date: "2020-04-03",
+      event: "Acquired Voysis",
+      description: "Price: None None",
+    },
+    {
+      date: "2020-05-14",
+      event: "Acquired ANAVRIN",
+      description: "Price: 1.0E8 $",
+    },
+    {
+      date: "2020-05-28",
+      event: "Acquired Inductiv",
+      description: "Price: None None",
+    },
+    {
+      date: "2020-06-24",
+      event: "Acquired Fleetsmith",
+      description: "Price: None None",
+    },
+    {
+      date: "2020-07-31",
+      event: "Acquired Mobeewave",
+      description: "Price: 1.0E8 $",
+    },
+    {
+      date: "2020-08-24",
+      event: "Acquired Spaces",
+      description: "Price: None None",
+    },
+    {
+      date: "2020-09-25",
+      event: "Acquired Scout FM",
+      description: "Price: None None",
+    },
+    {
+      date: "2020-10-27",
+      event: "Acquired Vilynx",
+      description: "Price: 5.0E7 $",
+    },
+    {
+      date: "2021-04-30",
+      event: "Raised None None in Post-IPO Equity - Apple",
+      description: "Led by ",
+    },
+    {
+      date: "2021-08-30",
+      event: "Acquired Primephonic",
+      description: "Price: None None",
+    },
+    {
+      date: "2021-08-30",
+      event: "Acquired Paws, Inc",
+      description: "Price: None None",
+    },
+    {
+      date: "2022-01-01",
+      event: "Raised 150000 $ in Pre Seed Round - Apple",
+      description: "Led by Apple",
+    },
+    {
+      date: "2022-02-07",
+      event: "Acquired AI Music",
+      description: "Price: None None",
+    },
+    {
+      date: "2022-02-07",
+      event: "Acquired AI Music",
+      description: "Price: None None",
+    },
+    {
+      date: "2022-03-23",
+      event: "Acquired Credit Kudos",
+      description: "Price: 1.5E8 $",
+    },
+    {
+      date: "2022-03-23",
+      event: "Acquired Credit Kudos",
+      description: "Price: 150000000 $",
+    },
+    {
+      date: "2022-04-01",
+      event: "Acquired Joby Aviation",
+      description: "Price: None None",
+    },
+    {
+      date: "2022-06-15",
+      event: "Raised 30000000 $ in Private Equity Round - Apple",
+      description: "Led by ",
+    },
+    {
+      date: "2023-03-27",
+      event: "Acquired WaveOne",
+      description: "Price: None None",
+    },
+    {
+      date: "2023-03-27",
+      event: "Acquired WaveOne",
+      description: "Price: None None",
+    },
+    {
+      date: "2023-06-01",
+      event: "Acquired Mira Labs, Inc.",
+      description: "Price: None None",
+    },
+    {
+      date: "2023-06-06",
+      event: "Acquired Mira",
+      description: "Price: None None",
+    },
+    {
+      date: "2023-06-06",
+      event: "Acquired Mira",
+      description: "Price: None None",
+    },
+    {
+      date: "2023-09-01",
+      event: "Acquired BIS Records AB",
+      description: "Price: None None",
+    },
+    {
+      date: "2023-09-05",
+      event: "Acquired BIS Records",
+      description: "Price: None None",
+    },
+    {
+      date: "2023-09-05",
+      event: "Acquired BIS Records",
+      description: "Price: None None",
+    },
+    {
+      date: "2023-10-03",
+      event: "Acquired Blinksight",
+      description: "Price: None None",
+    },
+    {
+      date: "2023-12-01",
+      event: "Acquired Datakalab",
+      description: "Price: None None",
+    },
+    {
+      date: "2023-12-17",
+      event: "Acquired Datakalab",
+      description: "Price: None None",
+    },
+    {
+      date: "2024-01-01",
+      event: "Acquired DarwinAI Corp.",
+      description: "Price: None None",
+    },
+    {
+      date: "2024-03-12",
+      event: null,
+      description: "",
+      url: null,
+    },
+    {
+      date: "2024-03-14",
+      event: "Acquired DarwinAI",
+      description: "Price: None None",
+    },
+    {
+      date: "2024-03-14",
+      event: "Acquired DarwinAI",
+      description: "Price: None None",
+    },
+    {
+      date: "2024-04-22",
+      event: "Acquired DatakaLab",
+      description: "Price: None None",
+    },
+    {
+      date: "2024-05-22",
+      event: null,
+      description: "",
+      url: null,
+    },
+    {
+      date: "2024-08-26",
+      event: null,
+      description: "",
+      url: null,
+    },
+    {
+      date: "2024-09-13",
+      event: null,
+      description: "",
+      url: null,
+    },
+    {
+      date: "2024-11-01",
+      event: "Acquired Pixelmator",
+      description: "Price: None None",
+    },
+    {
+      date: "2024-11-01",
+      event: "Acquired Pixelmator Team Ltd.",
+      description: "Price: None None",
+    },
+    {
+      date: "2025-01-07",
+      event: null,
+      description: "",
+      url: null,
+    },
+    {
+      date: "2025-01-16",
+      event: null,
+      description: "",
+      url: null,
+    },
+    {
+      date: "2025-01-21",
+      event: null,
+      description: "",
+      url: null,
+    },
+    {
+      date: "2025-01-24",
+      event: null,
+      description: "",
+      url: null,
+    },
+    {
+      date: "2025-01-25",
+      event: null,
+      description: "",
+      url: null,
+    },
+    {
+      date: "2025-02-01",
+      event: null,
+      description: "",
+      url: null,
+    },
+  ],
   
+};

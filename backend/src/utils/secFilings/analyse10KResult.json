@@ -314,7 +314,7 @@
       }
     },
     "company_overview": {
-      "BusinessModel": "PayPal Holdings, Inc. operates a global, two-sided platform that facilitates digital payments for consumers and merchants, enabling secure and efficient transactions online and offline. The company earns revenue primarily through transaction fees charged to customers for processing payments, as well as from additional value-added services.",
+      "business_model": "PayPal Holdings, Inc. operates a global, two-sided platform that facilitates digital payments for consumers and merchants, enabling secure and efficient transactions online and offline. The company earns revenue primarily through transaction fees charged to customers for processing payments, as well as from additional value-added services.",
       "ProductsAndBrands": [
         {
           "name": "PayPal",

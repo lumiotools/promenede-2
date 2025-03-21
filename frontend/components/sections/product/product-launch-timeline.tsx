@@ -65,12 +65,14 @@ export function ProductLaunchesTimeline() {
     return <div className="p-6 text-red-500">{error}</div>;
 
   return (
-    <div className="w-full bg-white">
+    <div className="space-y-6 bg-white">
      
       <h1 className="text-4xl font-medium text-[#475467]">Product Launches Timeline</h1>
       <div className="w-full h-px bg-[#e5e7eb] mb-16"></div>
 
-      <Timeline events={events} />
+      {/* <Timeline events={events} /> */}
+
+      <div className='text-center'>No Data Available</div>
 
       <div className="text-xs text-[#6b7280] mt-20 italic">
         Source: 1.PromenadeAI, 2.Crunchbase

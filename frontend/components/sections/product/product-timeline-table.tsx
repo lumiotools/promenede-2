@@ -83,8 +83,8 @@ export function ProductTimelineTable() {
 
       <div className="border-t border-[#e5e7eb] w-full"></div>
 
-      <div className="border border-[#e5e7eb] mx-10 rounded-md overflow-hidden">
-        {/* Table Header */}
+      {/* <div className="border border-[#e5e7eb] mx-10 rounded-md overflow-hidden">
+        {/* Table Header *
         <div className="flex justify-between items-center px-4 py-3 border-b border-[#e5e7eb]">
           <h2 className="text-lg font-medium text-[#475467]">Product Timeline</h2>
           {isEditing ? (
@@ -105,7 +105,7 @@ export function ProductTimelineTable() {
           )}
         </div>
 
-        {/* Table */}
+        {/* Table *
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-[#002266] text-white">
@@ -153,7 +153,9 @@ export function ProductTimelineTable() {
             ))}
           </tbody>
         </table>
-      </div>
+      </div> */}
+
+      <div className='text-center'>No Data Available</div>
 
       <div className="text-xs text-[#8097a2] italic">Source: 1.PromenadeAI, 2.Crunchbase</div>
     </div>
