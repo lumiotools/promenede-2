@@ -26,6 +26,7 @@ export default function RisksPage({ initialData = defaultState }: RisksProps) {
 
   useEffect(() => {
     // Ensure we have valid data with the correct structure
+    console.log("risk data", initialData);
     const validData = initialData || defaultState;
     setData(validData);
   }, [initialData]);
