@@ -1,42 +1,69 @@
 "use client";
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { EmployeeReviewsData } from "@/types/employeeTrend";
+import { useEffect, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
-const employeeReviews = {
-  count: 61000,
-  score: 4.2,
-  breakdown: {
-    diversity_inclusion: 4.3,
-    work_life_balance: 4.1,
-    culture_values: 4.2,
-    career_opportunities: 4.0,
-  },
-  ceo_approval: 0.92,
-  recommend: 0.86,
-};
+interface EmployeeReviewsProps {
+  initialData?: EmployeeReviewsData;
+}
 
-// Convert ratings into bar chart data
-const ratingsData = Object.entries(employeeReviews.breakdown).map(([key, value]) => ({
-  category: key.replace(/_/g, " ").toUpperCase(),
-  rating: value,
-}));
+export function EmployeeReviews({ initialData }: EmployeeReviewsProps) {
+  const [members, setMembers] = useState<EmployeeReviewsData | null>(null);
 
-export function EmployeeReviews() {
+  useEffect(() => {
+    if (initialData) {
+      setMembers(initialData);
+    }
+  }, [initialData]);
+
+  console.log("Employee Reviews",initialData)
+
+  // Return null or a loader if no data is available
+  if (!members) {
+    return <div className="text-center py-10 text-[#475467]">Loading...</div>;
+  }
+
+  // Convert ratings into bar chart data
+  const ratingsData = Object.entries(members.breakdown).map(([key, value]) => ({
+    category: key.replace(/_/g, " ").toUpperCase(),
+    rating: value,
+  }));
+
   return (
     <div className="space-y-6 bg-white">
       {/* Header */}
-      <h1 className="text-4xl font-medium text-[#475467]">Organization: Employee Reviews</h1>
+      <h1 className="text-4xl font-medium text-[#475467]">
+        Organization: Employee Reviews
+      </h1>
       <div className="border-t border-[#e5e7eb] my-6"></div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 mx-10">
         {[
-          { label: "Overall rating", value: `${employeeReviews.score} / 5` },
-          { label: "Total Reviews", value: `${(employeeReviews.count / 1000).toFixed(1)}K` },
-          { label: "CEO approval", value: `${(employeeReviews.ceo_approval * 100).toFixed(0)}%` },
-          { label: "Recommend", value: `${(employeeReviews.recommend * 100).toFixed(0)}%` },
+          { label: "Overall rating", value: `${members.score} / 5` },
+          {
+            label: "Total Reviews",
+            value: `${(members.count / 1000).toFixed(1)}K`,
+          },
+          {
+            label: "CEO approval",
+            value: `${(members.breakdown.ceo_approval * 100).toFixed(0)}%`,
+          },
+          { label: "Recommend", value: `${(members.breakdown.recommend * 100).toFixed(0)}%` },
         ].map((stat, index) => (
-          <div key={index} className="bg-white p-6 rounded-lg shadow-sm border border-[#e5e7eb] text-center">
+          <div
+            key={index}
+            className="bg-white p-6 rounded-lg shadow-sm border border-[#e5e7eb] text-center"
+          >
             <p className="text-3xl font-bold text-[#002169]">{stat.value}</p>
             <p className="text-sm text-[#475467]">{stat.label}</p>
           </div>
@@ -47,12 +74,19 @@ export function EmployeeReviews() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mx-10">
         {/* Employee Ratings Chart */}
         <div className="bg-[#f9fafb] p-6 rounded-lg">
-          <h2 className="text-base font-medium text-[#475467] mb-4">Employee Ratings (by category)</h2>
+          <h2 className="text-base font-medium text-[#475467] mb-4">
+            Employee Ratings (by category)
+          </h2>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={ratingsData} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" domain={[0, 5]} tick={{ fill: "#475467" }} />
-              <YAxis dataKey="category" type="category" tick={{ fill: "#475467" }} width={180} />
+              <YAxis
+                dataKey="category"
+                type="category"
+                tick={{ fill: "#475467" }}
+                width={180}
+              />
               <Tooltip formatter={(value) => `${value.toFixed(2)}`} />
               <Bar dataKey="rating" fill="#002169" barSize={20} />
             </BarChart>
@@ -91,7 +125,9 @@ export function EmployeeReviews() {
       </div>
 
       {/* Footer Source */}
-      <div className="text-xs text-[#8097a2] italic mt-6">Source: 1.PromenadeAI, 2.Crunchbase</div>
+      <div className="text-xs text-[#8097a2] italic mt-6">
+        Source: 1.PromenadeAI, 2.Crunchbase
+      </div>
     </div>
   );
 }

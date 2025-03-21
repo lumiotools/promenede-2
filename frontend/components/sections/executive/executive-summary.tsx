@@ -1,7 +1,19 @@
 import { BarChart } from "@/components/ui/bar-chart";
 import { SectionHeader } from "@/components/ui/section-header";
+import { ExecutiveSummaryTitle } from "@/types/executive";
+import { useEffect, useState } from "react";
 
-export function ExecutiveSummary() {
+type ExecutiveSummaryProps = {
+  initialData?: ExecutiveSummaryTitle
+}
+
+export function ExecutiveSummary({initialData}: ExecutiveSummaryProps) {
+  const [data, setData] = useState<ExecutiveSummaryTitle | undefined>(initialData);
+  useEffect(()=>{
+    setData(initialData);
+  },[initialData]);
+
+  console.log("Executive summary",initialData);
   return (
     <div className="w-full max-w-full bg-white">
       <SectionHeader title="Executive Summary" />
@@ -256,14 +268,7 @@ export function ExecutiveSummary() {
               Business Description
             </h2>
             <p className="text-sm text-[#475467] mb-8">
-              PayPal&apos;s USP lies in its ability to offer a secure, convenient,
-              and widely accepted digital payment platform that bridges the gap
-              between traditional and digital financial transactions[1]. Its
-              global presence, coupled with advanced security measures and
-              user-friendly interfaces, positions it as a leader in the digital
-              payments industry. positions it as a leader in the digital
-              payments industry.positions it as a leader in the digital payments
-              industry.
+             {data || "NA"}
             </p>
 
             <div className="mt-auto mb-10">

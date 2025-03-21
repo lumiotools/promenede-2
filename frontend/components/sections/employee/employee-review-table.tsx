@@ -10,9 +10,9 @@ export function EmployeeReviewsTable() {
       <div className="border-t border-[#e5e7eb] my-6"></div>
 
       {/* Table Section */}
-      <div className="overflow-x-auto rounded-lg border border-gray-200 mx-15">
+      {/* <div className="overflow-x-auto rounded-lg border border-gray-200 mx-15">
         <table className="w-full border-collapse">
-          {/* Table Head */}
+          {/* Table Head *
           <thead>
             <tr className="bg-[#002169] text-white text-left">
               <th className="px-6 py-3 font-medium">
@@ -23,7 +23,7 @@ export function EmployeeReviewsTable() {
             </tr>
           </thead>
 
-          {/* Table Body */}
+          {/* Table Body 
           <tbody className="text-[#475467]">
             <tr className="border-t border-gray-300">
               <td className="px-6 py-2">
@@ -62,7 +62,9 @@ export function EmployeeReviewsTable() {
            
           </tbody>
         </table>
-      </div>
+      </div> */}
+
+      <div className='text-center'>No Data Available</div>
 
       {/* Footer Source */}
       <div className="text-xs text-gray-500 italic mt-6">

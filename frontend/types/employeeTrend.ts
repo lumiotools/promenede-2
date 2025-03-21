@@ -56,3 +56,21 @@ export interface KeyMember {
   member_full_name: string | null;
   member_position_title: string | null;
 }
+
+export interface EmployeeReviewsData {
+  count: number;
+  score: number;
+  breakdown: {
+    diversity_inclusion: number;
+    work_life_balance: number;
+    culture_values: number;
+    career_opportunities: number;
+    business_outlook:number;
+    ceo_approval:number;
+    compensation_benefits:number;
+    recommend:number;
+    senior_management:number;
+  };
+  ceo_approval: number;
+  recommend: number;
+};

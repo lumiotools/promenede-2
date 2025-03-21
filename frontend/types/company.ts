@@ -178,12 +178,11 @@ export interface TimelineEvent {
     demo_available: boolean | null
     product_reviews: ProductReviews
   }
-  
   export interface Company {
-    executive_summary?: string | null
     company_overview: CompanyOverviewItem | null
     company_profile: CompanyProfiles | null
     company_timeline: TimelineEvent | null
     web_traffic: WebTrafficItem | null
     products_services: ProductsServices | null
   }
+

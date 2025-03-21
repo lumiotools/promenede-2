@@ -19,6 +19,7 @@ export default function Home() {
         breakdown_by_seniority: null,
       },
       key_members: null,
+      employee_reviews:null,
     },
     market_leadership: {
       industry: null,
@@ -94,6 +95,7 @@ export default function Home() {
       demo_available:null,
       product_reviews:null,
     }
+    
   });
 
   const handleSearchResults = (data: CompanyData) => {

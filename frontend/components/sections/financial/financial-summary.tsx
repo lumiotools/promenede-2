@@ -259,7 +259,9 @@ export function FinancialSummary() {
     <div className="space-y-6 bg-white">
       <SectionHeader title="Financial Summary (Past three years)" />
 
-      <div className="grid grid-cols-3 gap-6 mb-6">
+      <div className="border-t border-[#e5e7eb] mb-6"></div>
+
+      {/* <div className="grid grid-cols-3 gap-6 mb-6">
         <div className="bg-[#f9fafb] rounded-md p-6">
           <h3 className="text-[#475467] font-medium mb-4">Revenue</h3>
           <div className="h-[300px] flex items-center justify-center">
@@ -280,12 +282,14 @@ export function FinancialSummary() {
             <BarChart data={financialData.profit} color="#002169" maxValue={35} yAxisLabel="USD (billions)" />
           </div>
         </div>
-      </div>
+      </div> */}
+
+      <div className='text-center'>No Data Available</div>
 
       <div className="text-xs text-[#8097a2] italic">Source: 1.PromenadeAI, 2.Crunchbase</div>
 
       {/* Financial Data Table */}
-        <div className="overflow-x-auto">
+        {/* <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-[#002169] text-white">
@@ -309,8 +313,8 @@ export function FinancialSummary() {
               ))}
             </tbody>
           </table>
-        </div>
-        <div className="mt-2 p-2 text-xs text-[#8097a2] italic">Source: 1.PromenadeAI, 2.Crunchbase</div>
+        </div> */}
+        {/* <div className="mt-2 p-2 text-xs text-[#8097a2] italic">Source: 1.PromenadeAI, 2.Crunchbase</div> */}
     </div>
   )
 }

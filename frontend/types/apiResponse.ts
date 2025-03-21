@@ -1,6 +1,7 @@
 import type { CompanyOverviewItem, CompanyProfiles, TimelineEvent, WebTrafficItem, ProductsServices} from "./company"
 import { CompetitiveAnalysis } from "./competitor";
-import { EmployeesTrend, KeyMember } from "./employeeTrend";
+import { EmployeesTrend, KeyMember, EmployeeReviewsData } from "./employeeTrend";
+import { ExecutiveSummaryTitle } from "./executive";
 import { MAActivity } from "./maActivity";
 import { MarketInfo } from "./market";
 import { MarketLeadership } from "./market_leadership";
@@ -19,7 +20,9 @@ export type CompanyData = {
 organization: {
   employees_trend: EmployeesTrend;
   key_members: KeyMember[] | null;
+  employee_reviews: EmployeeReviewsData | null
 };
+executive_summary: ExecutiveSummaryTitle;
 market_leadership: MarketLeadership;
 key_technology: KeyTechnology;
 ma_activity: MAActivity;
