@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { competitiveAnalysis as initialData } from "./competitorData";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
-import type { FinancialComparable } from "@/types/competitor";
+import { CompetitiveAnalysis, FinancialComparable } from "@/types/competitor";
 
 // Helper function to format numbers
 const formatNumber = (num: string | null | undefined): string => {
@@ -12,20 +11,52 @@ const formatNumber = (num: string | null | undefined): string => {
   return num;
 };
 
-export default function FinancialComparablesPage() {
+// Default state for the component
+const defaultState: CompetitiveAnalysis = {
+  landscape: [],
+  competitors: [],
+  competitors_websites: [],
+  financial_comparables: [],
+  peer_developments: null,
+};
+
+type FinancialComparablesProps = {
+  initialData?: CompetitiveAnalysis;
+};
+
+export default function FinancialComparablesPage({
+  initialData = defaultState,
+}: FinancialComparablesProps) {
+  // Ensure financial_comparables exists and is an array
+  const safeFinancialComparables = initialData?.financial_comparables || [];
+
   const [data, setData] = useState<FinancialComparable[]>(
-    initialData.financialComparables
+    safeFinancialComparables
   );
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editData, setEditData] = useState<FinancialComparable[]>(
-    initialData.financialComparables
+    safeFinancialComparables
   );
+
+  // Update data when initialData changes
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("financial comparables initialData update:", initialData);
+
+    // Ensure financial_comparables exists and is an array
+    const updatedFinancialComparables = initialData.financial_comparables || [];
+
+    // Update the state with the new data
+    setData(updatedFinancialComparables);
+  }, [initialData]);
 
   // Financial metrics to display
   const metrics = ["revenue", "profit", "employees"];
 
   const startEditing = (): void => {
     setIsEditing(true);
+    // Create a deep copy to avoid reference issues
     setEditData(JSON.parse(JSON.stringify(data)));
   };
 
@@ -46,21 +77,35 @@ export default function FinancialComparablesPage() {
 
   const updateSimilarityScore = (index: number, value: string): void => {
     const newData = [...editData];
-    newData[index].similarityScore = Number(value);
+    newData[index].similarity_score = Number(value);
     setEditData(newData);
   };
 
-  // Fixed code
   const updateFinancialData = (
     index: number,
     field: string,
     value: string
   ): void => {
     const newData = [...editData];
-    // Fix the type assertion to specifically use the keys of financialData
-    newData[index].financialData[
-      field as keyof FinancialComparable["financialData"]
-    ] = value;
+
+    // Ensure financial_data exists
+    if (!newData[index].financial_data) {
+      newData[index].financial_data = {
+        revenue: null,
+        profit: null,
+        employees: null,
+      };
+    }
+
+    // Update the field
+    if (field === "revenue") {
+      newData[index].financial_data.revenue = value;
+    } else if (field === "profit") {
+      newData[index].financial_data.profit = value;
+    } else if (field === "employees") {
+      newData[index].financial_data.employees = value;
+    }
+
     setEditData(newData);
   };
 
@@ -68,8 +113,8 @@ export default function FinancialComparablesPage() {
     const newData = [...editData];
     newData.push({
       name: "New Company",
-      similarityScore: 0,
-      financialData: {
+      similarity_score: 0,
+      financial_data: {
         revenue: "N/A",
         profit: "N/A",
         employees: "N/A",
@@ -89,7 +134,7 @@ export default function FinancialComparablesPage() {
     if (data.length > 0) {
       return data.map((company, index) => (
         <th key={index} className="p-4 text-center font-medium text-lg">
-          {company.name}
+          {company.name || "Unnamed Company"}
         </th>
       ));
     } else {
@@ -112,7 +157,7 @@ export default function FinancialComparablesPage() {
               <div className="flex items-center justify-center">
                 <input
                   type="text"
-                  value={company.name}
+                  value={company.name || ""}
                   onChange={(e) => updateCompanyName(index, e.target.value)}
                   className="w-full border border-[#ced7db] p-2 rounded text-center"
                 />
@@ -132,7 +177,7 @@ export default function FinancialComparablesPage() {
             <td key={index} className="p-4 border-l border-[#ced7db]">
               <input
                 type="number"
-                value={company.similarityScore}
+                value={company.similarity_score || 0}
                 onChange={(e) => updateSimilarityScore(index, e.target.value)}
                 className="w-full border border-[#ced7db] p-2 rounded text-center"
               />
@@ -144,22 +189,33 @@ export default function FinancialComparablesPage() {
             <td className="p-4 font-medium text-[#35454c] capitalize">
               {metric}
             </td>
-            {editData.map((company, index) => (
-              <td key={index} className="p-4 border-l border-[#ced7db]">
-                <input
-                  type="text"
-                  value={
-                    company.financialData[
-                      metric as keyof typeof company.financialData
-                    ]
-                  }
-                  onChange={(e) =>
-                    updateFinancialData(index, metric, e.target.value)
-                  }
-                  className="w-full border border-[#ced7db] p-2 rounded text-center"
-                />
-              </td>
-            ))}
+            {editData.map((company, index) => {
+              // Safely access financial data
+              const financialData = company.financial_data || {
+                revenue: "N/A",
+                profit: "N/A",
+                employees: "N/A",
+              };
+
+              let value = "N/A";
+              if (metric === "revenue") value = financialData.revenue || "N/A";
+              if (metric === "profit") value = financialData.profit || "N/A";
+              if (metric === "employees")
+                value = financialData.employees || "N/A";
+
+              return (
+                <td key={index} className="p-4 border-l border-[#ced7db]">
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) =>
+                      updateFinancialData(index, metric, e.target.value)
+                    }
+                    className="w-full border border-[#ced7db] p-2 rounded text-center"
+                  />
+                </td>
+              );
+            })}
           </tr>
         ))}
       </>
@@ -177,7 +233,7 @@ export default function FinancialComparablesPage() {
               key={index}
               className="p-4 text-center text-[#35454c] border-l border-[#ced7db]"
             >
-              {company.similarityScore || "N/A"}
+              {company.similarity_score || "N/A"}
             </td>
           ))}
         </tr>
@@ -186,18 +242,29 @@ export default function FinancialComparablesPage() {
             <td className="p-4 font-medium text-[#35454c] capitalize">
               {metric}
             </td>
-            {data.map((company, index) => (
-              <td
-                key={index}
-                className="p-4 text-center text-[#35454c] border-l border-[#ced7db]"
-              >
-                {formatNumber(
-                  company.financialData[
-                    metric as keyof typeof company.financialData
-                  ]
-                )}
-              </td>
-            ))}
+            {data.map((company, index) => {
+              // Safely access financial data
+              const financialData = company.financial_data || {
+                revenue: "N/A",
+                profit: "N/A",
+                employees: "N/A",
+              };
+
+              let value = "N/A";
+              if (metric === "revenue") value = financialData.revenue || "N/A";
+              if (metric === "profit") value = financialData.profit || "N/A";
+              if (metric === "employees")
+                value = financialData.employees || "N/A";
+
+              return (
+                <td
+                  key={index}
+                  className="p-4 text-center text-[#35454c] border-l border-[#ced7db]"
+                >
+                  {formatNumber(value)}
+                </td>
+              );
+            })}
           </tr>
         ))}
       </>
