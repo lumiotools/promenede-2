@@ -142,10 +142,14 @@ export function Sections({ searchResults }: SectionsProps) {
         <FinancialComparablesPage />
       </section>
       <section id="peer-developments-component" className="p-6">
-        <PeerDevelopmentsPage />
+        <PeerDevelopmentsPage
+          initialData={searchResults?.competitive_analysis}
+        />
       </section>
       <section id="competitor-analysis-component" className="p-6">
-        <CompetitorAnalysisPage />
+        <CompetitorAnalysisPage
+          initialData={searchResults?.competitive_analysis}
+        />
       </section>
       <section id="regulation-component" className="p-6">
         <RegulationPage initialData={searchResults?.regulation} />

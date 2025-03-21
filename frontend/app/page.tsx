@@ -8,6 +8,22 @@ import { CompanyData } from "@/types/apiResponse";
 
 export default function Home() {
   const [searchResults, setSearchResults] = useState<CompanyData>({
+    competitive_analysis: {
+      landscape: [],
+      competitors: [],
+      competitors_websites: [],
+      financial_comparables: [],
+      peer_developments: {
+        funding_vs_founded: {
+          company_data: null,
+          competitors_data: [],
+        },
+        webtraffic_vs_founded: {
+          company_data: null,
+          competitors_data: [],
+        },
+      },
+    },
     regulation: [],
     opportunities_risks: {
       opportunities: [],

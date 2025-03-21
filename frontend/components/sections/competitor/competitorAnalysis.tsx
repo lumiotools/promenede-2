@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { competitiveAnalysis as initialData } from "./competitorData";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
 import type {
@@ -19,14 +18,64 @@ const formatNumber = (num: number | null | undefined): string => {
   return num.toString();
 };
 
-export default function CompetitorAnalysisPage() {
-  const [data, setData] = useState<CompetitiveAnalysis>(initialData);
+type CompetitiveAnalysisProps = {
+  initialData?: CompetitiveAnalysis;
+};
+
+const defaultState: CompetitiveAnalysis = {
+  landscape: [],
+  competitors: [],
+  competitors_websites: [],
+  financial_comparables: [],
+  peer_developments: {
+    funding_vs_founded: {
+      company_data: null,
+      competitors_data: [],
+    },
+    webtraffic_vs_founded: {
+      company_data: null,
+      competitors_data: [],
+    },
+  },
+};
+
+export default function CompetitorAnalysisPage({
+  initialData = defaultState,
+}: CompetitiveAnalysisProps) {
+  // Ensure initialData is not null and has expected structure
+  const safeInitialData = initialData || defaultState;
+
+  const [data, setData] = useState<CompetitiveAnalysis>({
+    ...safeInitialData,
+    competitors: safeInitialData.competitors || [],
+    competitors_websites: safeInitialData.competitors_websites || [],
+  });
+
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<CompetitiveAnalysis>(initialData);
+
+  const [editData, setEditData] = useState<CompetitiveAnalysis>({
+    ...safeInitialData,
+    competitors: safeInitialData.competitors || [],
+    competitors_websites: safeInitialData.competitors_websites || [],
+  });
+
+  useEffect(() => {
+    // Ensure we have valid data with the correct structure
+    const validData = initialData || defaultState;
+    setData({
+      ...validData,
+      competitors: validData.competitors || [],
+      competitors_websites: validData.competitors_websites || [],
+    });
+  }, [initialData]);
 
   const startEditing = (): void => {
     setIsEditing(true);
-    setEditData(JSON.parse(JSON.stringify(data)));
+    const dataCopy = JSON.parse(JSON.stringify(data));
+    // Ensure arrays exist even after parsing
+    dataCopy.competitors = dataCopy.competitors || [];
+    dataCopy.competitors_websites = dataCopy.competitors_websites || [];
+    setEditData(dataCopy);
   };
 
   const cancelEditing = (): void => {
@@ -44,12 +93,19 @@ export default function CompetitorAnalysisPage() {
     value: string | number
   ): void => {
     const newData = { ...editData };
-    if (field === "similarityScore") {
-      newData.competitors[index][field] = Number(value);
-    } else {
-      newData.competitors[index][field as keyof Competitor] = value as never;
+    // Ensure competitors array exists
+    if (!newData.competitors) {
+      newData.competitors = [];
     }
-    setEditData(newData);
+
+    if (newData.competitors[index]) {
+      if (field === "similarity_score") {
+        newData.competitors[index][field] = Number(value);
+      } else {
+        newData.competitors[index][field as keyof Competitor] = value as never;
+      }
+      setEditData(newData);
+    }
   };
 
   const updateCompetitorWebsite = (
@@ -58,51 +114,88 @@ export default function CompetitorAnalysisPage() {
     value: string | number
   ): void => {
     const newData = { ...editData };
-    if (
-      field === "similarityScore" ||
-      field === "totalWebsiteVisitsMonthly" ||
-      field === "rankCategory"
-    ) {
-      newData.competitorsWebsites[index][field] = Number(value);
-    } else {
-      newData.competitorsWebsites[index][field as keyof CompetitorWebsite] =
-        value as never;
+    // Ensure competitors_websites array exists
+    if (!newData.competitors_websites) {
+      newData.competitors_websites = [];
     }
-    setEditData(newData);
+
+    if (newData.competitors_websites[index]) {
+      if (
+        field === "similarity_score" ||
+        field === "total_website_visits_monthly" ||
+        field === "rank_category"
+      ) {
+        newData.competitors_websites[index][field] = Number(value);
+      } else {
+        newData.competitors_websites[index][field as keyof CompetitorWebsite] =
+          value as never;
+      }
+      setEditData(newData);
+    }
   };
 
   const addCompetitor = (): void => {
     const newData = { ...editData };
+    // Ensure competitors array exists
+    if (!newData.competitors) {
+      newData.competitors = [];
+    }
+
     newData.competitors.push({
-      companyName: "New Competitor",
-      similarityScore: 0,
+      company_name: "New Competitor",
+      similarity_score: 0,
     });
     setEditData(newData);
   };
 
   const addCompetitorWebsite = (): void => {
     const newData = { ...editData };
-    newData.competitorsWebsites.push({
+    // Ensure competitors_websites array exists
+    if (!newData.competitors_websites) {
+      newData.competitors_websites = [];
+    }
+
+    newData.competitors_websites.push({
       website: "example.com",
-      similarityScore: 0,
-      totalWebsiteVisitsMonthly: 0,
+      similarity_score: 0,
+      total_website_visits_monthly: 0,
       category: "Category",
-      rankCategory: 0,
+      rank_category: 0,
     });
     setEditData(newData);
   };
 
   const removeCompetitor = (index: number): void => {
     const newData = { ...editData };
+    // Ensure competitors array exists
+    if (!newData.competitors) {
+      newData.competitors = [];
+      return;
+    }
+
     newData.competitors.splice(index, 1);
     setEditData(newData);
   };
 
   const removeCompetitorWebsite = (index: number): void => {
     const newData = { ...editData };
-    newData.competitorsWebsites.splice(index, 1);
+    // Ensure competitors_websites array exists
+    if (!newData.competitors_websites) {
+      newData.competitors_websites = [];
+      return;
+    }
+
+    newData.competitors_websites.splice(index, 1);
     setEditData(newData);
   };
+
+  // Ensure arrays exist for rendering
+  const competitors = data.competitors || [];
+  const competitors_websites = data.competitors_websites || [];
+
+  // Check if competitors and websites data are empty
+  const isCompetitorsEmpty = competitors.length === 0;
+  const isWebsitesEmpty = competitors_websites.length === 0;
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
@@ -170,16 +263,16 @@ export default function CompetitorAnalysisPage() {
                 <th className="p-4 text-left font-medium text-lg border-r border-[#35454c]">
                   Company Name
                 </th>
-                {data.competitors.length > 0 &&
-                  data.competitors.map((competitor, index) => (
+                {!isCompetitorsEmpty &&
+                  competitors.map((competitor, index) => (
                     <th
                       key={index}
                       className="p-4 text-center font-medium text-lg border-r border-[#35454c]"
                     >
-                      {competitor.companyName || "N/A"}
+                      {competitor.company_name || "N/A"}
                     </th>
                   ))}
-                {data.competitors.length === 0 && (
+                {isCompetitorsEmpty && (
                   <th className="p-4 text-center font-medium text-lg border-r border-[#35454c]">
                     No competitors available
                   </th>
@@ -193,7 +286,7 @@ export default function CompetitorAnalysisPage() {
                 </td>
                 {isEditing ? (
                   <>
-                    {editData.competitors.map((competitor, index) => (
+                    {(editData.competitors || []).map((competitor, index) => (
                       <td
                         key={index}
                         className="p-4 text-center border-r border-[#ced7db]"
@@ -201,11 +294,11 @@ export default function CompetitorAnalysisPage() {
                         <div className="flex items-center justify-center">
                           <input
                             type="number"
-                            value={competitor.similarityScore}
+                            value={competitor.similarity_score || 0}
                             onChange={(e) =>
                               updateCompetitor(
                                 index,
-                                "similarityScore",
+                                "similarity_score",
                                 e.target.value
                               )
                             }
@@ -223,12 +316,12 @@ export default function CompetitorAnalysisPage() {
                   </>
                 ) : (
                   <>
-                    {data.competitors.map((competitor, index) => (
+                    {competitors.map((competitor, index) => (
                       <td
                         key={index}
                         className="p-4 text-center text-[#35454c] border-r border-[#ced7db]"
                       >
-                        {competitor.similarityScore || "N/A"}
+                        {competitor.similarity_score || "N/A"}
                       </td>
                     ))}
                   </>
@@ -263,19 +356,19 @@ export default function CompetitorAnalysisPage() {
               </tr>
             </thead>
             <tbody>
-              {data.competitorsWebsites.length === 0 && !isEditing ? (
+              {isWebsitesEmpty && !isEditing ? (
                 <tr className="border-t border-[#ced7db]">
                   <td colSpan={5} className="p-4 text-center text-[#57727e]">
                     No competitor websites available
                   </td>
                 </tr>
               ) : isEditing ? (
-                editData.competitorsWebsites.map((website, index) => (
+                (editData.competitors_websites || []).map((website, index) => (
                   <tr key={index} className="border-t border-[#ced7db]">
                     <td className="p-4">
                       <input
                         type="text"
-                        value={website.website}
+                        value={website.website || ""}
                         onChange={(e) =>
                           updateCompetitorWebsite(
                             index,
@@ -289,11 +382,11 @@ export default function CompetitorAnalysisPage() {
                     <td className="p-4">
                       <input
                         type="number"
-                        value={website.similarityScore}
+                        value={website.similarity_score || 0}
                         onChange={(e) =>
                           updateCompetitorWebsite(
                             index,
-                            "similarityScore",
+                            "similarity_score",
                             e.target.value
                           )
                         }
@@ -303,11 +396,11 @@ export default function CompetitorAnalysisPage() {
                     <td className="p-4">
                       <input
                         type="number"
-                        value={website.totalWebsiteVisitsMonthly}
+                        value={website.total_website_visits_monthly || 0}
                         onChange={(e) =>
                           updateCompetitorWebsite(
                             index,
-                            "totalWebsiteVisitsMonthly",
+                            "total_website_visits_monthly",
                             e.target.value
                           )
                         }
@@ -317,7 +410,7 @@ export default function CompetitorAnalysisPage() {
                     <td className="p-4">
                       <input
                         type="text"
-                        value={website.category}
+                        value={website.category || ""}
                         onChange={(e) =>
                           updateCompetitorWebsite(
                             index,
@@ -331,11 +424,11 @@ export default function CompetitorAnalysisPage() {
                     <td className="p-4">
                       <input
                         type="number"
-                        value={website.rankCategory}
+                        value={website.rank_category || 0}
                         onChange={(e) =>
                           updateCompetitorWebsite(
                             index,
-                            "rankCategory",
+                            "rank_category",
                             e.target.value
                           )
                         }
@@ -353,22 +446,22 @@ export default function CompetitorAnalysisPage() {
                   </tr>
                 ))
               ) : (
-                data.competitorsWebsites.map((website, index) => (
+                competitors_websites.map((website, index) => (
                   <tr key={index} className="border-t border-[#ced7db]">
                     <td className="p-4 text-[#35454c]">
                       {website.website || "N/A"}
                     </td>
                     <td className="p-4 text-[#35454c]">
-                      {website.similarityScore || "N/A"}
+                      {website.similarity_score || "N/A"}
                     </td>
                     <td className="p-4 text-[#35454c]">
-                      {formatNumber(website.totalWebsiteVisitsMonthly)}
+                      {formatNumber(website.total_website_visits_monthly)}
                     </td>
                     <td className="p-4 text-[#35454c]">
                       {website.category || "N/A"}
                     </td>
                     <td className="p-4 text-[#35454c]">
-                      {website.rankCategory || "N/A"}
+                      {website.rank_category || "N/A"}
                     </td>
                   </tr>
                 ))

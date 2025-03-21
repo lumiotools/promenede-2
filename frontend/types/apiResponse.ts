@@ -1,3 +1,4 @@
+import { CompetitiveAnalysis } from "./competitor";
 import { OpportunitiesRisks } from "./opportunitiesRisks";
 import { QAItem } from "./qa";
 import { RegulationItem } from "./regulation";
@@ -9,6 +10,7 @@ export type ApiResponse<T> = {
 };
 
 export type CompanyData = {
+  competitive_analysis: CompetitiveAnalysis;
   regulation: RegulationItem[];
   opportunities_risks: OpportunitiesRisks;
   qa: QAItem[];

@@ -1,62 +1,62 @@
-// Define types for competitive analysis data
 export interface Competitor {
-  companyName: string;
-  similarityScore: number;
+  company_name: string | null;
+  similarity_score: number | null;
 }
 
 export interface CompetitorWebsite {
-  website: string;
-  similarityScore: number;
-  totalWebsiteVisitsMonthly: number;
-  category: string;
-  rankCategory: number;
+  website: string | null;
+  similarity_score: number | null;
+  total_website_visits_monthly: number | null;
+  category: string | null;
+  rank_category: number | null;
 }
 
 export interface LandscapeCompetitor {
-  name: string;
-  similarityScore: number;
-  website: string;
-  monthlyVisits: number;
-  rankCategory: number;
+  name: string | null;
+  similarityScore: number | null;
+  website: string | null;
+  monthlyVisits: number | null;
+  rankCategory: number | null;
 }
 
 export interface FinancialComparable {
-  name: string;
-  similarityScore: number;
-  financialData: {
-    revenue: string;
-    profit: string;
-    employees: string;
-  };
+  name: string | null;
+  similarity_score: number | null;
+  financial_data: {
+    revenue: string | null;
+    profit: string | null;
+    employees: string | null;
+  } | null;
 }
 
 export interface CompanyData {
-  name: string;
-  foundedYear: string;
-  totalFunding: number | string;
+  monthly_traffic: number | string | null;
+  name: string | null;
+  founded_year: string | null;
+  total_funding: number | string | null;
 }
 
 export interface CompanyTrafficData {
-  name: string;
-  foundedYear: string;
-  monthlyTraffic: number | string;
+  name: string | null;
+  founded_year: string | null;
+  monthly_traffic: number | string | null;
 }
 
 export interface PeerDevelopments {
-  fundingVsFounded: {
-    companyData: CompanyData;
-    competitorsData: CompanyData[];
-  };
-  webtrafficVsFounded: {
-    companyData: CompanyTrafficData;
-    competitorsData: CompanyTrafficData[];
-  };
+  funding_vs_founded: {
+    company_data: CompanyData | null;
+    competitors_data: CompanyData[] | null;
+  } | null;
+  webtraffic_vs_founded: {
+    company_data: CompanyTrafficData | null;
+    competitors_data: CompanyTrafficData[] | null;
+  } | null;
 }
 
 export interface CompetitiveAnalysis {
-  landscape: LandscapeCompetitor[];
-  competitors: Competitor[];
-  competitorsWebsites: CompetitorWebsite[];
-  financialComparables: FinancialComparable[];
-  peerDevelopments: PeerDevelopments;
+  landscape: LandscapeCompetitor[] | null;
+  competitors: Competitor[] | null;
+  competitors_websites: CompetitorWebsite[] | null;
+  financial_comparables: FinancialComparable[] | null;
+  peer_developments: PeerDevelopments | null;
 }

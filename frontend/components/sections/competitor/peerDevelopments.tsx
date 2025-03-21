@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState } from "react";
-import { competitiveAnalysis as initialData } from "./competitorData";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
-import type { CompanyData, CompanyTrafficData } from "@/types/competitor";
+import type { ChartOptions } from "chart.js";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,6 +15,13 @@ import {
   Legend,
 } from "chart.js";
 import { Scatter } from "react-chartjs-2";
+import {
+  CompanyData,
+  CompanyTrafficData,
+  CompetitiveAnalysis,
+} from "@/types/competitor";
+
+// Define types for competitive analysis data
 
 // Register Chart.js components
 ChartJS.register(
@@ -36,14 +43,176 @@ const formatNumber = (num: number | string | null | undefined): string => {
   return num.toString();
 };
 
-export default function PeerDevelopmentsPage() {
-  const [data, setData] = useState(initialData.peerDevelopments);
+type PeerDevelopmentsProps = {
+  initialData?: CompetitiveAnalysis;
+};
+
+// Define strongly typed default values
+const defaultFundingCompanyData: CompanyData = {
+  monthly_traffic: 0,
+  name: "",
+  founded_year: "",
+  total_funding: 0,
+};
+
+const defaultTrafficCompanyData: CompanyTrafficData = {
+  name: "",
+  founded_year: "",
+  monthly_traffic: 0,
+};
+
+const defaultState: CompetitiveAnalysis = {
+  landscape: [],
+  competitors: [],
+  competitors_websites: [],
+  financial_comparables: [],
+  peer_developments: {
+    funding_vs_founded: {
+      company_data: defaultFundingCompanyData,
+      competitors_data: [],
+    },
+    webtraffic_vs_founded: {
+      company_data: defaultTrafficCompanyData,
+      competitors_data: [],
+    },
+  },
+};
+
+export default function PeerDevelopmentsPage({
+  initialData = defaultState,
+}: PeerDevelopmentsProps) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState(initialData.peerDevelopments);
+
+  // Ensure initialData is not null and has expected structure
+  const safeInitialData = initialData || defaultState;
+
+  // Ensure peer_developments exists with proper structure
+  const safePeerDevelopments = safeInitialData.peer_developments || {
+    funding_vs_founded: {
+      company_data: defaultFundingCompanyData,
+      competitors_data: [],
+    },
+    webtraffic_vs_founded: {
+      company_data: defaultTrafficCompanyData,
+      competitors_data: [],
+    },
+  };
+
+  // Ensure funding_vs_founded exists with proper structure
+  const safeFundingVsFounded = safePeerDevelopments.funding_vs_founded || {
+    company_data: defaultFundingCompanyData,
+    competitors_data: [],
+  };
+
+  // Ensure webtraffic_vs_founded exists with proper structure
+  const safeWebtrafficVsFounded =
+    safePeerDevelopments.webtraffic_vs_founded || {
+      company_data: defaultTrafficCompanyData,
+      competitors_data: [],
+    };
+
+  // Ensure company_data exists in both sections with correct types\
+  const safeFundingCompanyData: CompanyData =
+    safeFundingVsFounded.company_data || defaultFundingCompanyData;
+  const safeWebtrafficCompanyData: CompanyTrafficData =
+    safeWebtrafficVsFounded.company_data || defaultTrafficCompanyData;
+
+  // Ensure competitors_data arrays exist in both sections
+  const safeFundingCompetitorsData: CompanyData[] =
+    safeFundingVsFounded.competitors_data || [];
+  const safeWebtrafficCompetitorsData: CompanyTrafficData[] =
+    safeWebtrafficVsFounded.competitors_data || [];
+
+  const [data, setData] = useState<CompetitiveAnalysis>({
+    ...safeInitialData,
+    competitors: safeInitialData.competitors || [],
+    competitors_websites: safeInitialData.competitors_websites || [],
+    peer_developments: {
+      funding_vs_founded: {
+        company_data: safeFundingCompanyData,
+        competitors_data: safeFundingCompetitorsData,
+      },
+      webtraffic_vs_founded: {
+        company_data: safeWebtrafficCompanyData,
+        competitors_data: safeWebtrafficCompetitorsData,
+      },
+    },
+  });
+  useEffect(() => {
+    if (!initialData) return; // Ensure initialData exists before updating
+
+    console.log("peer development initialData update:", initialData);
+
+    // Create a properly structured data object with all the necessary defaults
+    const updatedData = {
+      ...initialData,
+      competitors: initialData.competitors || [],
+      competitors_websites: initialData.competitors_websites || [],
+      peer_developments: initialData.peer_developments || {
+        funding_vs_founded: {
+          company_data: defaultFundingCompanyData,
+          competitors_data: [],
+        },
+        webtraffic_vs_founded: {
+          company_data: defaultTrafficCompanyData,
+          competitors_data: [],
+        },
+      },
+    };
+
+    // Completely replace the state with the new data
+    setData(updatedData);
+  }, [initialData]); // Only depend on initialData
+
+  // Create separate state for editing different sections
+  const [editData, setEditData] = useState({
+    funding_vs_founded: {
+      company_data: { ...safeFundingCompanyData },
+      competitors_data: [...safeFundingCompetitorsData],
+    },
+    webtraffic_vs_founded: {
+      company_data: { ...safeWebtrafficCompanyData },
+      competitors_data: [...safeWebtrafficCompetitorsData],
+    },
+  });
 
   const startEditing = (): void => {
     setIsEditing(true);
-    setEditData(JSON.parse(JSON.stringify(data)));
+
+    // Create a deep copy to avoid reference issues
+    const dataCopy = data.peer_developments
+      ? JSON.parse(JSON.stringify(data.peer_developments))
+      : JSON.parse(
+          JSON.stringify({
+            funding_vs_founded: {
+              company_data: defaultFundingCompanyData,
+              competitors_data: [],
+            },
+            webtraffic_vs_founded: {
+              company_data: defaultTrafficCompanyData,
+              competitors_data: [],
+            },
+          })
+        );
+
+    // Ensure the structure is maintained after parsing
+    const editDataWithDefaults = {
+      funding_vs_founded: {
+        company_data: dataCopy.funding_vs_founded?.company_data || {
+          ...defaultFundingCompanyData,
+        },
+        competitors_data: dataCopy.funding_vs_founded?.competitors_data || [],
+      },
+      webtraffic_vs_founded: {
+        company_data: dataCopy.webtraffic_vs_founded?.company_data || {
+          ...defaultTrafficCompanyData,
+        },
+        competitors_data:
+          dataCopy.webtraffic_vs_founded?.competitors_data || [],
+      },
+    };
+
+    setEditData(editDataWithDefaults);
   };
 
   const cancelEditing = (): void => {
@@ -51,68 +220,148 @@ export default function PeerDevelopmentsPage() {
   };
 
   const saveChanges = (): void => {
-    setData(editData);
+    const updatedData = { ...data };
+    updatedData.peer_developments = editData;
+    setData(updatedData);
     setIsEditing(false);
   };
 
-  const updateCompanyData = (
-    section: "fundingVsFounded" | "webtrafficVsFounded",
-    isCompany: boolean,
-    index: number,
-    field: keyof CompanyData | keyof CompanyTrafficData,
+  // Type-safe update function for company data
+  const updateFundingCompanyData = (
+    field: keyof CompanyData,
     value: string | number
   ): void => {
     const newData = { ...editData };
 
-    if (isCompany) {
-      if (section === "fundingVsFounded") {
-        if (
-          field === "totalFunding" &&
-          typeof value === "string" &&
-          value !== "N/A"
-        ) {
-          newData[section].companyData[field] = Number(value);
-        } else {
-          newData[section].companyData[field as keyof CompanyData] =
-            value as never;
-        }
-      } else {
-        if (
-          field === "monthlyTraffic" &&
-          typeof value === "string" &&
-          value !== "N/A"
-        ) {
-          newData[section].companyData[field] = Number(value);
-        } else {
-          newData[section].companyData[field as keyof CompanyTrafficData] =
-            value as never;
-        }
-      }
+    if (!newData.funding_vs_founded) {
+      newData.funding_vs_founded = {
+        company_data: { ...defaultFundingCompanyData },
+        competitors_data: [],
+      };
+    }
+
+    if (!newData.funding_vs_founded.company_data) {
+      newData.funding_vs_founded.company_data = {
+        ...defaultFundingCompanyData,
+      };
+    }
+
+    if (
+      field === "total_funding" &&
+      typeof value === "string" &&
+      value !== "N/A"
+    ) {
+      newData.funding_vs_founded.company_data[field] = Number(value);
     } else {
-      if (section === "fundingVsFounded") {
-        if (
-          field === "totalFunding" &&
-          typeof value === "string" &&
-          value !== "N/A"
-        ) {
-          newData[section].competitorsData[index][field] = Number(value);
-        } else {
-          newData[section].competitorsData[index][field as keyof CompanyData] =
-            value as never;
-        }
-      } else {
-        if (
-          field === "monthlyTraffic" &&
-          typeof value === "string" &&
-          value !== "N/A"
-        ) {
-          newData[section].competitorsData[index][field] = Number(value);
-        } else {
-          newData[section].competitorsData[index][
-            field as keyof CompanyTrafficData
-          ] = value as never;
-        }
-      }
+      newData.funding_vs_founded.company_data[field] = value as never;
+    }
+
+    setEditData(newData);
+  };
+
+  // Type-safe update function for traffic company data
+  const updateTrafficCompanyData = (
+    field: keyof CompanyTrafficData,
+    value: string | number
+  ): void => {
+    const newData = { ...editData };
+
+    if (!newData.webtraffic_vs_founded) {
+      newData.webtraffic_vs_founded = {
+        company_data: { ...defaultTrafficCompanyData },
+        competitors_data: [],
+      };
+    }
+
+    if (!newData.webtraffic_vs_founded.company_data) {
+      newData.webtraffic_vs_founded.company_data = {
+        ...defaultTrafficCompanyData,
+      };
+    }
+
+    if (
+      field === "monthly_traffic" &&
+      typeof value === "string" &&
+      value !== "N/A"
+    ) {
+      newData.webtraffic_vs_founded.company_data[field] = Number(value);
+    } else {
+      newData.webtraffic_vs_founded.company_data[field] = value as never;
+    }
+
+    setEditData(newData);
+  };
+
+  // Type-safe update function for funding competitor data
+  const updateFundingCompetitor = (
+    index: number,
+    field: keyof CompanyData,
+    value: string | number
+  ): void => {
+    const newData = { ...editData };
+
+    if (!newData.funding_vs_founded) {
+      newData.funding_vs_founded = {
+        company_data: { ...defaultFundingCompanyData },
+        competitors_data: [],
+      };
+    }
+
+    if (!newData.funding_vs_founded.competitors_data) {
+      newData.funding_vs_founded.competitors_data = [];
+    }
+
+    if (!newData.funding_vs_founded.competitors_data[index]) {
+      return;
+    }
+
+    if (
+      field === "total_funding" &&
+      typeof value === "string" &&
+      value !== "N/A"
+    ) {
+      newData.funding_vs_founded.competitors_data[index][field] = Number(value);
+    } else {
+      newData.funding_vs_founded.competitors_data[index][field] =
+        value as never;
+    }
+
+    setEditData(newData);
+  };
+
+  // Type-safe update function for traffic competitor data
+  const updateTrafficCompetitor = (
+    index: number,
+    field: keyof CompanyTrafficData,
+    value: string | number
+  ): void => {
+    const newData = { ...editData };
+
+    if (!newData.webtraffic_vs_founded) {
+      newData.webtraffic_vs_founded = {
+        company_data: { ...defaultTrafficCompanyData },
+        competitors_data: [],
+      };
+    }
+
+    if (!newData.webtraffic_vs_founded.competitors_data) {
+      newData.webtraffic_vs_founded.competitors_data = [];
+    }
+
+    if (!newData.webtraffic_vs_founded.competitors_data[index]) {
+      return;
+    }
+
+    if (
+      field === "monthly_traffic" &&
+      typeof value === "string" &&
+      value !== "N/A"
+    ) {
+      newData.webtraffic_vs_founded.competitors_data[index][field] =
+        Number(value);
+    } else {
+      newData.webtraffic_vs_founded.competitors_data[index][field] =
+        value as never;
     }
 
     setEditData(newData);
@@ -121,64 +370,125 @@ export default function PeerDevelopmentsPage() {
   // Add new competitor to funding vs founded section
   const addFundingCompetitor = (): void => {
     const newData = { ...editData };
-    newData.fundingVsFounded.competitorsData.push({
+
+    if (!newData.funding_vs_founded) {
+      newData.funding_vs_founded = {
+        company_data: { ...defaultFundingCompanyData },
+        competitors_data: [],
+      };
+    }
+
+    if (!newData.funding_vs_founded.competitors_data) {
+      newData.funding_vs_founded.competitors_data = [];
+    }
+
+    newData.funding_vs_founded.competitors_data.push({
+      monthly_traffic: 0,
       name: "New Competitor",
-      foundedYear: "2020",
-      totalFunding: 0,
+      founded_year: "2020",
+      total_funding: 0,
     });
+
     setEditData(newData);
   };
 
   // Add new competitor to web traffic vs founded section
   const addTrafficCompetitor = (): void => {
     const newData = { ...editData };
-    newData.webtrafficVsFounded.competitorsData.push({
+
+    if (!newData.webtraffic_vs_founded) {
+      newData.webtraffic_vs_founded = {
+        company_data: { ...defaultTrafficCompanyData },
+        competitors_data: [],
+      };
+    }
+
+    if (!newData.webtraffic_vs_founded.competitors_data) {
+      newData.webtraffic_vs_founded.competitors_data = [];
+    }
+
+    newData.webtraffic_vs_founded.competitors_data.push({
       name: "New Competitor",
-      foundedYear: "2020",
-      monthlyTraffic: 0,
+      founded_year: "2020",
+      monthly_traffic: 0,
     });
+
     setEditData(newData);
   };
 
   // Remove competitor from funding vs founded section
   const removeFundingCompetitor = (index: number): void => {
     const newData = { ...editData };
-    newData.fundingVsFounded.competitorsData.splice(index, 1);
+
+    if (
+      !newData.funding_vs_founded ||
+      !newData.funding_vs_founded.competitors_data
+    ) {
+      return;
+    }
+
+    newData.funding_vs_founded.competitors_data.splice(index, 1);
     setEditData(newData);
   };
 
   // Remove competitor from web traffic vs founded section
   const removeTrafficCompetitor = (index: number): void => {
     const newData = { ...editData };
-    newData.webtrafficVsFounded.competitorsData.splice(index, 1);
+
+    if (
+      !newData.webtraffic_vs_founded ||
+      !newData.webtraffic_vs_founded.competitors_data
+    ) {
+      return;
+    }
+
+    newData.webtraffic_vs_founded.competitors_data.splice(index, 1);
     setEditData(newData);
   };
+
+  // Safely access the required data for charts
+  const fundingCompanyData: CompanyData =
+    data.peer_developments?.funding_vs_founded?.company_data ||
+    defaultFundingCompanyData;
+
+  const fundingCompetitorsData: CompanyData[] =
+    data.peer_developments?.funding_vs_founded?.competitors_data || [];
+
+  const trafficCompanyData: CompanyTrafficData =
+    data.peer_developments?.webtraffic_vs_founded?.company_data ||
+    defaultTrafficCompanyData;
+
+  const trafficCompetitorsData: CompanyTrafficData[] =
+    data.peer_developments?.webtraffic_vs_founded?.competitors_data || [];
 
   // Prepare data for funding vs founded year chart
   const fundingChartData = {
     datasets: [
       {
-        label: data.fundingVsFounded.companyData.name,
+        label: fundingCompanyData.name || "Company",
         data: [
           {
-            x: data.fundingVsFounded.companyData.foundedYear,
+            x: fundingCompanyData.founded_year || "N/A",
             y:
-              typeof data.fundingVsFounded.companyData.totalFunding === "number"
-                ? data.fundingVsFounded.companyData.totalFunding / 1000000
+              typeof fundingCompanyData.total_funding === "number"
+                ? fundingCompanyData.total_funding / 1000000
                 : 0,
           },
         ],
         backgroundColor: "#1ba9f5",
         borderColor: "#1ba9f5",
       },
-      ...data.fundingVsFounded.competitorsData.map((competitor, index) => ({
-        label: competitor.name,
+      ...fundingCompetitorsData.map((competitor, index) => ({
+        label: competitor.name || `Competitor ${index + 1}`,
         data: [
           {
-            x: competitor.foundedYear === "N/A" ? 0 : competitor.foundedYear,
+            x:
+              competitor.founded_year === "N/A"
+                ? 0
+                : competitor.founded_year || "",
             y:
-              typeof competitor.totalFunding === "number"
-                ? competitor.totalFunding / 1000000
+              typeof competitor.total_funding === "number"
+                ? competitor.total_funding / 1000000
                 : 0,
           },
         ],
@@ -192,28 +502,30 @@ export default function PeerDevelopmentsPage() {
   const trafficChartData = {
     datasets: [
       {
-        label: data.webtrafficVsFounded.companyData.name,
+        label: trafficCompanyData.name || "Company",
         data: [
           {
-            x: data.webtrafficVsFounded.companyData.foundedYear,
+            x: trafficCompanyData.founded_year || "N/A",
             y:
-              typeof data.webtrafficVsFounded.companyData.monthlyTraffic ===
-              "number"
-                ? data.webtrafficVsFounded.companyData.monthlyTraffic / 1000000
+              typeof trafficCompanyData.monthly_traffic === "number"
+                ? trafficCompanyData.monthly_traffic / 1000000
                 : 0,
           },
         ],
         backgroundColor: "#1ba9f5",
         borderColor: "#1ba9f5",
       },
-      ...data.webtrafficVsFounded.competitorsData.map((competitor, index) => ({
-        label: competitor.name,
+      ...trafficCompetitorsData.map((competitor, index) => ({
+        label: competitor.name || `Competitor ${index + 1}`,
         data: [
           {
-            x: competitor.foundedYear === "N/A" ? 0 : competitor.foundedYear,
+            x:
+              competitor.founded_year === "N/A"
+                ? 0
+                : competitor.founded_year || "",
             y:
-              typeof competitor.monthlyTraffic === "number"
-                ? competitor.monthlyTraffic / 1000000
+              typeof competitor.monthly_traffic === "number"
+                ? competitor.monthly_traffic / 1000000
                 : 0,
           },
         ],
@@ -223,7 +535,7 @@ export default function PeerDevelopmentsPage() {
     ],
   };
 
-  const chartOptions = {
+  const chartOptions: ChartOptions<"scatter"> = {
     scales: {
       y: {
         beginAtZero: true,
@@ -249,6 +561,16 @@ export default function PeerDevelopmentsPage() {
     },
     maintainAspectRatio: false,
   };
+
+  // Safely access edit data
+  const editFundingCompanyData: CompanyData =
+    editData.funding_vs_founded?.company_data || defaultFundingCompanyData;
+  const editFundingCompetitorsData: CompanyData[] =
+    editData.funding_vs_founded?.competitors_data || [];
+  const editTrafficCompanyData: CompanyTrafficData =
+    editData.webtraffic_vs_founded?.company_data || defaultTrafficCompanyData;
+  const editTrafficCompetitorsData: CompanyTrafficData[] =
+    editData.webtraffic_vs_founded?.competitors_data || [];
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
@@ -311,15 +633,9 @@ export default function PeerDevelopmentsPage() {
                   </label>
                   <input
                     type="text"
-                    value={editData.fundingVsFounded.companyData.name}
+                    value={editFundingCompanyData.name || ""}
                     onChange={(e) =>
-                      updateCompanyData(
-                        "fundingVsFounded",
-                        true,
-                        0,
-                        "name",
-                        e.target.value
-                      )
+                      updateFundingCompanyData("name", e.target.value)
                     }
                     className="w-full border border-[#ced7db] p-2 rounded"
                   />
@@ -330,15 +646,9 @@ export default function PeerDevelopmentsPage() {
                   </label>
                   <input
                     type="text"
-                    value={editData.fundingVsFounded.companyData.foundedYear}
+                    value={editFundingCompanyData.founded_year || ""}
                     onChange={(e) =>
-                      updateCompanyData(
-                        "fundingVsFounded",
-                        true,
-                        0,
-                        "foundedYear",
-                        e.target.value
-                      )
+                      updateFundingCompanyData("founded_year", e.target.value)
                     }
                     className="w-full border border-[#ced7db] p-2 rounded"
                   />
@@ -349,15 +659,9 @@ export default function PeerDevelopmentsPage() {
                   </label>
                   <input
                     type="text"
-                    value={editData.fundingVsFounded.companyData.totalFunding}
+                    value={editFundingCompanyData.total_funding || 0}
                     onChange={(e) =>
-                      updateCompanyData(
-                        "fundingVsFounded",
-                        true,
-                        0,
-                        "totalFunding",
-                        e.target.value
-                      )
+                      updateFundingCompanyData("total_funding", e.target.value)
                     }
                     className="w-full border border-[#ced7db] p-2 rounded"
                   />
@@ -367,80 +671,68 @@ export default function PeerDevelopmentsPage() {
               <h3 className="font-medium text-[#445963] mb-2">
                 Competitors Data
               </h3>
-              {editData.fundingVsFounded.competitorsData.map(
-                (competitor, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-3 gap-4 mb-4 relative"
-                  >
-                    <div>
-                      <label className="block text-sm text-[#57727e] mb-1">
-                        Name
-                      </label>
+              {editFundingCompetitorsData.map((competitor, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-3 gap-4 mb-4 relative"
+                >
+                  <div>
+                    <label className="block text-sm text-[#57727e] mb-1">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      value={competitor.name || ""}
+                      onChange={(e) =>
+                        updateFundingCompetitor(index, "name", e.target.value)
+                      }
+                      className="w-full border border-[#ced7db] p-2 rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#57727e] mb-1">
+                      Founded Year
+                    </label>
+                    <input
+                      type="text"
+                      value={competitor.founded_year || ""}
+                      onChange={(e) =>
+                        updateFundingCompetitor(
+                          index,
+                          "founded_year",
+                          e.target.value
+                        )
+                      }
+                      className="w-full border border-[#ced7db] p-2 rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#57727e] mb-1">
+                      Total Funding
+                    </label>
+                    <div className="flex items-center">
                       <input
                         type="text"
-                        value={competitor.name}
+                        value={competitor.total_funding || 0}
                         onChange={(e) =>
-                          updateCompanyData(
-                            "fundingVsFounded",
-                            false,
+                          updateFundingCompetitor(
                             index,
-                            "name",
+                            "total_funding",
                             e.target.value
                           )
                         }
                         className="w-full border border-[#ced7db] p-2 rounded"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-[#57727e] mb-1">
-                        Founded Year
-                      </label>
-                      <input
-                        type="text"
-                        value={competitor.foundedYear}
-                        onChange={(e) =>
-                          updateCompanyData(
-                            "fundingVsFounded",
-                            false,
-                            index,
-                            "foundedYear",
-                            e.target.value
-                          )
-                        }
-                        className="w-full border border-[#ced7db] p-2 rounded"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-[#57727e] mb-1">
-                        Total Funding
-                      </label>
-                      <div className="flex items-center">
-                        <input
-                          type="text"
-                          value={competitor.totalFunding}
-                          onChange={(e) =>
-                            updateCompanyData(
-                              "fundingVsFounded",
-                              false,
-                              index,
-                              "totalFunding",
-                              e.target.value
-                            )
-                          }
-                          className="w-full border border-[#ced7db] p-2 rounded"
-                        />
-                        <button
-                          onClick={() => removeFundingCompetitor(index)}
-                          className="ml-2 text-[#445963] hover:text-red-500"
-                        >
-                          <TrashIcon size={16} />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => removeFundingCompetitor(index)}
+                        className="ml-2 text-[#445963] hover:text-red-500"
+                      >
+                        <TrashIcon size={16} />
+                      </button>
                     </div>
                   </div>
-                )
-              )}
+                </div>
+              ))}
             </div>
           ) : (
             <>
@@ -467,32 +759,28 @@ export default function PeerDevelopmentsPage() {
                   <tbody>
                     <tr>
                       <td className="p-2 border border-[#ced7db]">
-                        {data.fundingVsFounded.companyData.name}
+                        {fundingCompanyData.name || "N/A"}
                       </td>
                       <td className="p-2 border border-[#ced7db]">
-                        {data.fundingVsFounded.companyData.foundedYear || "N/A"}
+                        {fundingCompanyData.founded_year || "N/A"}
                       </td>
                       <td className="p-2 border border-[#ced7db]">
-                        {formatNumber(
-                          data.fundingVsFounded.companyData.totalFunding
-                        )}
+                        {formatNumber(fundingCompanyData.total_funding)}
                       </td>
                     </tr>
-                    {data.fundingVsFounded.competitorsData.map(
-                      (competitor, index) => (
-                        <tr key={index}>
-                          <td className="p-2 border border-[#ced7db]">
-                            {competitor.name}
-                          </td>
-                          <td className="p-2 border border-[#ced7db]">
-                            {competitor.foundedYear || "N/A"}
-                          </td>
-                          <td className="p-2 border border-[#ced7db]">
-                            {formatNumber(competitor.totalFunding)}
-                          </td>
-                        </tr>
-                      )
-                    )}
+                    {fundingCompetitorsData.map((competitor, index) => (
+                      <tr key={index}>
+                        <td className="p-2 border border-[#ced7db]">
+                          {competitor.name || "N/A"}
+                        </td>
+                        <td className="p-2 border border-[#ced7db]">
+                          {competitor.founded_year || "N/A"}
+                        </td>
+                        <td className="p-2 border border-[#ced7db]">
+                          {formatNumber(competitor.total_funding)}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -527,15 +815,9 @@ export default function PeerDevelopmentsPage() {
                   </label>
                   <input
                     type="text"
-                    value={editData.webtrafficVsFounded.companyData.name}
+                    value={editTrafficCompanyData.name || ""}
                     onChange={(e) =>
-                      updateCompanyData(
-                        "webtrafficVsFounded",
-                        true,
-                        0,
-                        "name",
-                        e.target.value
-                      )
+                      updateTrafficCompanyData("name", e.target.value)
                     }
                     className="w-full border border-[#ced7db] p-2 rounded"
                   />
@@ -546,15 +828,9 @@ export default function PeerDevelopmentsPage() {
                   </label>
                   <input
                     type="text"
-                    value={editData.webtrafficVsFounded.companyData.foundedYear}
+                    value={editTrafficCompanyData.founded_year || ""}
                     onChange={(e) =>
-                      updateCompanyData(
-                        "webtrafficVsFounded",
-                        true,
-                        0,
-                        "foundedYear",
-                        e.target.value
-                      )
+                      updateTrafficCompanyData("founded_year", e.target.value)
                     }
                     className="w-full border border-[#ced7db] p-2 rounded"
                   />
@@ -565,15 +841,10 @@ export default function PeerDevelopmentsPage() {
                   </label>
                   <input
                     type="text"
-                    value={
-                      editData.webtrafficVsFounded.companyData.monthlyTraffic
-                    }
+                    value={editTrafficCompanyData.monthly_traffic || 0}
                     onChange={(e) =>
-                      updateCompanyData(
-                        "webtrafficVsFounded",
-                        true,
-                        0,
-                        "monthlyTraffic",
+                      updateTrafficCompanyData(
+                        "monthly_traffic",
                         e.target.value
                       )
                     }
@@ -585,80 +856,68 @@ export default function PeerDevelopmentsPage() {
               <h3 className="font-medium text-[#445963] mb-2">
                 Competitors Data
               </h3>
-              {editData.webtrafficVsFounded.competitorsData.map(
-                (competitor, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-3 gap-4 mb-4 relative"
-                  >
-                    <div>
-                      <label className="block text-sm text-[#57727e] mb-1">
-                        Name
-                      </label>
+              {editTrafficCompetitorsData.map((competitor, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-3 gap-4 mb-4 relative"
+                >
+                  <div>
+                    <label className="block text-sm text-[#57727e] mb-1">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      value={competitor.name || ""}
+                      onChange={(e) =>
+                        updateTrafficCompetitor(index, "name", e.target.value)
+                      }
+                      className="w-full border border-[#ced7db] p-2 rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#57727e] mb-1">
+                      Founded Year
+                    </label>
+                    <input
+                      type="text"
+                      value={competitor.founded_year || ""}
+                      onChange={(e) =>
+                        updateTrafficCompetitor(
+                          index,
+                          "founded_year",
+                          e.target.value
+                        )
+                      }
+                      className="w-full border border-[#ced7db] p-2 rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#57727e] mb-1">
+                      Monthly Traffic
+                    </label>
+                    <div className="flex items-center">
                       <input
                         type="text"
-                        value={competitor.name}
+                        value={competitor.monthly_traffic || 0}
                         onChange={(e) =>
-                          updateCompanyData(
-                            "webtrafficVsFounded",
-                            false,
+                          updateTrafficCompetitor(
                             index,
-                            "name",
+                            "monthly_traffic",
                             e.target.value
                           )
                         }
                         className="w-full border border-[#ced7db] p-2 rounded"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-[#57727e] mb-1">
-                        Founded Year
-                      </label>
-                      <input
-                        type="text"
-                        value={competitor.foundedYear}
-                        onChange={(e) =>
-                          updateCompanyData(
-                            "webtrafficVsFounded",
-                            false,
-                            index,
-                            "foundedYear",
-                            e.target.value
-                          )
-                        }
-                        className="w-full border border-[#ced7db] p-2 rounded"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-[#57727e] mb-1">
-                        Monthly Traffic
-                      </label>
-                      <div className="flex items-center">
-                        <input
-                          type="text"
-                          value={competitor.monthlyTraffic}
-                          onChange={(e) =>
-                            updateCompanyData(
-                              "webtrafficVsFounded",
-                              false,
-                              index,
-                              "monthlyTraffic",
-                              e.target.value
-                            )
-                          }
-                          className="w-full border border-[#ced7db] p-2 rounded"
-                        />
-                        <button
-                          onClick={() => removeTrafficCompetitor(index)}
-                          className="ml-2 text-[#445963] hover:text-red-500"
-                        >
-                          <TrashIcon size={16} />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => removeTrafficCompetitor(index)}
+                        className="ml-2 text-[#445963] hover:text-red-500"
+                      >
+                        <TrashIcon size={16} />
+                      </button>
                     </div>
                   </div>
-                )
-              )}
+                </div>
+              ))}
             </div>
           ) : (
             <>
@@ -685,33 +944,28 @@ export default function PeerDevelopmentsPage() {
                   <tbody>
                     <tr>
                       <td className="p-2 border border-[#ced7db]">
-                        {data.webtrafficVsFounded.companyData.name}
+                        {trafficCompanyData.name || "N/A"}
                       </td>
                       <td className="p-2 border border-[#ced7db]">
-                        {data.webtrafficVsFounded.companyData.foundedYear ||
-                          "N/A"}
+                        {trafficCompanyData.founded_year || "N/A"}
                       </td>
                       <td className="p-2 border border-[#ced7db]">
-                        {formatNumber(
-                          data.webtrafficVsFounded.companyData.monthlyTraffic
-                        )}
+                        {formatNumber(trafficCompanyData.monthly_traffic)}
                       </td>
                     </tr>
-                    {data.webtrafficVsFounded.competitorsData.map(
-                      (competitor, index) => (
-                        <tr key={index}>
-                          <td className="p-2 border border-[#ced7db]">
-                            {competitor.name}
-                          </td>
-                          <td className="p-2 border border-[#ced7db]">
-                            {competitor.foundedYear || "N/A"}
-                          </td>
-                          <td className="p-2 border border-[#ced7db]">
-                            {formatNumber(competitor.monthlyTraffic)}
-                          </td>
-                        </tr>
-                      )
-                    )}
+                    {trafficCompetitorsData.map((competitor, index) => (
+                      <tr key={index}>
+                        <td className="p-2 border border-[#ced7db]">
+                          {competitor.name || "N/A"}
+                        </td>
+                        <td className="p-2 border border-[#ced7db]">
+                          {competitor.founded_year || "N/A"}
+                        </td>
+                        <td className="p-2 border border-[#ced7db]">
+                          {formatNumber(competitor.monthly_traffic)}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
