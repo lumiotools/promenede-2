@@ -7,7 +7,7 @@ export interface TimelineEvent {
   date: string | null;
   title: string | null;
   description?: string | null;
-  position: "top" | "bottom"; // Indicates whether event appears above or below timeline
+  position: "top" | "bottom" | ""; // Indicates whether event appears above or below timeline
 }
 
 export interface TimelineData {
@@ -16,22 +16,34 @@ export interface TimelineData {
 }
 
 // Sample initial data
+// const initialData: TimelineData = {
+//   title: "Recent Strategic Development",
+//   events: [
+//     {
+//       id: "event-1",
+//       date: "2024.12.07",
+//       title: "Generative AI Platform",
+//       description: null,
+//       position: "top",
+//     },
+//     {
+//       id: "event-2",
+//       date: "2024.12.07",
+//       title: "Generative AI Platform",
+//       description: null,
+//       position: "bottom",
+//     },
+//   ],
+// };
 const initialData: TimelineData = {
-  title: "Recent Strategic Development",
+  title: "",
   events: [
     {
-      id: "event-1",
-      date: "2024.12.07",
-      title: "Generative AI Platform",
+      id: "",
+      date: "",
+      title: "",
       description: null,
-      position: "top",
-    },
-    {
-      id: "event-2",
-      date: "2024.12.07",
-      title: "Generative AI Platform",
-      description: null,
-      position: "bottom",
+      position: "",
     },
   ],
 };

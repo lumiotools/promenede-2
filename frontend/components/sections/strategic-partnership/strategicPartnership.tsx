@@ -11,41 +11,50 @@ export type StrategicPartnership = {
 };
 
 // Sample data
+// export const strategicPartnershipsData: StrategicPartnership[] = [
+//   {
+//     id: "1",
+//     name: "Microsoft",
+//     description: "Cloud services partnership for enterprise solutions",
+//     logoUrl: null,
+//     partnershipDate: "2023-05-15",
+//   },
+//   {
+//     id: "2",
+//     name: "Salesforce",
+//     description: "CRM integration and co-marketing agreement",
+//     logoUrl: null,
+//     partnershipDate: "2022-11-03",
+//   },
+//   {
+//     id: "3",
+//     name: "IBM",
+//     description: "AI research and development collaboration",
+//     logoUrl: null,
+//     partnershipDate: "2024-01-22",
+//   },
+//   {
+//     id: "4",
+//     name: "Oracle",
+//     description: "Database technology integration partnership",
+//     logoUrl: null,
+//     partnershipDate: "2023-08-10",
+//   },
+//   {
+//     id: "5",
+//     name: "AWS",
+//     description: "Cloud infrastructure and deployment solutions",
+//     logoUrl: null,
+//     partnershipDate: "2022-06-30",
+//   },
+// ];
 export const strategicPartnershipsData: StrategicPartnership[] = [
   {
-    id: "1",
-    name: "Microsoft",
-    description: "Cloud services partnership for enterprise solutions",
+    id: "",
+    name: "",
+    description: "",
     logoUrl: null,
-    partnershipDate: "2023-05-15",
-  },
-  {
-    id: "2",
-    name: "Salesforce",
-    description: "CRM integration and co-marketing agreement",
-    logoUrl: null,
-    partnershipDate: "2022-11-03",
-  },
-  {
-    id: "3",
-    name: "IBM",
-    description: "AI research and development collaboration",
-    logoUrl: null,
-    partnershipDate: "2024-01-22",
-  },
-  {
-    id: "4",
-    name: "Oracle",
-    description: "Database technology integration partnership",
-    logoUrl: null,
-    partnershipDate: "2023-08-10",
-  },
-  {
-    id: "5",
-    name: "AWS",
-    description: "Cloud infrastructure and deployment solutions",
-    logoUrl: null,
-    partnershipDate: "2022-06-30",
+    partnershipDate: "",
   },
 ];
 

@@ -26,87 +26,112 @@ export interface StrategyData {
 }
 
 // Sample initial data
+// const initialData: StrategyData = {
+//   latestStrategy: {
+//     id: "latest-strategy-1",
+//     title: "Latest Strategy",
+//     content: "Comment A",
+//   },
+//   strategicFocus: {
+//     id: "strategic-focus-1",
+//     title: "Strategic Focus going forward",
+//     content: "Comment A",
+//   },
+//   strategySections: [
+//     {
+//       id: "recent-strategy",
+//       title: "Recent Strategy and Outcomes Digital Focus",
+//       points: [
+//         {
+//           id: "digital-focus",
+//           title: "Digital Focus:",
+//           description:
+//             "Significant investments in e-commerce and digital platforms, resulting in robust online sales growth.",
+//         },
+//         {
+//           id: "sustainability-efforts",
+//           title: "Sustainability Efforts:",
+//           description:
+//             "Increased investment in sustainable practices and eco-friendly product lines.",
+//         },
+//         {
+//           id: "luxury-segments",
+//           title: "Luxury and Professional Segments:",
+//           description:
+//             "Luxury and Professional Segments: Strong performance in luxury cosmetics and professional haircare sectors, driving overall revenue growth.",
+//         },
+//         {
+//           id: "innovation",
+//           title: "Innovation:",
+//           description:
+//             "Continuous focus on research and development, introducing new, innovative beauty products to the market.",
+//         },
+//         {
+//           id: "financial-performance",
+//           title: "Financial Performance:",
+//           description:
+//             "Achieved solid financial results in 2022, reflecting successful strategic initiatives.",
+//         },
+//       ],
+//     },
+//     {
+//       id: "strategic-focus-forward",
+//       title: "Strategic Focus Going Forward",
+//       points: [
+//         {
+//           id: "digital-transformation",
+//           title: "Digital Transformation:",
+//           description:
+//             "Achieved solid financial results in 2022, reflecting successful strategic initiatives.",
+//         },
+//         {
+//           id: "emerging-markets",
+//           title: "Emerging Markets",
+//           description:
+//             "Strengthen presence and expand operations in emerging economies.",
+//         },
+//         {
+//           id: "sustainability",
+//           title: "Sustainability:",
+//           description:
+//             "Maintain commitment to sustainability through eco-friendly products and practices.",
+//         },
+//         {
+//           id: "innovation-forward",
+//           title: "Innovation:",
+//           description:
+//             "Continue investment in R&D for cutting-edge beauty technologies.",
+//         },
+//         {
+//           id: "consumer-engagement",
+//           title: "Consumer Engagement:",
+//           description:
+//             "Enhance direct-to-consumer channels to improve customer experience and personalization.",
+//         },
+//       ],
+//     },
+//   ],
+// };
 const initialData: StrategyData = {
   latestStrategy: {
-    id: "latest-strategy-1",
-    title: "Latest Strategy",
-    content: "Comment A",
+    id: "",
+    title: "",
+    content: "",
   },
   strategicFocus: {
-    id: "strategic-focus-1",
-    title: "Strategic Focus going forward",
-    content: "Comment A",
+    id: "",
+    title: "",
+    content: "",
   },
   strategySections: [
     {
-      id: "recent-strategy",
-      title: "Recent Strategy and Outcomes Digital Focus",
+      id: "",
+      title: "",
       points: [
         {
-          id: "digital-focus",
-          title: "Digital Focus:",
-          description:
-            "Significant investments in e-commerce and digital platforms, resulting in robust online sales growth.",
-        },
-        {
-          id: "sustainability-efforts",
-          title: "Sustainability Efforts:",
-          description:
-            "Increased investment in sustainable practices and eco-friendly product lines.",
-        },
-        {
-          id: "luxury-segments",
-          title: "Luxury and Professional Segments:",
-          description:
-            "Luxury and Professional Segments: Strong performance in luxury cosmetics and professional haircare sectors, driving overall revenue growth.",
-        },
-        {
-          id: "innovation",
-          title: "Innovation:",
-          description:
-            "Continuous focus on research and development, introducing new, innovative beauty products to the market.",
-        },
-        {
-          id: "financial-performance",
-          title: "Financial Performance:",
-          description:
-            "Achieved solid financial results in 2022, reflecting successful strategic initiatives.",
-        },
-      ],
-    },
-    {
-      id: "strategic-focus-forward",
-      title: "Strategic Focus Going Forward",
-      points: [
-        {
-          id: "digital-transformation",
-          title: "Digital Transformation:",
-          description:
-            "Achieved solid financial results in 2022, reflecting successful strategic initiatives.",
-        },
-        {
-          id: "emerging-markets",
-          title: "Emerging Markets",
-          description:
-            "Strengthen presence and expand operations in emerging economies.",
-        },
-        {
-          id: "sustainability",
-          title: "Sustainability:",
-          description:
-            "Maintain commitment to sustainability through eco-friendly products and practices.",
-        },
-        {
-          id: "innovation-forward",
-          title: "Innovation:",
-          description:
-            "Continue investment in R&D for cutting-edge beauty technologies.",
-        },
-        {
-          id: "consumer-engagement",
-          title: "Consumer Engagement:",
-          description:
-            "Enhance direct-to-consumer channels to improve customer experience and personalization.",
+          id: "",
+          title: "",
+          description: "",
         },
       ],
     },
