@@ -85,8 +85,8 @@ export function Sidebar() {
               <div className="ml-6 space-y-1 mt-1">
                 <SidebarLink href="#executive-summary" label="Overview" />
                 <SidebarLink href="#company-profile" label="Firmographic" />
-                <SidebarLink href="#business-model" label="Business Model" />
-                <SidebarLink href="#value-proposition" label="Value Proposition" />
+                <SidebarLink href="#financial-summary" label="Business Model" />
+                <SidebarLink href="#web-traffic" label="Value Proposition" />
                 <SidebarLink href="#products-services" label="Products & Services" />
                 <SidebarLink href="#geographic-presence" label="Geographic Presence" />
                 <SidebarLink href="#strategy" label="Strategy" />
