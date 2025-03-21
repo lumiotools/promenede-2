@@ -53,8 +53,8 @@ export function EmployeeTrendChart() {
       <div className="border-t border-[#e5e7eb] mb-6"></div>
 
       {/* Chart Section */}
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="bg-[#f9fafb] p-6 rounded-lg shadow-sm lg:w-2/3">
+      <div className="mx-10">
+        <div className="bg-[#f9fafb] p-6 rounded-lg">
           <h2 className="text-base font-medium text-[#475467] mb-4">Employees Count Over Time</h2>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={chartData}>
@@ -90,15 +90,7 @@ export function EmployeeTrendChart() {
         </div>
 
         {/* Right section - Summary */}
-        <div className="lg:w-1/3 mt-1">
-          <h2 className="text-lg font-medium text-[#475467] mb-4">Summary</h2>
-          <p className="text-[#475467]">
-            PayPal&apos;s USP lies in its ability to offer a secure, convenient, and widely accepted digital payment
-            platform that bridges the gap between traditional and digital financial transactions[1]. Its global
-            presence, coupled with advanced security measures and user-friendly interfaces, positions it as a leader in
-            the digital payments industry.
-          </p>
-        </div>
+        
       </div>
 
       {/* Employee Increase Info */}
