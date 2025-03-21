@@ -154,7 +154,7 @@ export function Sections({ searchResults }: SectionsProps) {
         <OpportunitiesPage />
       </section>
       <section id="risks-component" className="p-6">
-        <RisksPage />
+        <RisksPage initialData={searchResults?.opportunities_risks} />
       </section>
       <section id="qa-component" className="p-6">
         <QAComponent initialData={searchResults?.qa} />

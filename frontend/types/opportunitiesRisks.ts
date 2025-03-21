@@ -12,6 +12,6 @@ export interface Risk {
 }
 
 export interface OpportunitiesRisks {
-  opportunities: Opportunity[];
-  risks: Risk[];
+  opportunities: Opportunity[] | null;
+  risks: Risk[] | null;
 }

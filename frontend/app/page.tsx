@@ -8,6 +8,10 @@ import { CompanyData } from "@/types/apiResponse";
 
 export default function Home() {
   const [searchResults, setSearchResults] = useState<CompanyData>({
+    opportunities_risks: {
+      opportunities: [],
+      risks: [],
+    },
     qa: [],
   });
 
