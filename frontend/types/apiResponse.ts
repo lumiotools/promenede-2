@@ -1,6 +1,7 @@
 import { CompetitiveAnalysis } from "./competitor";
 import { MAActivity } from "./maActivity";
 import { MarketInfo } from "./market";
+import { MarketLeadership } from "./market_leadership";
 import { OpportunitiesRisks } from "./opportunitiesRisks";
 import { QAItem } from "./qa";
 import { RegulationItem } from "./regulation";
@@ -13,6 +14,7 @@ export type ApiResponse<T> = {
 };
 
 export type CompanyData = {
+  market_leadership: MarketLeadership;
   key_technology: KeyTechnology;
   ma_activity: MAActivity;
   market_info: MarketInfo;

@@ -8,6 +8,11 @@ import { CompanyData } from "@/types/apiResponse";
 
 export default function Home() {
   const [searchResults, setSearchResults] = useState<CompanyData>({
+    market_leadership: {
+      industry: null,
+      rank_category: 0,
+      rank_global: 0,
+    },
     key_technology: {
       technologies_used: [],
       num_technologies: 0,
