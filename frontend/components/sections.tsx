@@ -133,7 +133,7 @@ export function Sections({ searchResults }: SectionsProps) {
         <ValueChainPage />
       </section>
       <section id="market-map-component" className="p-6">
-        <MarketMapPage />
+        <MarketMapPage initialData={searchResults?.market_info} />
       </section>
       <section id="competitor-landscape-component" className="p-6">
         <CompetitiveLandscapePage

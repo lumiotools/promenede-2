@@ -1,33 +1,97 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState } from "react";
-import { marketInfo as initialData } from "./marketData";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
-import type { MarketInfo } from "@/types/market";
+import type { MarketInfo, MarketMap } from "@/types/market";
 
-export default function MarketMapPage() {
-  const [data, setData] = useState<MarketInfo>(initialData);
+// Default state for the component
+const defaultState: MarketInfo = {
+  size: null,
+  valueChain: null,
+  market_map: {
+    industry: "",
+    segments: [],
+    related_industries: [],
+  },
+};
+
+type MarketMapProps = {
+  initialData?: MarketInfo;
+};
+
+export default function MarketMapPage({
+  initialData = defaultState,
+}: MarketMapProps) {
+  // Ensure market_map exists and has the expected structure
+  const safeMarketMap: MarketMap = initialData?.market_map || {
+    industry: "",
+    segments: [],
+    related_industries: [],
+  };
+
+  const [data, setData] = useState<MarketInfo>({
+    ...initialData,
+    market_map: safeMarketMap,
+  });
+
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<MarketInfo>(initialData);
+  const [editData, setEditData] = useState<MarketInfo>({
+    ...initialData,
+    market_map: safeMarketMap,
+  });
 
   // State for managing segments and related industries
   const [editSegments, setEditSegments] = useState<string[]>(
-    initialData.marketMap.segments
+    safeMarketMap.segments || []
   );
   const [editRelatedIndustries, setEditRelatedIndustries] = useState<string[]>(
-    initialData.marketMap.relatedIndustries
+    safeMarketMap.related_industries || []
   );
   const [editIndustry, setEditIndustry] = useState<string>(
-    initialData.marketMap.industry
+    safeMarketMap.industry || ""
   );
+
+  // Update data when initialData changes
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("market map initialData update:", initialData);
+
+    // Ensure market_map exists and has the expected structure
+    const updatedMarketMap: MarketMap = initialData.market_map || {
+      industry: "",
+      segments: [],
+      related_industries: [],
+    };
+
+    // Update the state with the new data
+    setData({
+      ...initialData,
+      market_map: updatedMarketMap,
+    });
+
+    // If we're not in edit mode, also update the edit-related state
+    if (!isEditing) {
+      setEditSegments(updatedMarketMap.segments || []);
+      setEditRelatedIndustries(updatedMarketMap.related_industries || []);
+      setEditIndustry(updatedMarketMap.industry || "");
+    }
+  }, [initialData, isEditing]);
 
   const startEditing = (): void => {
     setIsEditing(true);
-    setEditSegments([...data.marketMap.segments]);
-    setEditRelatedIndustries([...data.marketMap.relatedIndustries]);
-    setEditIndustry(data.marketMap.industry);
+
+    // Ensure we have the latest data
+    const safeSegments = data.market_map?.segments || [];
+    const safeRelatedIndustries = data.market_map?.related_industries || [];
+    const safeIndustry = data.market_map?.industry || "";
+
+    // Create deep copies to avoid reference issues
+    setEditSegments([...safeSegments]);
+    setEditRelatedIndustries([...safeRelatedIndustries]);
+    setEditIndustry(safeIndustry);
     setEditData(JSON.parse(JSON.stringify(data)));
   };
 
@@ -37,9 +101,20 @@ export default function MarketMapPage() {
 
   const saveChanges = (): void => {
     const newData = { ...data };
-    newData.marketMap.segments = editSegments;
-    newData.marketMap.relatedIndustries = editRelatedIndustries;
-    newData.marketMap.industry = editIndustry;
+
+    // Ensure market_map exists
+    if (!newData.market_map) {
+      newData.market_map = {
+        industry: "",
+        segments: [],
+        related_industries: [],
+      };
+    }
+
+    newData.market_map.segments = editSegments;
+    newData.market_map.related_industries = editRelatedIndustries;
+    newData.market_map.industry = editIndustry;
+
     setData(newData);
     setIsEditing(false);
   };
@@ -78,6 +153,16 @@ export default function MarketMapPage() {
     newRelatedIndustries[index] = value;
     setEditRelatedIndustries(newRelatedIndustries);
   };
+
+  // Safely access market_map data
+  const marketMap = data.market_map || {
+    industry: "",
+    segments: [],
+    related_industries: [],
+  };
+  const segments = marketMap.segments || [];
+  const relatedIndustries = marketMap.related_industries || [];
+  const industry = marketMap.industry || "";
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
@@ -152,6 +237,12 @@ export default function MarketMapPage() {
                   </button>
                 </div>
               ))}
+              {editSegments.length === 0 && (
+                <div className="text-center py-4 text-[#57727e]">
+                  No segments added yet. Click &quot;Add Segment&quot; to add
+                  one.
+                </div>
+              )}
             </div>
           </div>
 
@@ -187,14 +278,20 @@ export default function MarketMapPage() {
                   </button>
                 </div>
               ))}
+              {editRelatedIndustries.length === 0 && (
+                <div className="col-span-3 text-center py-4 text-[#57727e]">
+                  No related industries added yet. Click &quot;Add Related
+                  Industry&quot; to add one.
+                </div>
+              )}
             </div>
           </div>
         </div>
       ) : (
         <>
-          {!data.marketMap.industry &&
-          data.marketMap.segments.length === 0 &&
-          data.marketMap.relatedIndustries.length === 0 ? (
+          {!industry &&
+          segments.length === 0 &&
+          relatedIndustries.length === 0 ? (
             <div className="text-center py-12 text-[#57727e] text-lg">
               No market map data present
             </div>
@@ -203,9 +300,7 @@ export default function MarketMapPage() {
               {/* Main Industry Section */}
               <div className="flex flex-col items-center">
                 <div className="bg-[#002169] text-white px-8 py-4 rounded-md text-center w-full max-w-md">
-                  <h2 className="text-xl font-medium">
-                    {data.marketMap.industry || "N/A"}
-                  </h2>
+                  <h2 className="text-xl font-medium">{industry || "N/A"}</h2>
                 </div>
                 <div className="h-8 border-l-2 border-[#ced7db]"></div>
               </div>
@@ -216,8 +311,8 @@ export default function MarketMapPage() {
                   Industry Segments
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {data.marketMap.segments.length > 0 ? (
-                    data.marketMap.segments.map((segment, index) => (
+                  {segments.length > 0 ? (
+                    segments.map((segment, index) => (
                       <div
                         key={index}
                         className="bg-[#eff2f3] border border-[#ced7db] rounded-md p-4 text-center shadow-sm hover:shadow-md transition-shadow"
@@ -241,8 +336,8 @@ export default function MarketMapPage() {
                   Related Industries
                 </h2>
                 <div className="flex flex-wrap justify-center gap-3">
-                  {data.marketMap.relatedIndustries.length > 0 ? (
-                    data.marketMap.relatedIndustries.map((industry, index) => (
+                  {relatedIndustries.length > 0 ? (
+                    relatedIndustries.map((industry, index) => (
                       <div
                         key={index}
                         className="bg-[#e5e7eb] border border-[#ced7db] rounded-full px-4 py-2 text-[#445963]"
