@@ -3,5 +3,7 @@
     "env": {
       "VERCEL_CACHE": "false"
     }
-  }
+  },
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/.next"
 }
