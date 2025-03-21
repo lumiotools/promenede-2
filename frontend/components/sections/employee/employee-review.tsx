@@ -25,7 +25,7 @@ export function EmployeeReviews({ initialData }: EmployeeReviewsProps) {
     }
   }, [initialData]);
 
-  console.log("Employee Reviews",initialData)
+  console.log("Employee Reviews", initialData);
 
   // Return null or a loader if no data is available
   if (!members) {
@@ -58,7 +58,10 @@ export function EmployeeReviews({ initialData }: EmployeeReviewsProps) {
             label: "CEO approval",
             value: `${(members.breakdown.ceo_approval * 100).toFixed(0)}%`,
           },
-          { label: "Recommend", value: `${(members.breakdown.recommend * 100).toFixed(0)}%` },
+          {
+            label: "Recommend",
+            value: `${(members.breakdown.recommend * 100).toFixed(0)}%`,
+          },
         ].map((stat, index) => (
           <div
             key={index}
@@ -87,7 +90,7 @@ export function EmployeeReviews({ initialData }: EmployeeReviewsProps) {
                 tick={{ fill: "#475467" }}
                 width={180}
               />
-              <Tooltip formatter={(value) => `${value.toFixed(2)}`} />
+              <Tooltip formatter={(value) => `${value}`} />
               <Bar dataKey="rating" fill="#002169" barSize={20} />
             </BarChart>
           </ResponsiveContainer>

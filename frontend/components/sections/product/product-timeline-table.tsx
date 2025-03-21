@@ -1,8 +1,24 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useEffect } from "react";
 import { Edit, Save, X } from "lucide-react";
 
+// Define interface for the timeline API response
+interface ApiTimelineItem {
+  date: string;
+  event: string | null;
+  link?: string;
+}
+
+// Interface for the company data structure
+interface CompanyData {
+  data: {
+    company_timeline?: ApiTimelineItem[];
+  };
+}
+
+// Interface for the processed product launch data
 interface ProductLaunch {
   id: number;
   year: string;
@@ -21,18 +37,22 @@ export function ProductTimelineTable() {
     async function fetchData() {
       try {
         const response = await fetch("/paypal.json");
-        if (!response.ok) throw new Error(`Failed to fetch data: ${response.status}`);
+        if (!response.ok)
+          throw new Error(`Failed to fetch data: ${response.status}`);
 
-        const jsonData = await response.json();
+        const jsonData: CompanyData = await response.json();
 
-        if (jsonData?.data?.company_timeline && Array.isArray(jsonData.data.company_timeline)) {
+        if (
+          jsonData?.data?.company_timeline &&
+          Array.isArray(jsonData.data.company_timeline)
+        ) {
           const timelineEvents = jsonData.data.company_timeline
-            .filter((item: any) => item.event !== null)
+            .filter((item: ApiTimelineItem) => item.event !== null)
             .slice(0, 5)
-            .map((item: any, index: number) => ({
+            .map((item: ApiTimelineItem, index: number) => ({
               id: index + 1,
               year: new Date(item.date).getFullYear().toString(),
-              description: item.event,
+              description: item.event as string, // Safe assertion since we filtered nulls
               link: item.link || "#",
             }));
 
@@ -68,14 +88,20 @@ export function ProductTimelineTable() {
     setIsEditing(false);
   };
 
-  const updateField = (id: number, field: keyof ProductLaunch, value: string) => {
+  const updateField = (
+    id: number,
+    field: keyof ProductLaunch,
+    value: string
+  ) => {
     setEditData((prev) =>
       prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
   };
 
-  if (loading) return <div className="p-6">Loading product timeline data...</div>;
-  if (error && data.length === 0) return <div className="p-6 text-red-500">{error}</div>;
+  if (loading)
+    return <div className="p-6">Loading product timeline data...</div>;
+  if (error && data.length === 0)
+    return <div className="p-6 text-red-500">{error}</div>;
 
   return (
     <div className="space-y-6 bg-white">
@@ -84,8 +110,8 @@ export function ProductTimelineTable() {
       <div className="border-t border-[#e5e7eb] w-full"></div>
 
       {/* <div className="border border-[#e5e7eb] mx-10 rounded-md overflow-hidden">
-        {/* Table Header *
-        <div className="flex justify-between items-center px-4 py-3 border-b border-[#e5e7eb]">
+        {/* Table Header */}
+      {/* <div className="flex justify-between items-center px-4 py-3 border-b border-[#e5e7eb]">
           <h2 className="text-lg font-medium text-[#475467]">Product Timeline</h2>
           {isEditing ? (
             <div className="flex gap-2">
@@ -103,10 +129,10 @@ export function ProductTimelineTable() {
               <Edit size={18} />
             </button>
           )}
-        </div>
+        </div> */}
 
-        {/* Table *
-        <table className="w-full border-collapse">
+      {/* Table */}
+      {/* <table className="w-full border-collapse">
           <thead>
             <tr className="bg-[#002266] text-white">
               <th className="py-2 px-4 text-left font-medium border-r border-[#1a3a80] w-12">#</th>
@@ -155,9 +181,11 @@ export function ProductTimelineTable() {
         </table>
       </div> */}
 
-      <div className='text-center'>No Data Available</div>
+      <div className="text-center">No Data Available</div>
 
-      <div className="text-xs text-[#8097a2] italic">Source: 1.PromenadeAI, 2.Crunchbase</div>
+      <div className="text-xs text-[#8097a2] italic">
+        Source: 1.PromenadeAI, 2.Crunchbase
+      </div>
     </div>
   );
 }

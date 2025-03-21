@@ -1,8 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
 import { TimelineEvent, Timeline } from "../../timeline";
 import { SectionHeader } from "@/components/ui/section-header";
+
+// Define the interface for the raw timeline item from the API
+interface ApiTimelineItem {
+  date: string;
+  event: string | null;
+}
+
+// Define the interface for the company data structure
+interface CompanyData {
+  data: {
+    company_timeline?: ApiTimelineItem[];
+  };
+}
 
 export function ProductLaunchesTimeline() {
   const [loading, setLoading] = useState(true);
@@ -18,18 +32,18 @@ export function ProductLaunchesTimeline() {
           throw new Error(`Failed to fetch data: ${response.status}`);
         }
 
-        const jsonData = await response.json();
+        const jsonData: CompanyData = await response.json();
 
         if (
           jsonData?.data?.company_timeline &&
           Array.isArray(jsonData.data.company_timeline)
         ) {
           const timelineEvents = jsonData.data.company_timeline
-            .filter((item: any) => item.event !== null)
+            .filter((item: ApiTimelineItem) => item.event !== null)
             .slice(0, 4)
-            .map((item: any) => ({
+            .map((item: ApiTimelineItem) => ({
               date: formatDate(item.date),
-              title: item.event,
+              title: item.event as string, // We've already filtered out null events
             }));
 
           setEvents(timelineEvents);
@@ -66,13 +80,14 @@ export function ProductLaunchesTimeline() {
 
   return (
     <div className="space-y-6 bg-white">
-     
-      <h1 className="text-4xl font-medium text-[#475467]">Product Launches Timeline</h1>
+      <h1 className="text-4xl font-medium text-[#475467]">
+        Product Launches Timeline
+      </h1>
       <div className="w-full h-px bg-[#e5e7eb] mb-16"></div>
 
       {/* <Timeline events={events} /> */}
 
-      <div className='text-center'>No Data Available</div>
+      <div className="text-center">No Data Available</div>
 
       <div className="text-xs text-[#6b7280] mt-20 italic">
         Source: 1.PromenadeAI, 2.Crunchbase

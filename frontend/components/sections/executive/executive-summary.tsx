@@ -1,19 +1,23 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BarChart } from "@/components/ui/bar-chart";
 import { SectionHeader } from "@/components/ui/section-header";
 import { ExecutiveSummaryTitle } from "@/types/executive";
 import { useEffect, useState } from "react";
 
 type ExecutiveSummaryProps = {
-  initialData?: ExecutiveSummaryTitle
-}
+  initialData?: ExecutiveSummaryTitle;
+};
 
-export function ExecutiveSummary({initialData}: ExecutiveSummaryProps) {
-  const [data, setData] = useState<ExecutiveSummaryTitle | undefined>(initialData);
-  useEffect(()=>{
+export function ExecutiveSummary({ initialData }: ExecutiveSummaryProps) {
+  const [data, setData] = useState<ExecutiveSummaryTitle | undefined>(
+    initialData
+  );
+  useEffect(() => {
     setData(initialData);
-  },[initialData]);
+  }, [initialData]);
 
-  console.log("Executive summary",initialData);
+  console.log("Executive summary", initialData);
+
   return (
     <div className="w-full max-w-full bg-white">
       <SectionHeader title="Executive Summary" />
@@ -267,9 +271,9 @@ export function ExecutiveSummary({initialData}: ExecutiveSummaryProps) {
             <h2 className="text-base font-medium text-[#475467] mb-4">
               Business Description
             </h2>
-            <p className="text-sm text-[#475467] mb-8">
-             {data || "NA"}
-            </p>
+            {/* <p className="text-sm text-[#475467] mb-8">
+              {data?.title || "No business description available"}
+            </p> */}
 
             <div className="mt-auto mb-10">
               <h3 className="text-base font-medium mb-4 text-[#475467]">

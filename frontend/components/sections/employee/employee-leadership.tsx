@@ -1,6 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+} from "recharts";
 
 const dummyData = [
   {
@@ -21,11 +31,15 @@ export function LeadershipExecutives() {
   return (
     <div className="space-y-6 bg-white">
       {/* Header */}
-      <h1 className="text-4xl font-medium text-[#475467]">Organization: Leadership & Executives</h1>
+      <h1 className="text-4xl font-medium text-[#475467]">
+        Organization: Leadership & Executives
+      </h1>
       <div className="border-t border-[#e5e7eb] mb-6"></div>
 
       {/* Company Tenure Section */}
-      <h2 className="text-xl font-medium text-[#475467] mx-10">Company tenure</h2>
+      <h2 className="text-xl font-medium text-[#475467] mx-10">
+        Company tenure
+      </h2>
 
       {/* Cards Section */}
       {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-10">
@@ -56,10 +70,12 @@ export function LeadershipExecutives() {
         ))}
       </div> */}
 
-      <div className='text-center'>No Data Available</div>
+      <div className="text-center">No Data Available</div>
 
       {/* Footer Source */}
-      <div className="text-xs text-[#8097a2] italic mt-4">Source: 1.PromenadeAI, 2.Crunchbase</div>
+      <div className="text-xs text-[#8097a2] italic mt-4">
+        Source: 1.PromenadeAI, 2.Crunchbase
+      </div>
     </div>
   );
 }

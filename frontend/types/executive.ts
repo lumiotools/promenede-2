@@ -1,3 +1,3 @@
 export interface ExecutiveSummaryTitle {
-    executive_summary:string;
-};
+  executive_summary: string | null;
+}
