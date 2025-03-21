@@ -172,7 +172,7 @@ export interface TimelineEvent {
   
   export interface ProductsServices {
     details: ProductDetail[]
-    launch_timeline: any[] // You might want to define a more specific type here
+    launch_timeline: null, // You might want to define a more specific type here
     pricing_available: boolean | null
     free_trial_available: boolean | null
     demo_available: boolean | null
