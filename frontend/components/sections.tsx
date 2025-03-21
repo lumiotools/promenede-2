@@ -31,12 +31,12 @@ import { CompanyTimelineTable } from "./sections/company/company-timeline-table"
 import { ProductsServices } from "./sections/product/product-services";
 import { ProductLaunchesTimeline } from "./sections/product/product-launch-timeline";
 import { ProductTimelineTable } from "./sections/product/product-timeline-table";
-import { EmployeeBreakdown } from "./sections/employee/employee-breakdown";
 import { ExecutiveSummary } from "./sections/executive/executive-summary";
 import { EmployeeTrendChart } from "./sections/employee/employee-trend-chart";
 import { EmployeeKeyMembers } from "./sections/employee/employee-keymember";
 import { LeadershipExecutives } from "./sections/employee/employee-leadership";
 import { CompanyData } from "@/types/apiResponse";
+import EmployeeBreakdown from "./sections/employee/employee-breakdown";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -91,7 +91,9 @@ export function Sections({ searchResults }: SectionsProps) {
         <ProductTimelineTable />
       </section>
       <section id="employee-breakdown" className="p-6">
-        <EmployeeBreakdown />
+        <EmployeeBreakdown
+          initialData={searchResults?.organization.employees_trend}
+        />
       </section>
       <section id="employee-trend-chart" className="p-6">
         <EmployeeTrendChart />
