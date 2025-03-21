@@ -4,6 +4,7 @@ import { MarketInfo } from "./market";
 import { OpportunitiesRisks } from "./opportunitiesRisks";
 import { QAItem } from "./qa";
 import { RegulationItem } from "./regulation";
+import { KeyTechnology } from "./technology";
 
 export type ApiResponse<T> = {
   success: boolean;
@@ -12,6 +13,7 @@ export type ApiResponse<T> = {
 };
 
 export type CompanyData = {
+  key_technology: KeyTechnology;
   ma_activity: MAActivity;
   market_info: MarketInfo;
   competitive_analysis: CompetitiveAnalysis;

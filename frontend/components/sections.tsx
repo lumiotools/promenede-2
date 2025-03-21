@@ -112,7 +112,7 @@ export function Sections({ searchResults }: SectionsProps) {
         <MarketLeadershipPage />
       </section>
       <section id="technology-component" className="p-6">
-        <KeyTechnologyPage />
+        <KeyTechnologyPage initialData={searchResults?.key_technology} />
       </section>
       <section id="strategy-component" className="p-6">
         <StrategyPage />

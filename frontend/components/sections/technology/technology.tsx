@@ -1,11 +1,17 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
+import type { KeyTechnology, Technology } from "@/types/technology";
 
-import { keyTechnology as initialData } from "./technologyData";
-import { KeyTechnology, Technology } from "@/types/technology";
+// Default state for the component
+const defaultState: KeyTechnology = {
+  technologies_used: [],
+  num_technologies: 0,
+};
 
 // Helper function to format dates
-const formatDate = (dateStr: string): string => {
+const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return "N/A";
 
   try {
@@ -20,20 +26,63 @@ const formatDate = (dateStr: string): string => {
   }
 };
 
-const KeyTechnologyPage: React.FC = () => {
-  const [data, setData] = useState<KeyTechnology>(initialData);
+type KeyTechnologyProps = {
+  initialData?: KeyTechnology;
+};
+
+const KeyTechnologyPage: React.FC<KeyTechnologyProps> = ({
+  initialData = defaultState,
+}: KeyTechnologyProps) => {
+  // Ensure technologies_used exists and is an array
+  const safeTechnologies = initialData?.technologies_used || [];
+  const safeNumTechnologies = initialData?.num_technologies || 0;
+
+  const [data, setData] = useState<KeyTechnology>({
+    technologies_used: safeTechnologies,
+    num_technologies: safeNumTechnologies,
+  });
+
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<KeyTechnology>(initialData);
+  const [editData, setEditData] = useState<KeyTechnology>({
+    technologies_used: safeTechnologies,
+    num_technologies: safeNumTechnologies,
+  });
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
 
+  // Update data when initialData changes
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("key technology initialData update:", initialData);
+
+    // Ensure technologies_used exists and is an array
+    const updatedTechnologies = initialData.technologies_used || [];
+    const updatedNumTechnologies = initialData.num_technologies || 0;
+
+    // Update the state with the new data
+    setData({
+      technologies_used: updatedTechnologies,
+      num_technologies: updatedNumTechnologies,
+    });
+
+    // If we're not in edit mode, also update the edit data
+    if (!isEditing) {
+      setEditData({
+        technologies_used: updatedTechnologies,
+        num_technologies: updatedNumTechnologies,
+      });
+    }
+  }, [initialData, isEditing]);
+
   // Calculate total pages whenever data or items per page changes
   useEffect(() => {
     const dataToUse = isEditing ? editData : data;
-    setTotalPages(Math.ceil(dataToUse.technologies_used.length / itemsPerPage));
+    const technologiesLength = dataToUse.technologies_used?.length || 0;
+    setTotalPages(Math.max(1, Math.ceil(technologiesLength / itemsPerPage)));
   }, [data, editData, isEditing, itemsPerPage]);
 
   // Reset to first page when switching between edit and view modes
@@ -66,6 +115,10 @@ const KeyTechnologyPage: React.FC = () => {
   ): void => {
     const newData = { ...editData };
 
+    if (!newData.technologies_used) {
+      newData.technologies_used = [];
+    }
+
     if (index >= 0 && index < newData.technologies_used.length) {
       newData.technologies_used[index] = {
         ...newData.technologies_used[index],
@@ -80,6 +133,10 @@ const KeyTechnologyPage: React.FC = () => {
     const newData = { ...editData };
     const today = new Date().toISOString().split("T")[0];
 
+    if (!newData.technologies_used) {
+      newData.technologies_used = [];
+    }
+
     newData.technologies_used.push({
       technology: "New Technology",
       first_verified_at: today,
@@ -87,7 +144,7 @@ const KeyTechnologyPage: React.FC = () => {
     });
 
     // Update count
-    newData.num_technologies += 1;
+    newData.num_technologies = (newData.num_technologies || 0) + 1;
 
     setEditData(newData);
 
@@ -102,11 +159,19 @@ const KeyTechnologyPage: React.FC = () => {
   const removeTechnology = (index: number): void => {
     const newData = { ...editData };
 
+    if (!newData.technologies_used) {
+      newData.technologies_used = [];
+      return;
+    }
+
     if (index >= 0 && index < newData.technologies_used.length) {
       newData.technologies_used.splice(index, 1);
 
       // Update count
-      newData.num_technologies -= 1;
+      newData.num_technologies = Math.max(
+        0,
+        (newData.num_technologies || 0) - 1
+      );
 
       setEditData(newData);
 
@@ -123,9 +188,11 @@ const KeyTechnologyPage: React.FC = () => {
   // Get current page items
   const getCurrentItems = () => {
     const dataToUse = isEditing ? editData : data;
+    const technologies = dataToUse.technologies_used || [];
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    return dataToUse.technologies_used.slice(indexOfFirstItem, indexOfLastItem);
+    return technologies.slice(indexOfFirstItem, indexOfLastItem);
   };
 
   // Pagination controls
@@ -138,6 +205,10 @@ const KeyTechnologyPage: React.FC = () => {
   const getActualIndex = (pageIndex: number) => {
     return (currentPage - 1) * itemsPerPage + pageIndex;
   };
+
+  // Safely access data
+  const technologies = (isEditing ? editData : data).technologies_used || [];
+  const numTechnologies = (isEditing ? editData : data).num_technologies || 0;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 bg-white">
@@ -207,8 +278,7 @@ const KeyTechnologyPage: React.FC = () => {
       {!isEditing ? (
         <div className="mb-6">
           <p className="text-lg text-gray-600">
-            Tracking{" "}
-            <span className="font-medium">{data.num_technologies}</span>{" "}
+            Tracking <span className="font-medium">{numTechnologies}</span>{" "}
             technologies
           </p>
         </div>
@@ -218,11 +288,11 @@ const KeyTechnologyPage: React.FC = () => {
           <input
             type="number"
             className="w-20 p-1 text-center border border-gray-300 rounded"
-            value={editData.num_technologies}
+            value={editData.num_technologies || 0}
             onChange={(e) =>
               setEditData({
                 ...editData,
-                num_technologies: parseInt(e.target.value) || 0,
+                num_technologies: Number.parseInt(e.target.value) || 0,
               })
             }
           />
@@ -256,7 +326,6 @@ const KeyTechnologyPage: React.FC = () => {
               <th className="p-3 text-left font-medium border-r border-gray-600">
                 Technology
               </th>
-
               <th className="p-3 text-left font-medium border-r border-gray-600">
                 First Verified
               </th>
@@ -267,97 +336,107 @@ const KeyTechnologyPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {getCurrentItems().map((tech, pageIndex) => {
-              const actualIndex = getActualIndex(pageIndex);
-              return (
-                <tr
-                  key={tech.technology + actualIndex}
-                  className="border-t border-gray-200"
+            {technologies.length === 0 ? (
+              <tr className="border-t border-gray-200">
+                <td
+                  colSpan={isEditing ? 4 : 3}
+                  className="p-3 text-center text-gray-500"
                 >
-                  {isEditing ? (
-                    <>
-                      <td className="p-3 border-r border-gray-200">
-                        <input
-                          type="text"
-                          className="w-full p-1 border border-gray-300 rounded"
-                          value={tech.technology}
-                          onChange={(e) =>
-                            updateTechnology(
-                              actualIndex,
-                              "technology",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </td>
-
-                      <td className="p-3 border-r border-gray-200">
-                        <input
-                          type="date"
-                          className="w-full p-1 border border-gray-300 rounded"
-                          value={tech.first_verified_at}
-                          onChange={(e) =>
-                            updateTechnology(
-                              actualIndex,
-                              "first_verified_at",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </td>
-                      <td className="p-3 border-r border-gray-200">
-                        <input
-                          type="date"
-                          className="w-full p-1 border border-gray-300 rounded"
-                          value={tech.last_verified_at}
-                          onChange={(e) =>
-                            updateTechnology(
-                              actualIndex,
-                              "last_verified_at",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </td>
-                      <td className="p-3 text-center">
-                        <button
-                          onClick={() => removeTechnology(actualIndex)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
+                  No technologies available
+                </td>
+              </tr>
+            ) : (
+              getCurrentItems().map((tech, pageIndex) => {
+                const actualIndex = getActualIndex(pageIndex);
+                return (
+                  <tr
+                    key={`${tech.technology || "unknown"}-${actualIndex}`}
+                    className="border-t border-gray-200"
+                  >
+                    {isEditing ? (
+                      <>
+                        <td className="p-3 border-r border-gray-200">
+                          <input
+                            type="text"
+                            className="w-full p-1 border border-gray-300 rounded"
+                            value={tech.technology || ""}
+                            onChange={(e) =>
+                              updateTechnology(
+                                actualIndex,
+                                "technology",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="p-3 border-r border-gray-200">
+                          <input
+                            type="date"
+                            className="w-full p-1 border border-gray-300 rounded"
+                            value={tech.first_verified_at || ""}
+                            onChange={(e) =>
+                              updateTechnology(
+                                actualIndex,
+                                "first_verified_at",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="p-3 border-r border-gray-200">
+                          <input
+                            type="date"
+                            className="w-full p-1 border border-gray-300 rounded"
+                            value={tech.last_verified_at || ""}
+                            onChange={(e) =>
+                              updateTechnology(
+                                actualIndex,
+                                "last_verified_at",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="p-3 text-center">
+                          <button
+                            onClick={() => removeTechnology(actualIndex)}
+                            className="text-red-500 hover:text-red-700"
                           >
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                          </svg>
-                        </button>
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="p-3 border-r border-gray-200">
-                        {tech.technology}
-                      </td>
-
-                      <td className="p-3 border-r border-gray-200">
-                        {formatDate(tech.first_verified_at)}
-                      </td>
-                      <td className="p-3">
-                        {formatDate(tech.last_verified_at)}
-                      </td>
-                    </>
-                  )}
-                </tr>
-              );
-            })}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                          </button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="p-3 border-r border-gray-200">
+                          {tech.technology || "N/A"}
+                        </td>
+                        <td className="p-3 border-r border-gray-200">
+                          {formatDate(tech.first_verified_at)}
+                        </td>
+                        <td className="p-3">
+                          {formatDate(tech.last_verified_at)}
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                );
+              })
+            )}
 
             {/* Empty rows for visual consistency */}
             {!isEditing &&
+              technologies.length > 0 &&
               getCurrentItems().length < itemsPerPage &&
               Array(itemsPerPage - getCurrentItems().length)
                 .fill(0)
@@ -368,7 +447,6 @@ const KeyTechnologyPage: React.FC = () => {
                   >
                     <td className="p-3 border-r border-gray-200">&nbsp;</td>
                     <td className="p-3 border-r border-gray-200">&nbsp;</td>
-                    <td className="p-3 border-r border-gray-200">&nbsp;</td>
                     <td className="p-3">&nbsp;</td>
                   </tr>
                 ))}
@@ -376,7 +454,7 @@ const KeyTechnologyPage: React.FC = () => {
             {/* Add new technology row */}
             {isEditing && (
               <tr className="border-t border-gray-200 bg-gray-50">
-                <td colSpan={5} className="p-3 text-center">
+                <td colSpan={4} className="p-3 text-center">
                   <button
                     onClick={addTechnology}
                     className="text-blue-700 hover:text-blue-900 flex items-center justify-center w-full"
@@ -402,78 +480,78 @@ const KeyTechnologyPage: React.FC = () => {
       </div>
 
       {/* Pagination controls */}
-      <div className="mt-4 flex justify-between items-center">
-        <div className="text-sm text-gray-600">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(
-            currentPage * itemsPerPage,
-            (isEditing ? editData : data).technologies_used.length
-          )}{" "}
-          of {(isEditing ? editData : data).technologies_used.length} entries
+      {technologies.length > 0 && (
+        <div className="mt-4 flex justify-between items-center">
+          <div className="text-sm text-gray-600">
+            Showing{" "}
+            {technologies.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}{" "}
+            to {Math.min(currentPage * itemsPerPage, technologies.length)} of{" "}
+            {technologies.length} entries
+          </div>
+          <div className="flex items-center">
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className={`mx-1 px-3 py-1 rounded border ${
+                currentPage === 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Previous
+            </button>
+
+            {/* Page number buttons - show first, last, and pages around current */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(
+                (page) =>
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+              )
+              .map((page, index, array) => {
+                // Add ellipsis if there's a gap
+                const showEllipsisBefore =
+                  index > 0 && page > array[index - 1] + 1;
+                const showEllipsisAfter =
+                  index < array.length - 1 && page < array[index + 1] - 1;
+
+                return (
+                  <React.Fragment key={page}>
+                    {showEllipsisBefore && (
+                      <span className="mx-1 px-3 py-1">...</span>
+                    )}
+                    <button
+                      onClick={() => paginate(page)}
+                      className={`mx-1 px-3 py-1 rounded border ${
+                        currentPage === page
+                          ? "bg-blue-700 text-white"
+                          : "bg-white text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                    {showEllipsisAfter && (
+                      <span className="mx-1 px-3 py-1">...</span>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+
+            <button
+              onClick={nextPage}
+              disabled={currentPage === totalPages}
+              className={`mx-1 px-3 py-1 rounded border ${
+                currentPage === totalPages
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Next
+            </button>
+          </div>
         </div>
-        <div className="flex items-center">
-          <button
-            onClick={prevPage}
-            disabled={currentPage === 1}
-            className={`mx-1 px-3 py-1 rounded border ${
-              currentPage === 1
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            Previous
-          </button>
-
-          {/* Page number buttons - show first, last, and pages around current */}
-          {Array.from({ length: totalPages }, (_, i) => i + 1)
-            .filter(
-              (page) =>
-                page === 1 ||
-                page === totalPages ||
-                (page >= currentPage - 1 && page <= currentPage + 1)
-            )
-            .map((page, index, array) => {
-              // Add ellipsis if there's a gap
-              const showEllipsisBefore =
-                index > 0 && page > array[index - 1] + 1;
-              const showEllipsisAfter =
-                index < array.length - 1 && page < array[index + 1] - 1;
-
-              return (
-                <React.Fragment key={page}>
-                  {showEllipsisBefore && (
-                    <span className="mx-1 px-3 py-1">...</span>
-                  )}
-                  <button
-                    onClick={() => paginate(page)}
-                    className={`mx-1 px-3 py-1 rounded border ${
-                      currentPage === page
-                        ? "bg-blue-700 text-white"
-                        : "bg-white text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                  {showEllipsisAfter && (
-                    <span className="mx-1 px-3 py-1">...</span>
-                  )}
-                </React.Fragment>
-              );
-            })}
-
-          <button
-            onClick={nextPage}
-            disabled={currentPage === totalPages}
-            className={`mx-1 px-3 py-1 rounded border ${
-              currentPage === totalPages
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            Next
-          </button>
-        </div>
-      </div>
+      )}
 
       <div className="mt-8 text-gray-500 text-sm">
         Source: 1.PromenadeAI, 2.Crunchbase
