@@ -1,13 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Acquisition } from "@/types/maActivity";
-import React, { useState } from "react";
+"use client";
 
-import { maActivity as initialData } from "./maActivityData";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import type { Acquisition, MAActivity } from "@/types/maActivity";
+import type React from "react";
+import { useState, useEffect } from "react";
+
+// Default state for the component
+const defaultState: MAActivity = {
+  acquisitions: [],
+  acquired_by: null,
+};
 
 // Helper function to format currency values
 const formatCurrency = (
   value: number | null | undefined,
-  currency: string = "$"
+  currency = "$"
 ): string => {
   if (value === null || value === undefined) return "N/A";
 
@@ -36,15 +43,63 @@ const formatDate = (dateStr: string | null | undefined): string => {
   }
 };
 
-const MAStrategyPage: React.FC = () => {
-  const [data, setData] = useState<Acquisition[]>(initialData.acquisitions);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<Acquisition[]>(
-    initialData.acquisitions
+type MaActivityProps = {
+  initialData?: MAActivity;
+};
+
+// Extended acquisition type with additional fields for UI
+interface ExtendedAcquisition extends Acquisition {
+  description?: string;
+  dealType?: string;
+}
+
+const MAStrategyPage: React.FC<MaActivityProps> = ({
+  initialData = defaultState,
+}: MaActivityProps) => {
+  // Ensure acquisitions exists and is an array
+  const safeAcquisitions = initialData?.acquisitions || [];
+
+  // Initialize with extended data
+  const getExtendedData = (
+    acquisitionsData: Acquisition[]
+  ): ExtendedAcquisition[] => {
+    return acquisitionsData.map((acquisition) => ({
+      ...acquisition,
+      description: "Technology company acquisition",
+      dealType: "Acquisition",
+    }));
+  };
+
+  const [data, setData] = useState<ExtendedAcquisition[]>(
+    getExtendedData(safeAcquisitions)
   );
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editData, setEditData] = useState<ExtendedAcquisition[]>(
+    getExtendedData(safeAcquisitions)
+  );
+
+  // Update data when initialData changes
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("M&A strategy initialData update:", initialData);
+
+    // Ensure acquisitions exists and is an array
+    const updatedAcquisitions = initialData.acquisitions || [];
+
+    // Update the state with the new extended data
+    const extendedData = getExtendedData(updatedAcquisitions);
+    setData(extendedData);
+
+    // If we're not in edit mode, also update the edit data
+    if (!isEditing) {
+      setEditData(extendedData);
+    }
+  }, [initialData, isEditing]);
 
   const startEditing = (): void => {
     setIsEditing(true);
+    // Create a deep copy to avoid reference issues
     setEditData(JSON.parse(JSON.stringify(data)));
   };
 
@@ -59,20 +114,29 @@ const MAStrategyPage: React.FC = () => {
 
   const updateAcquisition = (
     index: number,
-    field: keyof Acquisition,
+    field: keyof ExtendedAcquisition,
     value: string | number
   ): void => {
     const newData = [...editData];
-    newData[index][field] = value as never; // Type assertion needed due to generic update
+
+    // Handle property name mapping
+    if (field === "acquiree_name") {
+      newData[index].acquiree_name = value as string;
+    } else if (field === "announced_date") {
+      newData[index].announced_date = value as string;
+    } else {
+      // For other fields, directly update
+      newData[index][field] = value as never; // Type assertion needed due to generic update
+    }
+
     setEditData(newData);
   };
 
   const addAcquisition = (): void => {
-    const newId = `acq-${Date.now()}`;
     const newData = [...editData];
     newData.push({
-      acquireeName: "New Company",
-      announcedDate: new Date().toISOString().split("T")[0],
+      acquiree_name: "New Company",
+      announced_date: new Date().toISOString().split("T")[0],
       price: 0,
       currency: "$",
       description: "New acquisition",
@@ -187,8 +251,6 @@ const MAStrategyPage: React.FC = () => {
               <tr className="bg-blue-900 text-white">
                 <th className="p-4 text-left font-medium">Logo</th>
                 <th className="p-4 text-left font-medium">Name</th>
-                <th className="p-4 text-left font-medium">Description</th>
-                <th className="p-4 text-left font-medium">Deal Type</th>
                 <th className="p-4 text-left font-medium">Deal Date</th>
                 <th className="p-4 text-left font-medium">Deal Value</th>
                 {isEditing && (
@@ -217,49 +279,26 @@ const MAStrategyPage: React.FC = () => {
                     <td className="p-4 border-r border-gray-300">
                       <input
                         type="text"
-                        value={acquisition.acquireeName}
+                        value={acquisition.acquiree_name || ""}
                         onChange={(e) =>
                           updateAcquisition(
                             index,
-                            "acquireeName",
+                            "acquiree_name",
                             e.target.value
                           )
                         }
                         className="w-full border border-gray-300 p-2 rounded"
                       />
                     </td>
-                    <td className="p-4 border-r border-gray-300">
-                      <input
-                        type="text"
-                        value={acquisition.description || ""}
-                        onChange={(e) =>
-                          updateAcquisition(
-                            index,
-                            "description",
-                            e.target.value
-                          )
-                        }
-                        className="w-full border border-gray-300 p-2 rounded"
-                      />
-                    </td>
-                    <td className="p-4 border-r border-gray-300">
-                      <input
-                        type="text"
-                        value={acquisition.dealType || ""}
-                        onChange={(e) =>
-                          updateAcquisition(index, "dealType", e.target.value)
-                        }
-                        className="w-full border border-gray-300 p-2 rounded"
-                      />
-                    </td>
+
                     <td className="p-4 border-r border-gray-300">
                       <input
                         type="date"
-                        value={acquisition.announcedDate || ""}
+                        value={acquisition.announced_date || ""}
                         onChange={(e) =>
                           updateAcquisition(
                             index,
-                            "announcedDate",
+                            "announced_date",
                             e.target.value
                           )
                         }
@@ -269,7 +308,7 @@ const MAStrategyPage: React.FC = () => {
                     <td className="p-4 border-r border-gray-300">
                       <div className="flex items-center">
                         <select
-                          value={acquisition.currency}
+                          value={acquisition.currency || "$"}
                           onChange={(e) =>
                             updateAcquisition(index, "currency", e.target.value)
                           }
@@ -282,12 +321,12 @@ const MAStrategyPage: React.FC = () => {
                         </select>
                         <input
                           type="number"
-                          value={acquisition.price}
+                          value={acquisition.price || 0}
                           onChange={(e) =>
                             updateAcquisition(
                               index,
                               "price",
-                              parseFloat(e.target.value)
+                              Number.parseFloat(e.target.value)
                             )
                           }
                           className="flex-1 border border-gray-300 p-2 rounded"
@@ -325,19 +364,17 @@ const MAStrategyPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="p-4 border-r border-gray-300 text-gray-700">
-                      {acquisition.acquireeName || "N/A"}
+                      {acquisition.acquiree_name || "N/A"}
                     </td>
+
                     <td className="p-4 border-r border-gray-300 text-gray-700">
-                      {acquisition.description || "N/A"}
-                    </td>
-                    <td className="p-4 border-r border-gray-300 text-gray-700">
-                      {acquisition.dealType || "N/A"}
-                    </td>
-                    <td className="p-4 border-r border-gray-300 text-gray-700">
-                      {formatDate(acquisition.announcedDate)}
+                      {formatDate(acquisition.announced_date)}
                     </td>
                     <td className="p-4 text-gray-700">
-                      {formatCurrency(acquisition.price, acquisition.currency)}
+                      {formatCurrency(
+                        acquisition.price,
+                        acquisition.currency || "N/A"
+                      )}
                     </td>
                   </tr>
                 ))

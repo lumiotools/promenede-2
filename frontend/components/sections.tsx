@@ -124,7 +124,7 @@ export function Sections({ searchResults }: SectionsProps) {
         <MAMapPage />
       </section> */}
       <section id="ma-activity-component" className="p-6">
-        <MAStrategyPage />
+        <MAStrategyPage initialData={searchResults?.ma_activity} />
       </section>
       <section id="market-size-component" className="p-6">
         <MarketSizePage />

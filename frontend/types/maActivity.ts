@@ -1,24 +1,18 @@
 export interface Acquisition {
-  acquireeName: string;
-  announcedDate: string;
-  price: number;
-  currency: string;
-  logo?: string;
-  description?: string;
-  dealType?: string;
+  acquiree_name: string | null;
+  announced_date: string | null;
+  price: number | null;
+  currency: string | null;
 }
 
 export interface AcquiredBy {
-  acquirerName: string;
-  announcedDate: string;
-  price: number;
-  currency: string;
-  logo?: string;
-  description?: string;
-  dealType?: string;
+  acquirer_name: string | null;
+  announced_date: string | null;
+  price: number | null;
+  currency: string | null;
 }
 
 export interface MAActivity {
-  acquisitions: Acquisition[];
-  acquiredBy?: AcquiredBy;
+  acquisitions: Acquisition[] | null;
+  acquired_by?: AcquiredBy | null;
 }

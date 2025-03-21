@@ -8,6 +8,15 @@ import { CompanyData } from "@/types/apiResponse";
 
 export default function Home() {
   const [searchResults, setSearchResults] = useState<CompanyData>({
+    ma_activity: {
+      acquisitions: [],
+      acquired_by: {
+        acquirer_name: null,
+        announced_date: null,
+        price: 0,
+        currency: null,
+      },
+    },
     market_info: {
       size: null,
       valueChain: null,
