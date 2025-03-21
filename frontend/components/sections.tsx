@@ -26,7 +26,7 @@ import { CompanyProfile } from "./sections/company/company-profile";
 import { CompanyOverview } from "./sections/company/company-overview";
 import { FinancialSummary } from "./sections/financial/financial-summary";
 import { WebTraffic } from "./sections/webtraffic/web-traffic";
-import CompanyTimeline from "./sections/company/company-timeline";
+import { CompanyTimeline } from "./sections/company/company-timeline";
 import { CompanyTimelineTable } from "./sections/company/company-timeline-table";
 import { ProductsServices } from "./sections/product/product-services";
 import { ProductLaunchesTimeline } from "./sections/product/product-launch-timeline";
