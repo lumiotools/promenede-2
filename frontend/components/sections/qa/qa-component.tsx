@@ -1,18 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
-import { initialQaData } from "./qadata";
 import { QAItem } from "@/types/qa";
 
 // Initial QA data
+type QAProps = {
+  initialData?: QAItem[];
+};
 
-export default function QAComponent() {
-  const [qaData, setQaData] = useState<QAItem[]>(initialQaData);
+export default function QAComponent({ initialData = [] }: QAProps) {
+  const [qaData, setQaData] = useState<QAItem[]>(initialData);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<QAItem[]>(initialQaData);
-
+  const [editData, setEditData] = useState<QAItem[]>(initialData || []);
+  useEffect(() => {
+    // console.log("QAComponent received new data:", initialData);
+    setQaData(initialData);
+  }, [initialData]);
   const startEditing = (): void => {
     setIsEditing(true);
     setEditData(JSON.parse(JSON.stringify(qaData)));
@@ -52,6 +57,9 @@ export default function QAComponent() {
     setEditData(newData);
   };
 
+  // Check if QA data is empty
+  const isQADataEmpty = !qaData || qaData.length === 0;
+
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-4">
@@ -83,7 +91,7 @@ export default function QAComponent() {
       </div>
       <div className="border-t border-[#ced7db] mb-12"></div>
 
-      {qaData.length === 0 && !isEditing ? (
+      {isQADataEmpty && !isEditing ? (
         <div className="text-center py-12 text-[#57727e] text-lg">
           No Q&A data present
         </div>
@@ -108,7 +116,7 @@ export default function QAComponent() {
                   Question:
                 </label>
                 <textarea
-                  value={item.question}
+                  value={item.question || ""}
                   onChange={(e) => updateQA(index, "question", e.target.value)}
                   className="w-full border border-[#ced7db] p-2 rounded"
                   rows={2}
@@ -120,7 +128,7 @@ export default function QAComponent() {
                   Answer:
                 </label>
                 <textarea
-                  value={item.answer}
+                  value={item.answer || ""}
                   onChange={(e) => updateQA(index, "answer", e.target.value)}
                   className="w-full border border-[#ced7db] p-2 rounded"
                   rows={3}
@@ -143,7 +151,7 @@ export default function QAComponent() {
           {qaData.map((item, index) => (
             <div key={index} className="mb-12">
               <h3 className="text-[#35454c] text-2xl font-normal mb-8">
-                {item.question}
+                {item.question || ""}
               </h3>
 
               <ul className="space-y-6">
@@ -155,7 +163,7 @@ export default function QAComponent() {
                     <span className="text-[#35454c] font-semibold">
                       End-to-End Automation:{" "}
                     </span>
-                    <span className="text-[#445963]">{item.answer}</span>
+                    <span className="text-[#445963]">{item.answer || ""}</span>
                   </div>
                 </li>
               </ul>

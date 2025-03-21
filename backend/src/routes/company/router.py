@@ -241,6 +241,6 @@ async def get_company_data(request: CompanyRequest):
         }
     }
     
-    return {"company_name": company_name, "data": response_data}
+    return {"success":True,"company_name": company_name, "data": response_data}
 
 

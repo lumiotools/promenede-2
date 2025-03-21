@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React from 'react'
+import React, { useState } from "react";
 import QAComponent from "./sections/qa/qa-component";
 import OpportunitiesPage from "./sections/opportunities-risks/opportunities";
 import RisksPage from "./sections/opportunities-risks/risks";
@@ -40,12 +40,14 @@ import { EmployeeReviews } from './sections/employee/employee-review';
 import { EmployeeReviewImprovements } from './sections/employee/employee-review-improvement';
 import { EmployeeReviewsTable } from './sections/employee/employee-review-table';
 import {GroupStructure} from './sections/group/groupstructure';
-
+import { CompanyData } from "@/types/apiResponse";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
-
-export function Sections() {
+type SectionsProps = {
+  searchResults?: CompanyData;
+};
+export function Sections({ searchResults }: SectionsProps) {
   return (
     <div className="flex flex-col w-full">
       <ReportHeader
@@ -173,11 +175,8 @@ export function Sections() {
         <RisksPage />
       </section>
       <section id="qa-component" className="p-6">
-        <QAComponent />
+        <QAComponent initialData={searchResults?.qa} />
       </section>
-
-     
-      
     </div>
   );
 }
