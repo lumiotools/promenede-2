@@ -96,7 +96,9 @@ export function Sections({ searchResults }: SectionsProps) {
         />
       </section>
       <section id="employee-trend-chart" className="p-6">
-        <EmployeeTrendChart />
+        <EmployeeTrendChart
+          initialData={searchResults?.organization.employees_trend}
+        />
       </section>
       <section id="employee-keymembers" className="p-6">
         <EmployeeKeyMembers />
