@@ -1,4 +1,4 @@
 export interface QAItem {
-  question: string;
-  answer: string;
+  question: string | null;
+  answer: string | null;
 }
