@@ -29,6 +29,7 @@ export default function OpportunitiesPage({
   useEffect(() => {
     // Ensure we have valid data with the correct structure
     const validData = initialData || defaultState;
+    console.log("opportunities data", initialData);
     setData(validData);
   }, [initialData]);
 

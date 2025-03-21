@@ -159,7 +159,7 @@ export function Sections({ searchResults }: SectionsProps) {
         <RegulationPage initialData={searchResults?.regulation} />
       </section>
       <section id="opportunities-component" className="p-6">
-        <OpportunitiesPage />
+        <OpportunitiesPage initialData={searchResults?.opportunities_risks} />
       </section>
       <section id="risks-component" className="p-6">
         <RisksPage initialData={searchResults?.opportunities_risks} />
