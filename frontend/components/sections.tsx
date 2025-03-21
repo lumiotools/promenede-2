@@ -136,7 +136,9 @@ export function Sections({ searchResults }: SectionsProps) {
         <MarketMapPage />
       </section>
       <section id="competitor-landscape-component" className="p-6">
-        <CompetitiveLandscapePage />
+        <CompetitiveLandscapePage
+          initialData={searchResults?.competitive_analysis}
+        />
       </section>
       <section id="financial-comparables-component" className="p-6">
         <FinancialComparablesPage

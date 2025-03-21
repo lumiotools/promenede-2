@@ -13,10 +13,10 @@ export interface CompetitorWebsite {
 
 export interface LandscapeCompetitor {
   name: string | null;
-  similarityScore: number | null;
+  similarity_score: number | null;
   website: string | null;
-  monthlyVisits: number | null;
-  rankCategory: number | null;
+  monthly_visits: number | null;
+  rank_category: number | null;
 }
 
 export interface FinancialComparable {
