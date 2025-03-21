@@ -1,15 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import { regulationData as initialData } from "./regulationdata";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { RegulationItem } from "@/types/regulation";
 
-export default function RegulationPage() {
-  const [data, setData] = useState<RegulationItem[]>(initialData);
+type RegulationProps = {
+  initialData?: RegulationItem[];
+};
+
+const defaultState: RegulationItem[] = [];
+
+export default function RegulationPage({
+  initialData = defaultState,
+}: RegulationProps) {
+  const [data, setData] = useState<RegulationItem[]>(
+    initialData || defaultState
+  );
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<RegulationItem[]>(initialData);
+  const [editData, setEditData] = useState<RegulationItem[]>(
+    initialData || defaultState
+  );
+
+  useEffect(() => {
+    // Ensure we have valid data with the correct structure
+    const validData = initialData || defaultState;
+    setData(validData);
+  }, [initialData]);
 
   const startEditing = (): void => {
     setIsEditing(true);
@@ -31,8 +48,10 @@ export default function RegulationPage() {
     value: string
   ): void => {
     const newData = [...editData];
-    newData[index][field] = value;
-    setEditData(newData);
+    if (newData[index]) {
+      newData[index][field] = value;
+      setEditData(newData);
+    }
   };
 
   const addRegulation = (): void => {
@@ -49,6 +68,9 @@ export default function RegulationPage() {
     newData.splice(index, 1);
     setEditData(newData);
   };
+
+  // Check if regulation data is empty
+  const isDataEmpty = !data || data.length === 0;
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
@@ -81,7 +103,7 @@ export default function RegulationPage() {
       </div>
       <div className="border-t border-[#ced7db] mb-12"></div>
 
-      {data.length === 0 && !isEditing ? (
+      {isDataEmpty && !isEditing ? (
         <div className="text-center py-12 text-[#57727e] text-lg">
           No regulation data present
         </div>
@@ -116,7 +138,7 @@ export default function RegulationPage() {
                 >
                   <div className="p-4 border-r border-[#ced7db] flex items-start">
                     <textarea
-                      value={item.trend}
+                      value={item.trend || ""}
                       onChange={(e) =>
                         updateRegulation(index, "trend", e.target.value)
                       }
@@ -133,7 +155,7 @@ export default function RegulationPage() {
 
                   <div className="p-4">
                     <textarea
-                      value={item.description}
+                      value={item.description || ""}
                       onChange={(e) =>
                         updateRegulation(index, "description", e.target.value)
                       }
@@ -152,11 +174,11 @@ export default function RegulationPage() {
                   className="grid grid-cols-2 border-t border-[#ced7db]"
                 >
                   <div className="p-4 border-r border-[#ced7db]">
-                    <p className="text-[#35454c]">{item.trend}</p>
+                    <p className="text-[#35454c]">{item.trend || ""}</p>
                   </div>
 
                   <div className="p-4">
-                    <p className="text-[#35454c]">{item.description}</p>
+                    <p className="text-[#35454c]">{item.description || ""}</p>
                   </div>
                 </div>
               ))}

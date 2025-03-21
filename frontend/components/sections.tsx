@@ -148,7 +148,7 @@ export function Sections({ searchResults }: SectionsProps) {
         <CompetitorAnalysisPage />
       </section>
       <section id="regulation-component" className="p-6">
-        <RegulationPage />
+        <RegulationPage initialData={searchResults?.regulation} />
       </section>
       <section id="opportunities-component" className="p-6">
         <OpportunitiesPage />
