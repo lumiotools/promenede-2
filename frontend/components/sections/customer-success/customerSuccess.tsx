@@ -24,54 +24,74 @@ export interface CustomerSuccessData {
 }
 
 // Sample initial data
+// const initialData: CustomerSuccessData = {
+//   metrics: [
+//     {
+//       id: "fte-saved",
+//       value: 4500,
+//       label: "FTFEs Saved",
+//       suffix: "",
+//     },
+//     {
+//       id: "ai-call-volume",
+//       value: 700,
+//       label: "Saving AI call volume prediction",
+//       suffix: "hrs",
+//     },
+//     {
+//       id: "mobile-service",
+//       value: 50,
+//       label: "Reduction in mobile service registration",
+//       suffix: "%",
+//     },
+//     {
+//       id: "recruitment-hours",
+//       value: 85,
+//       label: "Reduction in recruitment hours",
+//       suffix: "%",
+//     },
+//     {
+//       id: "gen-ai-proposals",
+//       value: 52,
+//       label: "Gen AI proposals",
+//       suffix: "K",
+//     },
+//   ],
+//   caseStudies: [
+//     {
+//       id: "softbank",
+//       companyName: "SoftBank",
+//       description:
+//         "a key Automation Anywhere partner, underwent a strategic automation journey that yielded impressive results",
+//       results: [
+//         "4.5K Full-Time Equivalent (FTE) savings",
+//         "Improved employee experience",
+//         "Successful automation of cross-functional business processes",
+//         "Integration of RPA and AI for comprehensive process automation",
+//       ],
+//       additionalInfo:
+//         "SoftBank's approach included a strategic overhaul of business processes and significant investment in employee training to foster a digitally savvy workforce",
+//       link: "5",
+//     },
+//   ],
+// };
 const initialData: CustomerSuccessData = {
   metrics: [
     {
-      id: "fte-saved",
-      value: 4500,
-      label: "FTFEs Saved",
+      id: "",
+      value: 0,
+      label: "",
       suffix: "",
-    },
-    {
-      id: "ai-call-volume",
-      value: 700,
-      label: "Saving AI call volume prediction",
-      suffix: "hrs",
-    },
-    {
-      id: "mobile-service",
-      value: 50,
-      label: "Reduction in mobile service registration",
-      suffix: "%",
-    },
-    {
-      id: "recruitment-hours",
-      value: 85,
-      label: "Reduction in recruitment hours",
-      suffix: "%",
-    },
-    {
-      id: "gen-ai-proposals",
-      value: 52,
-      label: "Gen AI proposals",
-      suffix: "K",
     },
   ],
   caseStudies: [
     {
-      id: "softbank",
-      companyName: "SoftBank",
-      description:
-        "a key Automation Anywhere partner, underwent a strategic automation journey that yielded impressive results",
-      results: [
-        "4.5K Full-Time Equivalent (FTE) savings",
-        "Improved employee experience",
-        "Successful automation of cross-functional business processes",
-        "Integration of RPA and AI for comprehensive process automation",
-      ],
-      additionalInfo:
-        "SoftBank's approach included a strategic overhaul of business processes and significant investment in employee training to foster a digitally savvy workforce",
-      link: "5",
+      id: "",
+      companyName: "",
+      description: "",
+      results: [""],
+      additionalInfo: "",
+      link: "",
     },
   ],
 };

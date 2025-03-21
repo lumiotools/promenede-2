@@ -1,7 +1,15 @@
-import React, { useState } from "react";
+"use client";
 
-import { marketLeadershipData as marketLeadershipData } from "./marketLeadershipData";
-import { MarketLeadership } from "@/types/market_leadership";
+import type React from "react";
+import { useState, useEffect } from "react";
+import type { MarketLeadership } from "@/types/market_leadership";
+
+// Default state for the component
+const defaultState: MarketLeadership = {
+  industry: null,
+  rank_category: null,
+  rank_global: null,
+};
 
 // Award card component
 type AwardCardProps = {
@@ -36,7 +44,7 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
 
   return (
     <div className="bg-gray-50 p-6 rounded-lg">
-      <h3 className="text-lg font-semibold text-center mb-4">G2 Award</h3>
+      {/* <h3 className="text-lg font-semibold text-center mb-4">G2 Award</h3> */}
 
       <div className="bg-gray-200 rounded-lg h-36 mb-4"></div>
 
@@ -81,16 +89,16 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
       ) : (
         <>
           <div className="mb-2">
-            <p>Comments</p>
-            <p>{data.industry}</p>
+            <p className="text-sm text-gray-500">Industry</p>
+            <p className="font-medium">{data.industry || "N/A"}</p>
           </div>
           <div className="mb-2">
-            <p>Comments</p>
-            <p>Category Rank: {rankCategory}</p>
+            <p className="text-sm text-gray-500">Category Rank</p>
+            <p className="font-medium">{rankCategory}</p>
           </div>
           <div>
-            <p>Comments</p>
-            <p>Global Rank: {rankGlobal}</p>
+            <p className="text-sm text-gray-500">Global Rank</p>
+            <p className="font-medium">{rankGlobal}</p>
           </div>
         </>
       )}
@@ -98,11 +106,48 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
   );
 };
 
-const MarketLeadershipPage: React.FC = () => {
-  const [data, setData] = useState<MarketLeadership[]>(marketLeadershipData);
+type MarketLeadershipProps = {
+  initialData?: MarketLeadership | MarketLeadership[];
+};
+
+const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
+  initialData = defaultState,
+}: MarketLeadershipProps) => {
+  // Convert initialData to array if it's a single object
+  const getInitialDataArray = (
+    data: MarketLeadership | MarketLeadership[]
+  ): MarketLeadership[] => {
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return [data];
+  };
+
+  const [data, setData] = useState<MarketLeadership[]>(
+    getInitialDataArray(initialData)
+  );
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] =
-    useState<MarketLeadership[]>(marketLeadershipData);
+  const [editData, setEditData] = useState<MarketLeadership[]>(
+    getInitialDataArray(initialData)
+  );
+
+  // Update data when initialData changes
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("market leadership initialData update:", initialData);
+
+    // Convert initialData to array if it's a single object
+    const updatedData = getInitialDataArray(initialData);
+
+    // Update the state with the new data
+    setData(updatedData);
+
+    // If we're not in edit mode, also update the edit data
+    if (!isEditing) {
+      setEditData(updatedData);
+    }
+  }, [initialData, isEditing]);
 
   // Start editing
   const startEditing = (): void => {
@@ -145,6 +190,9 @@ const MarketLeadershipPage: React.FC = () => {
     newEditData.splice(index, 1);
     setEditData(newEditData);
   };
+
+  // Safely access data
+  const displayData = isEditing ? editData : data;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 bg-white">
@@ -215,63 +263,91 @@ const MarketLeadershipPage: React.FC = () => {
 
       <div className="mb-8">
         <p className="text-lg">
-          Company A has presence in the market with leading ~~~~
+          Company A has presence in the market with leading recognition in
+          various industries.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {(isEditing ? editData : data).map((item, index) => (
-          <div key={index} className="relative">
-            <AwardCard
-              data={item}
-              isEditing={isEditing}
-              onUpdate={(updated) => updateAward(index, updated)}
-            />
-
-            {isEditing && (
+      {displayData.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">
+          No market leadership data available.
+          {isEditing && (
+            <div className="mt-4">
               <button
-                onClick={() => removeAward(index)}
-                className="absolute top-2 right-2 text-red-500 hover:text-red-700 bg-white rounded-full p-1"
-                title="Remove award"
+                onClick={addAward}
+                className="text-blue-700 hover:text-blue-900 flex items-center mx-auto"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-6 w-6 mr-2"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
                 >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
+                Add Award
               </button>
-            )}
-          </div>
-        ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {displayData.map((item, index) => (
+            <div key={index} className="relative">
+              <AwardCard
+                data={item}
+                isEditing={isEditing}
+                onUpdate={(updated) => updateAward(index, updated)}
+              />
 
-        {isEditing && (
-          <div className="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-            <button
-              onClick={addAward}
-              className="text-blue-700 hover:text-blue-900 flex items-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 mr-2"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
+              {isEditing && (
+                <button
+                  onClick={() => removeAward(index)}
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 bg-white rounded-full p-1"
+                  title="Remove award"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              )}
+            </div>
+          ))}
+
+          {isEditing && (
+            <div className="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+              <button
+                onClick={addAward}
+                className="text-blue-700 hover:text-blue-900 flex items-center"
               >
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Add Award
-            </button>
-          </div>
-        )}
-      </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Award
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mt-8 text-gray-500 text-sm">
         Source: 1.PromenadeAI, 2.Crunchbase

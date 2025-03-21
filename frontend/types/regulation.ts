@@ -1,4 +1,4 @@
 export interface RegulationItem {
-  trend: string;
-  description: string;
+  trend: string | null;
+  description: string | null;
 }

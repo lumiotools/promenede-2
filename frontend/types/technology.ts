@@ -1,10 +1,10 @@
 export interface Technology {
-  technology: string;
-  first_verified_at: string;
-  last_verified_at: string;
+  technology: string | null;
+  first_verified_at: string | null;
+  last_verified_at: string | null;
 }
 
 export interface KeyTechnology {
-  technologies_used: Technology[];
-  num_technologies: number;
+  technologies_used: Technology[] | null;
+  num_technologies: number | null;
 }

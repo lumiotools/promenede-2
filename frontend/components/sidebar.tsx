@@ -128,8 +128,10 @@ export function Sidebar({
   };
 
   // Function to handle search
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
 
     if (!searchQuery.trim()) return;
 
@@ -218,18 +220,32 @@ export function Sidebar({
       <div className="px-4 py-2">
         <form onSubmit={handleSearch} className="relative">
           <div className="bg-[#151517] border border-[#38383A] rounded-md flex items-center px-3 py-2">
-            {isSearching ? (
-              <Loader2 className="h-5 w-5 text-[#777] animate-spin" />
-            ) : (
-              <Search className="h-5 w-5 text-[#777]" />
-            )}
-            <input
-              type="text"
-              placeholder="Search Company"
-              className="bg-transparent border-none outline-none text-sm ml-2 w-full text-[#ccc] placeholder:text-[#777]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <div className="flex-1 flex items-center">
+              {isSearching ? (
+                <Loader2 className="h-5 w-5 text-[#777] animate-spin" />
+              ) : (
+                <Search className="h-5 w-5 text-[#777]" />
+              )}
+              <input
+                type="text"
+                placeholder="Search Company"
+                className="bg-transparent border-none outline-none text-sm ml-2 w-full text-[#ccc] placeholder:text-[#777]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => handleSearch()}
+              disabled={isSearching || !searchQuery.trim()}
+              className={`ml-2 text-xs rounded px-3 py-1 ${
+                isSearching || !searchQuery.trim()
+                  ? "bg-[#2a2a2c] text-[#777] cursor-not-allowed"
+                  : "bg-[#2a2a2c] hover:bg-[#3a3a3c] text-white cursor-pointer"
+              }`}
+            >
+              Search
+            </button>
           </div>
           {error && <p className="text-red-500 text-xs mt-1 px-1">{error}</p>}
         </form>

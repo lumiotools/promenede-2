@@ -1,43 +1,43 @@
 export interface ValueChainActivity {
-  name: string;
+  name: string | null;
 }
 
 export interface ValueChainStage {
-  name: string;
-  activities: ValueChainActivity[];
-  tools?: string[];
+  name: string | null;
+  activities: ValueChainActivity[] | null;
+  tools?: string[] | null;
 }
 
 export interface ValueChain {
-  industry: string;
-  stages: ValueChainStage[];
+  industry: string | null;
+  stages: ValueChainStage[] | null;
 }
 
 export interface MarketMap {
-  industry: string;
-  segments: string[];
-  relatedIndustries: string[];
+  industry: string | null;
+  segments: string[] | null;
+  related_industries: string[] | null;
 }
 
 export interface MarketSizeExcerpt {
-  text: string;
+  text: string | null;
 }
 
 export interface MarketSizeItem {
-  marketName: string;
-  source: string;
-  sourceLink?: string;
-  keyExcerpts: MarketSizeExcerpt[];
+  marketName: string | null;
+  source: string | null;
+  sourceLink?: string | null;
+  keyExcerpts: MarketSizeExcerpt[] | null;
 }
 
 export interface MarketSize {
-  title: string;
-  subtitle: string;
-  items: MarketSizeItem[];
+  title: string | null;
+  subtitle: string | null;
+  items: MarketSizeItem[] | null;
 }
 
 export interface MarketInfo {
-  size: MarketSize;
-  valueChain: ValueChain;
-  marketMap: MarketMap;
+  size: MarketSize | null;
+  valueChain: ValueChain | null;
+  market_map: MarketMap | null;
 }

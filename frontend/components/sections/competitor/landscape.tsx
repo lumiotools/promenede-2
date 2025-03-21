@@ -1,10 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { competitiveAnalysis as initialData } from "./competitorData";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
-import type { LandscapeCompetitor } from "@/types/competitor";
+import { CompetitiveAnalysis, LandscapeCompetitor } from "@/types/competitor";
+
+// Extended landscape competitor with additional fields
+interface ExtendedLandscapeCompetitor extends LandscapeCompetitor {
+  description?: string;
+  year?: string;
+  ceo?: string;
+  hqLocation?: string;
+  employees?: number;
+  revenue?: number;
+}
 
 // Helper function to format numbers
 const formatNumber = (num: number | null | undefined): string => {
@@ -15,20 +24,30 @@ const formatNumber = (num: number | null | undefined): string => {
   return num.toString();
 };
 
-// Extended landscape competitor with additional fields
-interface ExtendedLandscapeCompetitor extends LandscapeCompetitor {
-  description?: string;
-  year?: string;
-  ceo?: string;
-  hqLocation?: string;
-  employees?: number; // Changed to number to use formatNumber
-  revenue?: number; // Added revenue field to demonstrate formatNumber
-}
+// Default state for the component
+const defaultState: CompetitiveAnalysis = {
+  landscape: [],
+  competitors: [],
+  competitors_websites: [],
+  financial_comparables: [],
+  peer_developments: null,
+};
 
-export default function CompetitiveLandscapePage() {
+type CompetitiveLandscapeProps = {
+  initialData?: CompetitiveAnalysis;
+};
+
+export default function CompetitiveLandscapePage({
+  initialData = defaultState,
+}: CompetitiveLandscapeProps) {
+  // Ensure landscape exists and is an array
+  const safeLandscape = initialData?.landscape || [];
+
   // Initialize with extended data
-  const extendedInitialData: ExtendedLandscapeCompetitor[] =
-    initialData.landscape.map((competitor) => ({
+  const getExtendedData = (
+    landscapeData: LandscapeCompetitor[]
+  ): ExtendedLandscapeCompetitor[] => {
+    return landscapeData.map((competitor) => ({
       ...competitor,
       description: "Technology company specializing in hardware and software",
       year: "1993",
@@ -37,15 +56,38 @@ export default function CompetitiveLandscapePage() {
       employees: Math.floor(Math.random() * 50000) + 1000, // Random number for demonstration
       revenue: Math.floor(Math.random() * 10000000000) + 1000000, // Random revenue for demonstration
     }));
+  };
 
-  const [data, setData] =
-    useState<ExtendedLandscapeCompetitor[]>(extendedInitialData);
+  const [data, setData] = useState<ExtendedLandscapeCompetitor[]>(
+    getExtendedData(safeLandscape)
+  );
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] =
-    useState<ExtendedLandscapeCompetitor[]>(extendedInitialData);
+  const [editData, setEditData] = useState<ExtendedLandscapeCompetitor[]>(
+    getExtendedData(safeLandscape)
+  );
+
+  // Update data when initialData changes
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("competitive landscape initialData update:", initialData);
+
+    // Ensure landscape exists and is an array
+    const updatedLandscape = initialData.landscape || [];
+
+    // Update the state with the new extended data
+    const extendedData = getExtendedData(updatedLandscape);
+    setData(extendedData);
+
+    // If we're not in edit mode, also update the edit data
+    if (!isEditing) {
+      setEditData(extendedData);
+    }
+  }, [initialData, isEditing]);
 
   const startEditing = (): void => {
     setIsEditing(true);
+    // Create a deep copy to avoid reference issues
     setEditData(JSON.parse(JSON.stringify(data)));
   };
 
@@ -64,18 +106,21 @@ export default function CompetitiveLandscapePage() {
     value: string | number
   ): void => {
     const newData = [...editData];
+
+    // Handle numeric fields
     if (
-      field === "similarityScore" ||
-      field === "monthlyVisits" ||
-      field === "rankCategory" ||
+      field === "similarity_score" ||
+      field === "monthly_visits" ||
+      field === "rank_category" ||
       field === "employees" ||
       field === "revenue"
     ) {
       newData[index][field] = Number(value);
     } else {
-      newData[index][field as keyof ExtendedLandscapeCompetitor] =
-        value as never;
+      // Handle string fields
+      newData[index][field] = value as never;
     }
+
     setEditData(newData);
   };
 
@@ -83,10 +128,10 @@ export default function CompetitiveLandscapePage() {
     const newData = [...editData];
     newData.push({
       name: "New Company",
-      similarityScore: 0,
+      similarity_score: 0,
       website: "example.com",
-      monthlyVisits: 0,
-      rankCategory: 0,
+      monthly_visits: 0,
+      rank_category: 0,
       description: "Technology company",
       year: "2000",
       ceo: "N/A",
@@ -191,7 +236,7 @@ export default function CompetitiveLandscapePage() {
                     <td className="p-4 border-r border-[#ced7db]">
                       <input
                         type="text"
-                        value={competitor.name}
+                        value={competitor.name || ""}
                         onChange={(e) =>
                           updateCompetitor(index, "name", e.target.value)
                         }
@@ -261,11 +306,11 @@ export default function CompetitiveLandscapePage() {
                     <td className="p-4 border-r border-[#ced7db]">
                       <input
                         type="number"
-                        value={competitor.monthlyVisits || 0}
+                        value={competitor.monthly_visits || 0}
                         onChange={(e) =>
                           updateCompetitor(
                             index,
-                            "monthlyVisits",
+                            "monthly_visits",
                             e.target.value
                           )
                         }
@@ -307,7 +352,7 @@ export default function CompetitiveLandscapePage() {
                       {formatNumber(competitor.revenue)}
                     </td>
                     <td className="p-4 text-[#35454c]">
-                      {formatNumber(competitor.monthlyVisits)}
+                      {formatNumber(competitor.monthly_visits)}
                     </td>
                   </tr>
                 ))

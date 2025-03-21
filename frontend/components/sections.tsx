@@ -29,7 +29,7 @@ import { CompanyTimelineTable } from './sections/company/company-timeline-table'
 import  ProductsServices  from './sections/product/product-services'
 import { ProductLaunchesTimeline } from './sections/product/product-launch-timeline'
 import { ProductTimelineTable } from './sections/product/product-timeline-table'
-import { EmployeeBreakdown } from './sections/employee/employee-breakdown'
+import  EmployeeBreakdown  from './sections/employee/employee-breakdown'
 import { ExecutiveSummary } from './sections/executive/executive-summary'
 import { EmployeeTrendChart } from './sections/employee/employee-trend-chart'
 import { EmployeeKeyMembers } from './sections/employee/employee-keymember'
@@ -41,6 +41,8 @@ import {GroupStructure} from './sections/group/groupstructure';
 import { CompanyData } from "@/types/apiResponse";
 import CompanyOverview from "./sections/company/company-overview";
 import CompanyProfile from "./sections/company/company-profile";
+
+
 type SectionsProps = {
   searchResults?: CompanyData;
 };
@@ -93,13 +95,19 @@ export function Sections({ searchResults }: SectionsProps) {
         <ProductTimelineTable/>
       </section>
       <section id="employee-breakdown" className="p-6">
-        <EmployeeBreakdown/>
+        <EmployeeBreakdown
+          initialData={searchResults?.organization.employees_trend}
+        />
       </section>
       <section id="employee-trend-chart" className="p-6">
-        <EmployeeTrendChart/>
+        <EmployeeTrendChart
+          initialData={searchResults?.organization.employees_trend}
+        />
       </section>
       <section id="employee-keymembers" className="p-6">
-        <EmployeeKeyMembers/>
+        <EmployeeKeyMembers
+          initialData={searchResults?.organization.key_members}
+        />
       </section>
       <section id="employee-leadership" className="p-6">
         <LeadershipExecutives/>
@@ -121,10 +129,10 @@ export function Sections({ searchResults }: SectionsProps) {
         <StrategicAlliancePage />
       </section>
       <section id="market-leadership-component" className="p-6">
-        <MarketLeadershipPage />
+        <MarketLeadershipPage initialData={searchResults?.market_leadership} />
       </section>
       <section id="technology-component" className="p-6">
-        <KeyTechnologyPage />
+        <KeyTechnologyPage initialData={searchResults?.key_technology} />
       </section>
       <section id="strategy-component" className="p-6">
         <StrategyPage />
@@ -136,7 +144,7 @@ export function Sections({ searchResults }: SectionsProps) {
         <MAMapPage />
       </section> */}
       <section id="ma-activity-component" className="p-6">
-        <MAStrategyPage />
+        <MAStrategyPage initialData={searchResults?.ma_activity} />
       </section>
       <section id="market-size-component" className="p-6">
         <MarketSizePage />
@@ -145,28 +153,36 @@ export function Sections({ searchResults }: SectionsProps) {
         <ValueChainPage />
       </section>
       <section id="market-map-component" className="p-6">
-        <MarketMapPage />
+        <MarketMapPage initialData={searchResults?.market_info} />
       </section>
       <section id="competitor-landscape-component" className="p-6">
-        <CompetitiveLandscapePage />
+        <CompetitiveLandscapePage
+          initialData={searchResults?.competitive_analysis}
+        />
       </section>
       <section id="financial-comparables-component" className="p-6">
-        <FinancialComparablesPage />
+        <FinancialComparablesPage
+          initialData={searchResults?.competitive_analysis}
+        />
       </section>
       <section id="peer-developments-component" className="p-6">
-        <PeerDevelopmentsPage />
+        <PeerDevelopmentsPage
+          initialData={searchResults?.competitive_analysis}
+        />
       </section>
       <section id="competitor-analysis-component" className="p-6">
-        <CompetitorAnalysisPage />
+        <CompetitorAnalysisPage
+          initialData={searchResults?.competitive_analysis}
+        />
       </section>
       <section id="regulation-component" className="p-6">
-        <RegulationPage />
+        <RegulationPage initialData={searchResults?.regulation} />
       </section>
       <section id="opportunities-component" className="p-6">
-        <OpportunitiesPage />
+        <OpportunitiesPage initialData={searchResults?.opportunities_risks} />
       </section>
       <section id="risks-component" className="p-6">
-        <RisksPage />
+        <RisksPage initialData={searchResults?.opportunities_risks} />
       </section>
       <section id="qa-component" className="p-6">
         <QAComponent initialData={searchResults?.qa} />

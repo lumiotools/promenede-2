@@ -1,9 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -11,95 +10,208 @@ import {
   ResponsiveContainer,
   Area,
   AreaChart,
-  Legend,
 } from "recharts";
+import type { EmployeesTrend } from "@/types/employeeTrend";
 
-// Dummy data for employee count trends
-const dummyEmployeeData = [
-  { date: "2024-03", employees_count: 2200 },
-  { date: "2024-04", employees_count: 2250 },
-  { date: "2024-05", employees_count: 2300 },
-  { date: "2024-06", employees_count: 2400 },
-  { date: "2024-07", employees_count: 2500 },
-  { date: "2024-08", employees_count: 2600 },
-  { date: "2024-09", employees_count: 2700 },
-  { date: "2024-10", employees_count: 2800 },
-  { date: "2024-11", employees_count: 2900 },
-  { date: "2024-12", employees_count: 3000 },
-];
+// Default empty state with null safety
+const defaultState: EmployeesTrend = {
+  count_by_month: null,
+  count_change: null,
+  breakdown_by_department: null,
+  breakdown_by_department_by_month: null,
+  breakdown_by_country: null,
+  breakdown_by_region: null,
+  breakdown_by_seniority: null,
+};
 
-export function EmployeeTrendChart() {
-  const [employeesTrend] = useState(dummyEmployeeData);
+interface EmployeeTrendChartProps {
+  initialData?: EmployeesTrend;
+}
 
-  // Ensure data is sorted (oldest to latest)
-  const sortedData = employeesTrend.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+interface ChartDataPoint {
+  month: string;
+  employees: number;
+}
 
-  // Format data for the chart
-  const chartData = sortedData.map((entry) => ({
-    month: new Date(entry.date).toLocaleString("en-US", { month: "short", year: "2-digit" }),
-    employees: entry.employees_count,
-  }));
+export function EmployeeTrendChart({
+  initialData = defaultState,
+}: EmployeeTrendChartProps) {
+  const [data, setData] = useState<EmployeesTrend>(initialData);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [increase, setIncrease] = useState<number>(0);
+  const [percentIncrease, setPercentIncrease] = useState<string>("0.0");
 
-  // Calculate increase in employees
-  const firstCount = chartData[0]?.employees || 0;
-  const lastCount = chartData[chartData.length - 1]?.employees || 0;
-  const increase = lastCount - firstCount;
-  const percentIncrease = firstCount ? ((increase / firstCount) * 100).toFixed(1) : "0.0";
+  useEffect(() => {
+    // Update state when initialData changes
+    if (initialData) {
+      setData(initialData);
+    }
+  }, [initialData]);
+
+  useEffect(() => {
+    // Process data for the chart when data changes
+    processChartData();
+  }, [data]);
+
+  const processChartData = () => {
+    if (!data.count_by_month || data.count_by_month.length === 0) {
+      setChartData([]);
+      setIncrease(0);
+      setPercentIncrease("0.0");
+      return;
+    }
+
+    // Filter out entries with null values
+    const validData = data.count_by_month.filter(
+      (entry) => entry.date !== null && entry.employees_count !== null
+    ) as {
+      date: string;
+      employees_count: number;
+    }[];
+
+    // Sort data by date (oldest to newest)
+    const sortedData = [...validData].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime();
+    });
+
+    // Take only the last 12 months of data for better visualization
+    const recentData = sortedData.slice(-12);
+
+    // Format data for the chart
+    const formattedData = recentData.map((entry) => {
+      // Parse date and format it
+      const date = new Date(entry.date);
+      const month = date.toLocaleString("en-US", {
+        month: "short",
+        year: "2-digit",
+      });
+
+      return {
+        month,
+        employees: entry.employees_count,
+      };
+    });
+
+    setChartData(formattedData);
+
+    // Calculate increase
+    if (formattedData.length > 0) {
+      const firstCount = formattedData[0]?.employees || 0;
+      const lastCount = formattedData[formattedData.length - 1]?.employees || 0;
+      const calculatedIncrease = lastCount - firstCount;
+      setIncrease(calculatedIncrease);
+
+      // Calculate percent increase with null safety
+      if (firstCount > 0) {
+        setPercentIncrease(
+          ((calculatedIncrease / firstCount) * 100).toFixed(1)
+        );
+      } else {
+        setPercentIncrease("0.0");
+      }
+    }
+  };
+
+  // Format number to K format (e.g., 2000 -> 2.0K)
+  const formatToK = (num: number) => {
+    return `${(num / 1000).toFixed(1)}K`;
+  };
 
   return (
-    <div className="space-y-6 bg-white">
+    <div className="space-y-6">
       {/* Header */}
-      <h1 className="text-4xl font-medium text-[#475467]">Organization: # of Employees Trend</h1>
-      <div className="border-t border-[#e5e7eb] mb-6"></div>
+      <h1 className="text-4xl font-medium text-[#445963]">
+        Organization : # of Employees trend
+      </h1>
+      <div className="border-t border-gray-200 mb-8"></div>
 
       {/* Chart Section */}
-      <div className="mx-10">
-        <div className="bg-[#f9fafb] p-6 rounded-lg">
-          <h2 className="text-base font-medium text-[#475467] mb-4">Employees Count Over Time</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={chartData}>
-              {/* Linear Gradient for Area Fill */}
-              <defs>
-                <linearGradient id="colorFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#002169" stopOpacity={0.5} />
-                  <stop offset="100%" stopColor="#002169" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-              <XAxis dataKey="month" tick={{ fill: "#475467", fontSize: 12 }} />
-              <YAxis
-                tickFormatter={(value) => `${(value / 1000).toFixed(1)}K`}
-                tick={{ fill: "#475467", fontSize: 12 }}
-              />
-              <Tooltip formatter={(value) => `${value.toLocaleString()}`} />
-
-              {/* Area Fill with Gradient */}
-              <Area type="monotone" dataKey="employees" stroke="#002169" fill="url(#colorFill)" strokeWidth={3} />
-
-              {/* Line with White-Outlined Dots */}
-              <Line
-                type="monotone"
-                dataKey="employees"
-                stroke="#002169"
-                strokeWidth={3}
-                dot={{ r: 5, fill: "#002169", stroke: "#fff", strokeWidth: 2 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-          <p className="text-xs text-[#8097a2] mt-2">Source: Employee Data</p>
-        </div>
-
-        {/* Right section - Summary */}
-        
+      <div className="bg-[#f7f9f9] p-6 rounded-lg">
+        {chartData.length > 0 ? (
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              >
+                <defs>
+                  <linearGradient
+                    id="colorEmployees"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#002169" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#002169" stopOpacity={0.1} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#e0e0e0"
+                />
+                <XAxis
+                  dataKey="month"
+                  tick={{ fill: "#445963" }}
+                  axisLine={{ stroke: "#e0e0e0" }}
+                />
+                <YAxis
+                  tickFormatter={formatToK}
+                  tick={{ fill: "#445963" }}
+                  axisLine={{ stroke: "#e0e0e0" }}
+                />
+                <Tooltip
+                  formatter={(value: number) => formatToK(value)}
+                  labelFormatter={(label) => label}
+                  contentStyle={{
+                    backgroundColor: "white",
+                    borderRadius: "4px",
+                    border: "1px solid #e0e0e0",
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="employees"
+                  stroke="#002169"
+                  strokeWidth={2}
+                  fillOpacity={1}
+                  fill="url(#colorEmployees)"
+                  dot={{
+                    r: 5,
+                    fill: "#002169",
+                    stroke: "white",
+                    strokeWidth: 2,
+                  }}
+                  activeDot={{
+                    r: 6,
+                    fill: "#002169",
+                    stroke: "white",
+                    strokeWidth: 2,
+                  }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-[400px] bg-gray-50 rounded-md">
+            <p className="text-gray-500">No employee trend data available</p>
+          </div>
+        )}
+        <p className="text-sm text-[#445963] mt-2">Source : Employee Data</p>
       </div>
 
       {/* Employee Increase Info */}
-      <p className="text-center text-lg font-medium text-[#475467]">
-        There has been an increase of <span className="text-blue-600">{increase.toLocaleString()}</span> employees (~
-        {percentIncrease}%)
+      <p className="text-center text-lg font-medium text-[#445963]">
+        There has been a total {increase >= 0 ? "increase" : "decrease"} of{" "}
+        {percentIncrease}%
       </p>
 
-      <div className="text-xs text-[#8097a2] italic">Source: 1.PromenadeAI, 2.Crunchbase</div>
+      <div className="text-sm text-[#445963]">
+        Source: 1.PromenadeAI, 2.Crunchbase
+      </div>
     </div>
   );
 }

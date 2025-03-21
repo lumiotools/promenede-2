@@ -6,10 +6,21 @@ import { Button } from "@/components/ui/button";
 import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
 import type { ValueChain } from "@/types/market";
 
+// Define default empty value chain
+const defaultValueChain: ValueChain = {
+  industry: "",
+  stages: [],
+};
+
 export default function ValueChainPage() {
-  const [data, setData] = useState<ValueChain>(initialData.valueChain);
+  // Use the default value chain if initialData.valueChain is null
+  const [data, setData] = useState<ValueChain>(
+    initialData.valueChain || defaultValueChain
+  );
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<ValueChain>(initialData.valueChain);
+  const [editData, setEditData] = useState<ValueChain>(
+    initialData.valueChain || defaultValueChain
+  );
 
   const startEditing = (): void => {
     setIsEditing(true);
@@ -34,12 +45,20 @@ export default function ValueChainPage() {
 
   const updateStageName = (index: number, value: string): void => {
     const newData = { ...editData };
-    newData.stages[index].name = value;
-    setEditData(newData);
+    if (!newData.stages) {
+      newData.stages = [];
+    }
+    if (newData.stages[index]) {
+      newData.stages[index].name = value;
+      setEditData(newData);
+    }
   };
 
   const addStage = (): void => {
     const newData = { ...editData };
+    if (!newData.stages) {
+      newData.stages = [];
+    }
     newData.stages.push({
       name: "New Stage",
       activities: [{ name: "New Activity" }],
@@ -50,12 +69,26 @@ export default function ValueChainPage() {
 
   const removeStage = (index: number): void => {
     const newData = { ...editData };
+    if (!newData.stages) {
+      newData.stages = [];
+      return;
+    }
     newData.stages.splice(index, 1);
     setEditData(newData);
   };
 
   const addActivity = (stageIndex: number): void => {
     const newData = { ...editData };
+    if (!newData.stages) {
+      newData.stages = [];
+      return;
+    }
+    if (!newData.stages[stageIndex]) {
+      return;
+    }
+    if (!newData.stages[stageIndex].activities) {
+      newData.stages[stageIndex].activities = [];
+    }
     newData.stages[stageIndex].activities.push({ name: "New Activity" });
     setEditData(newData);
   };
@@ -66,18 +99,36 @@ export default function ValueChainPage() {
     value: string
   ): void => {
     const newData = { ...editData };
+    if (
+      !newData.stages ||
+      !newData.stages[stageIndex] ||
+      !newData.stages[stageIndex].activities ||
+      !newData.stages[stageIndex].activities[activityIndex]
+    ) {
+      return;
+    }
     newData.stages[stageIndex].activities[activityIndex].name = value;
     setEditData(newData);
   };
 
   const removeActivity = (stageIndex: number, activityIndex: number): void => {
     const newData = { ...editData };
+    if (
+      !newData.stages ||
+      !newData.stages[stageIndex] ||
+      !newData.stages[stageIndex].activities
+    ) {
+      return;
+    }
     newData.stages[stageIndex].activities.splice(activityIndex, 1);
     setEditData(newData);
   };
 
   const addTool = (stageIndex: number): void => {
     const newData = { ...editData };
+    if (!newData.stages || !newData.stages[stageIndex]) {
+      return;
+    }
     if (!newData.stages[stageIndex].tools) {
       newData.stages[stageIndex].tools = [];
     }
@@ -91,17 +142,28 @@ export default function ValueChainPage() {
     value: string
   ): void => {
     const newData = { ...editData };
-    if (newData.stages[stageIndex].tools) {
-      newData.stages[stageIndex].tools![toolIndex] = value;
+    if (
+      !newData.stages ||
+      !newData.stages[stageIndex] ||
+      !newData.stages[stageIndex].tools ||
+      !newData.stages[stageIndex].tools[toolIndex]
+    ) {
+      return;
     }
+    newData.stages[stageIndex].tools![toolIndex] = value;
     setEditData(newData);
   };
 
   const removeTool = (stageIndex: number, toolIndex: number): void => {
     const newData = { ...editData };
-    if (newData.stages[stageIndex].tools) {
-      newData.stages[stageIndex].tools!.splice(toolIndex, 1);
+    if (
+      !newData.stages ||
+      !newData.stages[stageIndex] ||
+      !newData.stages[stageIndex].tools
+    ) {
+      return;
     }
+    newData.stages[stageIndex].tools!.splice(toolIndex, 1);
     setEditData(newData);
   };
 
@@ -112,6 +174,13 @@ export default function ValueChainPage() {
     Gem: "/placeholder.svg?height=20&width=80",
     seekout: "/placeholder.svg?height=20&width=80",
   };
+
+  // Create a safe reference to stages that's guaranteed to be an array
+  const stages = data.stages || [];
+
+  // Check if the value chain is empty
+  const isValueChainEmpty =
+    !data.industry && (!data.stages || data.stages.length === 0);
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
@@ -152,7 +221,7 @@ export default function ValueChainPage() {
             </h2>
             <input
               type="text"
-              value={editData.industry}
+              value={editData.industry || ""}
               onChange={(e) => updateIndustry(e.target.value)}
               className="w-full border border-[#ced7db] p-2 rounded mb-4"
             />
@@ -172,7 +241,7 @@ export default function ValueChainPage() {
           </div>
 
           <div className="space-y-6">
-            {editData.stages.map((stage, stageIndex) => (
+            {(editData.stages || []).map((stage, stageIndex) => (
               <div
                 key={stageIndex}
                 className="border border-[#ced7db] rounded-md p-4"
@@ -184,7 +253,7 @@ export default function ValueChainPage() {
                     </label>
                     <input
                       type="text"
-                      value={stage.name}
+                      value={stage.name || ""}
                       onChange={(e) =>
                         updateStageName(stageIndex, e.target.value)
                       }
@@ -214,14 +283,14 @@ export default function ValueChainPage() {
                     </Button>
                   </div>
                   <div className="space-y-2">
-                    {stage.activities.map((activity, activityIndex) => (
+                    {(stage.activities || []).map((activity, activityIndex) => (
                       <div
                         key={activityIndex}
                         className="flex items-center gap-2"
                       >
                         <input
                           type="text"
-                          value={activity.name}
+                          value={activity.name || ""}
                           onChange={(e) =>
                             updateActivity(
                               stageIndex,
@@ -259,11 +328,11 @@ export default function ValueChainPage() {
                     </Button>
                   </div>
                   <div className="space-y-2">
-                    {stage.tools?.map((tool, toolIndex) => (
+                    {(stage.tools || []).map((tool, toolIndex) => (
                       <div key={toolIndex} className="flex items-center gap-2">
                         <input
                           type="text"
-                          value={tool}
+                          value={tool || ""}
                           onChange={(e) =>
                             updateTool(stageIndex, toolIndex, e.target.value)
                           }
@@ -285,7 +354,7 @@ export default function ValueChainPage() {
         </div>
       ) : (
         <>
-          {!data.industry && data.stages.length === 0 ? (
+          {isValueChainEmpty ? (
             <div className="text-center py-12 text-[#57727e] text-lg">
               No value chain data present
             </div>
@@ -299,7 +368,7 @@ export default function ValueChainPage() {
               </div>
 
               <div className="flex flex-col md:flex-row justify-between gap-4 mb-8">
-                {data.stages.map((stage, stageIndex) => (
+                {stages.map((stage, stageIndex) => (
                   <div key={stageIndex} className="flex-1 flex flex-col">
                     <div className="bg-[#002169] text-white p-4 rounded-t-md text-center">
                       <h3 className="font-medium">{stage.name || "N/A"}</h3>

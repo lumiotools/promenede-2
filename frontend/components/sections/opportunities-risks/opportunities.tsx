@@ -1,15 +1,37 @@
 "use client";
 
-import { useState } from "react";
-import { opportunitiesRisks as initialData } from "./opportunitiesRisks";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { OpportunitiesRisks, Opportunity } from "@/types/opportunitiesRisks";
 
-export default function OpportunitiesPage() {
-  const [data, setData] = useState<OpportunitiesRisks>(initialData);
+type OpportunitiesProps = {
+  initialData?: OpportunitiesRisks;
+};
+
+// Default empty state that matches the OpportunitiesRisks interface structure
+const defaultState: OpportunitiesRisks = {
+  opportunities: [],
+  risks: [],
+};
+
+export default function OpportunitiesPage({
+  initialData = defaultState,
+}: OpportunitiesProps) {
+  const [data, setData] = useState<OpportunitiesRisks>(
+    initialData || defaultState
+  );
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<OpportunitiesRisks>(initialData);
+  const [editData, setEditData] = useState<OpportunitiesRisks>(
+    initialData || defaultState
+  );
+
+  useEffect(() => {
+    // Ensure we have valid data with the correct structure
+    const validData = initialData || defaultState;
+    console.log("opportunities data", initialData);
+    setData(validData);
+  }, [initialData]);
 
   const startEditing = (): void => {
     setIsEditing(true);
@@ -31,12 +53,22 @@ export default function OpportunitiesPage() {
     value: string
   ): void => {
     const newData = { ...editData };
-    newData.opportunities[index][field] = value;
-    setEditData(newData);
+    // Ensure opportunities array exists
+    if (!newData.opportunities) {
+      newData.opportunities = [];
+    }
+    if (newData.opportunities[index]) {
+      newData.opportunities[index][field] = value;
+      setEditData(newData);
+    }
   };
 
   const addOpportunity = (): void => {
     const newData = { ...editData };
+    // Ensure opportunities array exists
+    if (!newData.opportunities) {
+      newData.opportunities = [];
+    }
     newData.opportunities.push({
       area: "New Area",
       detail: "New detail",
@@ -47,9 +79,18 @@ export default function OpportunitiesPage() {
 
   const removeOpportunity = (index: number): void => {
     const newData = { ...editData };
+    // Ensure opportunities array exists
+    if (!newData.opportunities) {
+      newData.opportunities = [];
+      return;
+    }
     newData.opportunities.splice(index, 1);
     setEditData(newData);
   };
+
+  // Check if opportunities data is empty or null
+  const isOpportunitiesEmpty =
+    !data.opportunities || data.opportunities.length === 0;
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
@@ -84,7 +125,7 @@ export default function OpportunitiesPage() {
       </div>
       <div className="border-t border-[#ced7db] mb-12"></div>
 
-      {data.opportunities.length === 0 && !isEditing ? (
+      {isOpportunitiesEmpty && !isEditing ? (
         <div className="text-center py-12 text-[#57727e] text-lg">
           No opportunities present
         </div>
@@ -100,51 +141,52 @@ export default function OpportunitiesPage() {
 
           {isEditing ? (
             <>
-              {editData.opportunities.map((opportunity, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-3 border-t border-[#ced7db]"
-                >
-                  <div className="bg-[#002169] text-white p-4 flex items-center">
-                    <textarea
-                      value={opportunity.area}
-                      onChange={(e) =>
-                        updateOpportunity(index, "area", e.target.value)
-                      }
-                      className="w-full bg-[#156082] text-white p-2 rounded"
-                      rows={2}
-                    />
-                    <button
-                      onClick={() => removeOpportunity(index)}
-                      className="ml-2 text-white hover:text-red-300"
-                    >
-                      <TrashIcon size={16} />
-                    </button>
-                  </div>
+              {editData.opportunities &&
+                editData.opportunities.map((opportunity, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-3 border-t border-[#ced7db]"
+                  >
+                    <div className="bg-[#002169] text-white p-4 flex items-center">
+                      <textarea
+                        value={opportunity.area || ""}
+                        onChange={(e) =>
+                          updateOpportunity(index, "area", e.target.value)
+                        }
+                        className="w-full bg-[#156082] text-white p-2 rounded"
+                        rows={2}
+                      />
+                      <button
+                        onClick={() => removeOpportunity(index)}
+                        className="ml-2 text-white hover:text-red-300"
+                      >
+                        <TrashIcon size={16} />
+                      </button>
+                    </div>
 
-                  <div className="p-4 border-l border-[#ced7db]">
-                    <textarea
-                      value={opportunity.detail}
-                      onChange={(e) =>
-                        updateOpportunity(index, "detail", e.target.value)
-                      }
-                      className="w-full border border-[#ced7db] p-2 rounded"
-                      rows={3}
-                    />
-                  </div>
+                    <div className="p-4 border-l border-[#ced7db]">
+                      <textarea
+                        value={opportunity.detail || ""}
+                        onChange={(e) =>
+                          updateOpportunity(index, "detail", e.target.value)
+                        }
+                        className="w-full border border-[#ced7db] p-2 rounded"
+                        rows={3}
+                      />
+                    </div>
 
-                  <div className="p-4 border-l border-[#ced7db]">
-                    <textarea
-                      value={opportunity.rationale}
-                      onChange={(e) =>
-                        updateOpportunity(index, "rationale", e.target.value)
-                      }
-                      className="w-full border border-[#ced7db] p-2 rounded"
-                      rows={3}
-                    />
+                    <div className="p-4 border-l border-[#ced7db]">
+                      <textarea
+                        value={opportunity.rationale || ""}
+                        onChange={(e) =>
+                          updateOpportunity(index, "rationale", e.target.value)
+                        }
+                        className="w-full border border-[#ced7db] p-2 rounded"
+                        rows={3}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
               <div className="p-4 border-t border-[#ced7db] flex justify-center">
                 <Button
                   onClick={addOpportunity}
@@ -156,37 +198,43 @@ export default function OpportunitiesPage() {
             </>
           ) : (
             <>
-              {data.opportunities.map((opportunity, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-3 border-t border-[#ced7db]"
-                >
-                  {index === 0 ||
-                  data.opportunities[index - 1].area !== opportunity.area ? (
-                    <div className="bg-[#002169] text-white p-4 flex items-center">
-                      <h3 className="font-medium text-lg">
-                        {opportunity.area}
-                      </h3>
+              {data.opportunities &&
+                data.opportunities.map((opportunity, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-3 border-t border-[#ced7db]"
+                  >
+                    {index === 0 ||
+                    (data.opportunities &&
+                      data.opportunities[index - 1] &&
+                      data.opportunities[index - 1].area !==
+                        opportunity.area) ? (
+                      <div className="bg-[#002169] text-white p-4 flex items-center">
+                        <h3 className="font-medium text-lg">
+                          {opportunity.area || ""}
+                        </h3>
+                      </div>
+                    ) : (
+                      <div className="bg-[#002169] text-white p-4"></div>
+                    )}
+
+                    <div className="p-4 border-l border-[#ced7db]">
+                      <ul className="list-disc pl-5 space-y-4">
+                        <li className="text-[#35454c]">
+                          {opportunity.detail || ""}
+                        </li>
+                      </ul>
                     </div>
-                  ) : (
-                    <div className="bg-[#002169] text-white p-4"></div>
-                  )}
 
-                  <div className="p-4 border-l border-[#ced7db]">
-                    <ul className="list-disc pl-5 space-y-4">
-                      <li className="text-[#35454c]">{opportunity.detail}</li>
-                    </ul>
+                    <div className="p-4 border-l border-[#ced7db]">
+                      <ul className="list-disc pl-5 space-y-4">
+                        <li className="text-[#35454c]">
+                          {opportunity.rationale || ""}
+                        </li>
+                      </ul>
+                    </div>
                   </div>
-
-                  <div className="p-4 border-l border-[#ced7db]">
-                    <ul className="list-disc pl-5 space-y-4">
-                      <li className="text-[#35454c]">
-                        {opportunity.rationale}
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              ))}
+                ))}
             </>
           )}
         </div>

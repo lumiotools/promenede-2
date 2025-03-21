@@ -6,10 +6,22 @@ import { Button } from "@/components/ui/button";
 import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
 import type { MarketSize, MarketSizeItem } from "@/types/market";
 
+// Define default empty market size
+const defaultMarketSize: MarketSize = {
+  title: "Market Size",
+  subtitle: "",
+  items: [],
+};
+
 export default function MarketSizePage() {
-  const [data, setData] = useState<MarketSize>(initialData.size);
+  // Use the default market size if initialData.size is null
+  const [data, setData] = useState<MarketSize>(
+    initialData.size || defaultMarketSize
+  );
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<MarketSize>(initialData.size);
+  const [editData, setEditData] = useState<MarketSize>(
+    initialData.size || defaultMarketSize
+  );
 
   const startEditing = (): void => {
     setIsEditing(true);
@@ -45,6 +57,18 @@ export default function MarketSizePage() {
     value: string
   ): void => {
     const newData = { ...editData };
+
+    // Ensure items array exists
+    if (!newData.items) {
+      newData.items = [];
+      return;
+    }
+
+    // Ensure the item at this index exists
+    if (!newData.items[index]) {
+      return;
+    }
+
     if (field === "keyExcerpts") return; // Handle separately
 
     newData.items[index][field] = value as never;
@@ -53,6 +77,12 @@ export default function MarketSizePage() {
 
   const addMarketItem = (): void => {
     const newData = { ...editData };
+
+    // Ensure items array exists
+    if (!newData.items) {
+      newData.items = [];
+    }
+
     newData.items.push({
       marketName: "New Market",
       source: "Source",
@@ -64,12 +94,36 @@ export default function MarketSizePage() {
 
   const removeMarketItem = (index: number): void => {
     const newData = { ...editData };
+
+    // Ensure items array exists
+    if (!newData.items) {
+      newData.items = [];
+      return;
+    }
+
     newData.items.splice(index, 1);
     setEditData(newData);
   };
 
   const addExcerpt = (marketIndex: number): void => {
     const newData = { ...editData };
+
+    // Ensure items array exists
+    if (!newData.items) {
+      newData.items = [];
+      return;
+    }
+
+    // Ensure the item at this index exists
+    if (!newData.items[marketIndex]) {
+      return;
+    }
+
+    // Ensure keyExcerpts array exists
+    if (!newData.items[marketIndex].keyExcerpts) {
+      newData.items[marketIndex].keyExcerpts = [];
+    }
+
     newData.items[marketIndex].keyExcerpts.push({ text: "New excerpt" });
     setEditData(newData);
   };
@@ -80,15 +134,43 @@ export default function MarketSizePage() {
     value: string
   ): void => {
     const newData = { ...editData };
+
+    // Ensure items array exists
+    if (
+      !newData.items ||
+      !newData.items[marketIndex] ||
+      !newData.items[marketIndex].keyExcerpts ||
+      !newData.items[marketIndex].keyExcerpts[excerptIndex]
+    ) {
+      return;
+    }
+
     newData.items[marketIndex].keyExcerpts[excerptIndex].text = value;
     setEditData(newData);
   };
 
   const removeExcerpt = (marketIndex: number, excerptIndex: number): void => {
     const newData = { ...editData };
+
+    // Ensure items array exists
+    if (
+      !newData.items ||
+      !newData.items[marketIndex] ||
+      !newData.items[marketIndex].keyExcerpts
+    ) {
+      return;
+    }
+
     newData.items[marketIndex].keyExcerpts.splice(excerptIndex, 1);
     setEditData(newData);
   };
+
+  // Safe access to items array
+  const items = data.items || [];
+  const editItems = editData.items || [];
+
+  // Check if data is empty
+  const isDataEmpty = !items.length;
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
@@ -129,7 +211,7 @@ export default function MarketSizePage() {
             <h2 className="text-[#445963] text-xl font-medium mb-4">Title</h2>
             <input
               type="text"
-              value={editData.title}
+              value={editData.title || ""}
               onChange={(e) => updateTitle(e.target.value)}
               className="w-full border border-[#ced7db] p-2 rounded mb-4"
             />
@@ -141,7 +223,7 @@ export default function MarketSizePage() {
             </h2>
             <input
               type="text"
-              value={editData.subtitle}
+              value={editData.subtitle || ""}
               onChange={(e) => updateSubtitle(e.target.value)}
               className="w-full border border-[#ced7db] p-2 rounded mb-4"
             />
@@ -161,7 +243,7 @@ export default function MarketSizePage() {
           </div>
 
           <div className="space-y-6">
-            {editData.items.map((item, itemIndex) => (
+            {editItems.map((item, itemIndex) => (
               <div
                 key={itemIndex}
                 className="border border-[#ced7db] rounded-md p-4"
@@ -173,7 +255,7 @@ export default function MarketSizePage() {
                     </label>
                     <input
                       type="text"
-                      value={item.marketName}
+                      value={item.marketName || ""}
                       onChange={(e) =>
                         updateMarketItem(
                           itemIndex,
@@ -199,7 +281,7 @@ export default function MarketSizePage() {
                     </label>
                     <input
                       type="text"
-                      value={item.source}
+                      value={item.source || ""}
                       onChange={(e) =>
                         updateMarketItem(itemIndex, "source", e.target.value)
                       }
@@ -240,14 +322,14 @@ export default function MarketSizePage() {
                     </Button>
                   </div>
                   <div className="space-y-2">
-                    {item.keyExcerpts.map((excerpt, excerptIndex) => (
+                    {(item.keyExcerpts || []).map((excerpt, excerptIndex) => (
                       <div
                         key={excerptIndex}
                         className="flex items-center gap-2"
                       >
                         <input
                           type="text"
-                          value={excerpt.text}
+                          value={excerpt.text || ""}
                           onChange={(e) =>
                             updateExcerpt(
                               itemIndex,
@@ -273,7 +355,7 @@ export default function MarketSizePage() {
         </div>
       ) : (
         <>
-          {data.items.length === 0 ? (
+          {isDataEmpty ? (
             <div className="text-center py-12 text-[#57727e] text-lg">
               No market size data present
             </div>
@@ -290,7 +372,7 @@ export default function MarketSizePage() {
                 <div className="p-4">Key excerpts</div>
               </div>
 
-              {data.items.map((item, index) => (
+              {items.map((item, index) => (
                 <div
                   key={index}
                   className="grid grid-cols-2 border-t border-[#ced7db]"
