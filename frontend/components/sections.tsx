@@ -101,7 +101,9 @@ export function Sections({ searchResults }: SectionsProps) {
         />
       </section>
       <section id="employee-keymembers" className="p-6">
-        <EmployeeKeyMembers />
+        <EmployeeKeyMembers
+          initialData={searchResults?.organization.key_members}
+        />
       </section>
       <section id="employee-leadership" className="p-6">
         <LeadershipExecutives />

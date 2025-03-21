@@ -51,3 +51,8 @@ export interface DepartmentData {
   value: number | null;
   displayValue: number | null;
 }
+export interface KeyMember {
+  member_id: number | null;
+  member_full_name: string | null;
+  member_position_title: string | null;
+}

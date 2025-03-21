@@ -1,5 +1,5 @@
 import { CompetitiveAnalysis } from "./competitor";
-import { EmployeesTrend } from "./employeeTrend";
+import { EmployeesTrend, KeyMember } from "./employeeTrend";
 import { MAActivity } from "./maActivity";
 import { MarketInfo } from "./market";
 import { MarketLeadership } from "./market_leadership";
@@ -17,6 +17,7 @@ export type ApiResponse<T> = {
 export type CompanyData = {
   organization: {
     employees_trend: EmployeesTrend;
+    key_members: KeyMember[] | null;
   };
   market_leadership: MarketLeadership;
   key_technology: KeyTechnology;

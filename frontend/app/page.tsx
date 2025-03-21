@@ -18,6 +18,7 @@ export default function Home() {
         breakdown_by_region: null,
         breakdown_by_seniority: null,
       },
+      key_members: null,
     },
     market_leadership: {
       industry: null,
