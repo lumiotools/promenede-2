@@ -52,7 +52,23 @@ async def get_company_data(request: CompanyRequest):
     # Prepare the comprehensive response
     response_data = {
         # 1. Executive Summary
-        "executive_summary": coresignal_data.get("description_enriched", "") or crunchbase_data.get("description", "") or sec_10k_data.get("executive_summary", ""),
+        "executive_summary": {
+            "industry": coresignal_data.get("industry",""),
+            "topic_tags":coresignal_data.get("categories_and_keywords",""),
+            "valuation":crunchbase_data.get("cards", {}).get("fields", {}).get("valuation", ""),
+            "equity_funnding_total": crunchbase_data.get("cards", {}).get("fields", {}).get("equity_funding_total", ""),
+            "funding_total":crunchbase_data.get("cards", {}).get("fields", {}).get("funding_total", ""),
+            "description":crunchbase_data.get("cards", {}).get("fields", {}).get("short_description", ""),
+            "financial_highlights":{
+                "operating_revenue": extract_financial_data(coresignal_data, "revenue"),
+                "operating_profit": extract_financial_data(coresignal_data, "ebit"),
+                "ebitda": extract_financial_data(coresignal_data, "ebitda"),
+                "net_income": extract_financial_data(coresignal_data, "net_income"),
+                "per": calculate_per(coresignal_data),
+            }
+            
+
+        },
         
         # 2. Company Profile
         "company_profile": {
@@ -77,9 +93,9 @@ async def get_company_data(request: CompanyRequest):
             "key_financials": {
                 "income_statements": coresignal_data.get("income_statements", []),
                  "operating_revenue": extract_financial_data(coresignal_data, "revenue"),
-    "operating_profit": extract_financial_data(coresignal_data, "ebit"),
-    "ebitda": extract_financial_data(coresignal_data, "ebitda"),
-    "net_income": extract_financial_data(coresignal_data, "net_income"),
+                "operating_profit": extract_financial_data(coresignal_data, "ebit"),
+                "ebitda": extract_financial_data(coresignal_data, "ebitda"),
+                "net_income": extract_financial_data(coresignal_data, "net_income"),
                 "per": calculate_per(coresignal_data),
                 "revenue_growth": calculate_revenue_growth(coresignal_data)
             },

@@ -11,7 +11,7 @@ import {
   KeyMember,
   EmployeeReviewsData,
 } from "./employeeTrend";
-import { ExecutiveSummaryTitle } from "./executive";
+import { ExecutiveSummary } from "./executive";
 import { MAActivity } from "./maActivity";
 import { MarketInfo } from "./market";
 import { MarketLeadership } from "./market_leadership";
@@ -32,7 +32,7 @@ export type CompanyData = {
     key_members: KeyMember[] | null;
     employee_reviews: EmployeeReviewsData | null;
   };
-  executive_summary: ExecutiveSummaryTitle;
+  executive_summary: ExecutiveSummary;
   market_leadership: MarketLeadership;
   key_technology: KeyTechnology;
   ma_activity: MAActivity;

@@ -30,7 +30,7 @@ import ProductsServices from "./sections/product/product-services";
 import { ProductLaunchesTimeline } from "./sections/product/product-launch-timeline";
 import { ProductTimelineTable } from "./sections/product/product-timeline-table";
 import EmployeeBreakdown from "./sections/employee/employee-breakdown";
-import { ExecutiveSummary } from "./sections/executive/executive-summary";
+import { ExecutiveSummaryPage } from "./sections/executive/executive-summary";
 import { EmployeeTrendChart } from "./sections/employee/employee-trend-chart";
 import { EmployeeKeyMembers } from "./sections/employee/employee-keymember";
 import { LeadershipExecutives } from "./sections/employee/employee-leadership";
@@ -59,7 +59,7 @@ export function Sections({ searchResults }: SectionsProps) {
       />
 
       <section id="executive-summary" className="p-6">
-        <ExecutiveSummary initialData={searchResults?.executive_summary} />
+        <ExecutiveSummaryPage initialData={searchResults?.executive_summary} />
       </section>
 
       <section id="company-profile" className="p-6">

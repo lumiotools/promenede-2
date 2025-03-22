@@ -8,7 +8,19 @@ import { CompanyData } from "@/types/apiResponse";
 export default function Home() {
   const [searchResults, setSearchResults] = useState<CompanyData>({
     executive_summary: {
-      executive_summary: null,
+      industry: null,
+      topic_tags: null,
+      valuation: null,
+      equity_funding_total: null,
+      funding_total: null,
+      description: null,
+      financial_highlights: {
+        operating_revenue: null,
+        operating_profit: null,
+        ebitda: null,
+        net_income: null,
+        per: null,
+      },
     },
     organization: {
       employees_trend: {
