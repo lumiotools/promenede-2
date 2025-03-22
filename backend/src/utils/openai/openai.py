@@ -99,7 +99,7 @@ def process_dataframe_chunk(df_chunk, system_prompt, max_tokens=4000, model="gpt
         print(f"OpenAI API Error: {e}")
         return {"success": False, "error": str(e), "tokens_used": 0}
 
-def process_large_json_data(json_data, system_prompt, max_tokens=4000, model="gpt-4o-mini", column_limit=50):
+def process_large_json_data(json_data, system_prompt, max_tokens=10000, model="gpt-4o-mini", column_limit=50):
     """
     Process large JSON data by breaking it into smaller column chunks.
     
@@ -210,7 +210,7 @@ def process_large_json_data(json_data, system_prompt, max_tokens=4000, model="gp
             "column_chunks": len(chunk_responses)
         }
 
-def chat_with_gpt_plain(system_prompt, content, max_tokens=4000, model="gpt-4o-mini"):
+def chat_with_gpt_plain(system_prompt, content, max_tokens=10000, model="gpt-4o-mini"):
     """
     Get a plain text response from GPT model, handling content that exceeds context limits.
 
@@ -290,7 +290,7 @@ def chat_with_gpt_plain(system_prompt, content, max_tokens=4000, model="gpt-4o-m
         print(f"OpenAI API Error: {e}")
         return None
 
-def chat_with_gpt_json(system_prompt, content, max_tokens=4000, model="gpt-4o-mini", column_limit=50):
+def chat_with_gpt_json(system_prompt, content, max_tokens=10000, model="gpt-4o-mini", column_limit=50):
     """
     Get a JSON response from GPT model, handling content that exceeds context limits.
     Handles large datasets by processing in smaller chunks with column limits.

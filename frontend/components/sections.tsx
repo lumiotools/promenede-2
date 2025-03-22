@@ -85,7 +85,7 @@ export function Sections({ searchResults }: SectionsProps) {
       <section id="web-traffic" className="p-6">
         <WebTraffic initialData={searchResults?.web_traffic} />
       </section>
-      <section id="group-structure" className="p-6">
+      <section id="group-structure" className="hidden p-6">
         <GroupStructure />
       </section>
       <section id="company-timeline" className="p-6">
@@ -95,7 +95,9 @@ export function Sections({ searchResults }: SectionsProps) {
         <CompanyTimelineTable initialData={searchResults?.company_timeline} />
       </section>
       <section id="product-services" className="p-6">
-        <ProductsServices />
+        <ProductsServices
+          initialData={searchResults?.products_services.services}
+        />
       </section>
       <section id="product-launch-timeline" className="p-6">
         <ProductLaunchesTimeline />

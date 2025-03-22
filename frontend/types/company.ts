@@ -173,12 +173,20 @@ export interface ProductReviews {
 }
 
 export interface ProductsServices {
+  services: Service[] | null;
   details: ProductDetail[];
   launch_timeline: string | null; // You might want to define a more specific type here
   pricing_available: boolean | null;
   free_trial_available: boolean | null;
   demo_available: boolean | null;
   product_reviews: ProductReviews | null;
+}
+export interface Service {
+  uuid: string | null; // Unique identifier for the service (can be null)
+  value: string | null; // Name or description of the service (can be null)
+  image_id: string | null; // Image ID associated with the service (can be null)
+  permalink: string | null; // URL-friendly identifier (slug) for the service (can be null)
+  entity_def_id: string | null; // Defines the type of entity (e
 }
 export interface Company {
   company_overview: CompanyOverviewItem | null;

@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import os
 import requests
 from dotenv import load_dotenv
+from src.utils.llmInfo.llm import fetch_company_data
 from src.utils.crunchbase.company import get_organization_data
 from src.utils.secFilings.getCik import get_cik_by_company_name
 from src.utils.secFilings.analyse10K import analyze_10K_filing
@@ -48,6 +49,8 @@ async def get_company_data(request: CompanyRequest):
     print("enrichment id",company_enrichment_id)
     coresignal_data = get_company_details(company_enrichment_id)
     coresignal_data=convert_null_to_none(coresignal_data)
+    llmData =  fetch_company_data(company_name, 10000, "gpt-4o-mini")
+
     
     # If critical data is missing, then try SEC as fallback
     # if not coresignal_data or not coresignal_data.get("company_name"):
@@ -142,8 +145,9 @@ async def get_company_data(request: CompanyRequest):
         
         # 8-9. Products & Services and Launch Timeline
         "products_services": {
+            "services": crunchbase_data.get("cards", {}).get("fields", {}).get("categories", {}) or crunchbase_data.get("cards", {}).get("fields", {}).get("category_groups", {}),
             "details": extract_product_details(coresignal_data, crunchbase_data),
-            "launch_timeline": extract_product_timeline(coresignal_data, crunchbase_data),
+            "launch_timeline": llmData["launch_timeline"],
             "pricing_available": coresignal_data.get("pricing_available", False),
             "free_trial_available": coresignal_data.get("free_trial_available", False),
             "demo_available": coresignal_data.get("demo_available", False),
@@ -167,6 +171,7 @@ async def get_company_data(request: CompanyRequest):
                 "breakdown_by_seniority": coresignal_data.get("employees_count_breakdown_by_seniority", {})
             },
             "key_members": coresignal_data.get("key_executives", []),
+            "leadership_executives":llmData["leadership_executives"],
             "leadership": {
                 "key_executives": coresignal_data.get("key_executives", []),
                 "arrivals": coresignal_data.get("key_executive_arrivals", []),
@@ -195,7 +200,7 @@ async def get_company_data(request: CompanyRequest):
         },
         
         # 16. Strategic Alliance & Partnership
-        "strategic_alliances": crunchbase_data.get("partnerships", []) or [],
+        "strategic_alliances": llmData["strategic_alliances"],
         
         # 17. Market Leadership
         "market_leadership": {
@@ -211,8 +216,8 @@ async def get_company_data(request: CompanyRequest):
         },
         
         # 19-21. Strategic Development, Strategy, Customer Success
-        "strategic_development": extract_strategic_development(coresignal_data, crunchbase_data),
-        "strategy": extract_company_strategy(coresignal_data, crunchbase_data),
+        "strategic_development": llmData["strategic_development"],
+        "strategy": llmData["company_strategy"],
         "customer_success": extract_customer_success(coresignal_data, crunchbase_data),
         
         # 22-23. M&A
@@ -223,8 +228,8 @@ async def get_company_data(request: CompanyRequest):
         
         # 24-26. Market Info
         "market_info": {
-            "size": crunchbase_data.get("market_size", {}) or {},
-            "value_chain": {},
+            "size": llmData["market_size"],
+            "value_chain": llmData["value_chain"],
             "market_map": extract_market_map(coresignal_data, crunchbase_data)
         },
         

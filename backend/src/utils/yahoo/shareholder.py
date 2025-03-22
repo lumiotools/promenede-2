@@ -42,8 +42,8 @@ def get_shareholder_info(ticker_symbol: str):
         return None
 
 # Example Usage:
-shareholder_data = get_shareholder_info("AAPL")
+# shareholder_data = get_shareholder_info("AAPL")
 
-# Convert to JSON string (now it works)
-json_output = json.dumps(shareholder_data, indent=4)
-print(json_output)
+# # Convert to JSON string (now it works)
+# json_output = json.dumps(shareholder_data, indent=4)
+# print(json_output)

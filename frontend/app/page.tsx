@@ -106,6 +106,7 @@ export default function Home() {
       average_visit_duration: null,
     },
     products_services: {
+      services: null,
       details: [],
       launch_timeline: null,
       pricing_available: null,
