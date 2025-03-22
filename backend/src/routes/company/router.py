@@ -180,7 +180,7 @@ async def get_company_data(request: CompanyRequest):
             },
             
             # 13-15. Employee Reviews
-            "employee_reviews": {
+            "employee_reviews2": {
                 "count": coresignal_data.get("company_employee_reviews_count", 0),
                 "score": coresignal_data.get("company_employee_reviews_aggregate_score", 0),
                 "breakdown": coresignal_data.get("employee_reviews_score_breakdown", {}),

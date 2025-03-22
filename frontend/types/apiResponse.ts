@@ -6,6 +6,7 @@ import type {
   ProductsServices,
 } from "./company";
 import { CompetitiveAnalysis } from "./competitor";
+import { EmployeeReviews } from "./employee_reviews";
 import {
   EmployeesTrend,
   KeyMember,
@@ -36,6 +37,7 @@ export type CompanyData = {
   market_leadership: MarketLeadership;
   key_technology: KeyTechnology;
   ma_activity: MAActivity;
+  employee_reviews2: EmployeeReviews;
   market_info: MarketInfo;
   competitive_analysis: CompetitiveAnalysis;
   regulation: RegulationItem[];

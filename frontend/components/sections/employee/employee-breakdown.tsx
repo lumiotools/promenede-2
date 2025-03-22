@@ -115,6 +115,7 @@ export default function EmployeeBreakdown({
 
   useEffect(() => {
     // Update state with initialData when it changes
+    console.log("employee breakdown", initialData);
     if (initialData) {
       setData(initialData);
     }

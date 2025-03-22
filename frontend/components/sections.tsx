@@ -34,7 +34,7 @@ import { ExecutiveSummaryPage } from "./sections/executive/executive-summary";
 import { EmployeeTrendChart } from "./sections/employee/employee-trend-chart";
 import { EmployeeKeyMembers } from "./sections/employee/employee-keymember";
 import { LeadershipExecutives } from "./sections/employee/employee-leadership";
-import { EmployeeReviews } from "./sections/employee/employee-review";
+import { EmployeeReviewsPage } from "./sections/employee/employee-review";
 import { EmployeeReviewImprovements } from "./sections/employee/employee-review-improvement";
 import { EmployeeReviewsTable } from "./sections/employee/employee-review-table";
 import { GroupStructure } from "./sections/group/groupstructure";
@@ -122,14 +122,14 @@ export function Sections({ searchResults }: SectionsProps) {
         <LeadershipExecutives />
       </section>
       <section id="employee-review" className="p-6">
-        <EmployeeReviews />
+        <EmployeeReviewsPage initialData={searchResults?.employee_reviews2} />
       </section>
-      <section id="employee-review-improve" className="p-6">
+      {/* <section id="employee-review-improve" className="p-6">
         <EmployeeReviewImprovements />
       </section>
       <section id="employee-review-table" className="p-6">
         <EmployeeReviewsTable />
-      </section>
+      </section> */}
 
       <section id="strategic-development-component" className="p-6">
         <StrategicDevelopmentTimeline />
