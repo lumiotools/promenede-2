@@ -127,7 +127,7 @@ export default function Home() {
     },
     market_info: {
       size: null,
-      valueChain: null,
+      value_chain: null,
       market_map: null,
     },
     competitive_analysis: {

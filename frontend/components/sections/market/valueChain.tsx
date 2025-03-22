@@ -1,432 +1,647 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
-import { marketInfo as initialData } from "./marketData";
+import { useEffect, useState } from "react";
+import { Edit, Plus, Save, X } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
-import type { ValueChain } from "@/types/market";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { PrimaryActivity, SupportActivity, ValueChain } from "@/types/market";
 
-// Define default empty value chain
-const defaultValueChain: ValueChain = {
-  industry: "",
-  stages: [],
-};
+interface ValueChainPageProps {
+  initialData?: ValueChain | null;
+}
 
-export default function ValueChainPage() {
-  // Use the default value chain if initialData.valueChain is null
-  const [data, setData] = useState<ValueChain>(
-    initialData.valueChain || defaultValueChain
-  );
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<ValueChain>(
-    initialData.valueChain || defaultValueChain
-  );
+export default function ValueChainPage({ initialData }: ValueChainPageProps) {
+  const [data, setData] = useState<ValueChain | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editData, setEditData] = useState<ValueChain | null>(null);
 
-  const startEditing = (): void => {
-    setIsEditing(true);
-    setEditData(JSON.parse(JSON.stringify(data)));
-  };
+  useEffect(() => {
+    // Simulate loading data
+    const timer = setTimeout(() => {
+      setData(initialData || null);
+      setEditData(initialData || null);
+      setLoading(false);
+    }, 1000);
 
-  const cancelEditing = (): void => {
-    setIsEditing(false);
-  };
+    return () => clearTimeout(timer);
+  }, [initialData]);
 
-  const saveChanges = (): void => {
+  const handleSave = () => {
     setData(editData);
-    setIsEditing(false);
+    setEditMode(false);
   };
 
-  const updateIndustry = (value: string): void => {
+  const handleCancel = () => {
+    setEditData(data);
+    setEditMode(false);
+  };
+
+  const handleEdit = () => {
+    setEditData(data);
+    setEditMode(true);
+  };
+
+  const handleAddData = () => {
+    const emptyData: ValueChain = {
+      summary: "",
+      primaryActivities: [
+        { name: "Inbound Logistics", description: "" },
+        { name: "Operations", description: "" },
+        { name: "Outbound Logistics", description: "" },
+        { name: "Marketing and Sales", description: "" },
+        { name: "Service", description: "" },
+      ],
+      supportActivities: [
+        { name: "Firm Infrastructure", description: "" },
+        { name: "Human Resource Management", description: "" },
+        { name: "Technology Development", description: "" },
+        { name: "Procurement", description: "" },
+      ],
+      keyStrengths: [""],
+      keyChallenges: [""],
+    };
+
+    setEditData(emptyData);
+    setEditMode(true);
+  };
+
+  const updateSummary = (value: string) => {
+    if (!editData) return;
     setEditData({
       ...editData,
-      industry: value,
+      summary: value,
     });
   };
 
-  const updateStageName = (index: number, value: string): void => {
-    const newData = { ...editData };
-    if (!newData.stages) {
-      newData.stages = [];
-    }
-    if (newData.stages[index]) {
-      newData.stages[index].name = value;
-      setEditData(newData);
-    }
-  };
+  const updatePrimaryActivity = (
+    index: number,
+    field: keyof PrimaryActivity,
+    value: string
+  ) => {
+    if (!editData || !editData.primaryActivities) return;
 
-  const addStage = (): void => {
-    const newData = { ...editData };
-    if (!newData.stages) {
-      newData.stages = [];
-    }
-    newData.stages.push({
-      name: "New Stage",
-      activities: [{ name: "New Activity" }],
-      tools: ["Tool 1", "Tool 2"],
+    const updatedActivities = [...editData.primaryActivities];
+    updatedActivities[index] = {
+      ...updatedActivities[index],
+      [field]: value,
+    };
+
+    setEditData({
+      ...editData,
+      primaryActivities: updatedActivities,
     });
-    setEditData(newData);
   };
 
-  const removeStage = (index: number): void => {
-    const newData = { ...editData };
-    if (!newData.stages) {
-      newData.stages = [];
-      return;
-    }
-    newData.stages.splice(index, 1);
-    setEditData(newData);
-  };
-
-  const addActivity = (stageIndex: number): void => {
-    const newData = { ...editData };
-    if (!newData.stages) {
-      newData.stages = [];
-      return;
-    }
-    if (!newData.stages[stageIndex]) {
-      return;
-    }
-    if (!newData.stages[stageIndex].activities) {
-      newData.stages[stageIndex].activities = [];
-    }
-    newData.stages[stageIndex].activities.push({ name: "New Activity" });
-    setEditData(newData);
-  };
-
-  const updateActivity = (
-    stageIndex: number,
-    activityIndex: number,
+  const updateSupportActivity = (
+    index: number,
+    field: keyof SupportActivity,
     value: string
-  ): void => {
-    const newData = { ...editData };
-    if (
-      !newData.stages ||
-      !newData.stages[stageIndex] ||
-      !newData.stages[stageIndex].activities ||
-      !newData.stages[stageIndex].activities[activityIndex]
-    ) {
-      return;
-    }
-    newData.stages[stageIndex].activities[activityIndex].name = value;
-    setEditData(newData);
+  ) => {
+    if (!editData || !editData.supportActivities) return;
+
+    const updatedActivities = [...editData.supportActivities];
+    updatedActivities[index] = {
+      ...updatedActivities[index],
+      [field]: value,
+    };
+
+    setEditData({
+      ...editData,
+      supportActivities: updatedActivities,
+    });
   };
 
-  const removeActivity = (stageIndex: number, activityIndex: number): void => {
-    const newData = { ...editData };
-    if (
-      !newData.stages ||
-      !newData.stages[stageIndex] ||
-      !newData.stages[stageIndex].activities
-    ) {
-      return;
-    }
-    newData.stages[stageIndex].activities.splice(activityIndex, 1);
-    setEditData(newData);
-  };
-
-  const addTool = (stageIndex: number): void => {
-    const newData = { ...editData };
-    if (!newData.stages || !newData.stages[stageIndex]) {
-      return;
-    }
-    if (!newData.stages[stageIndex].tools) {
-      newData.stages[stageIndex].tools = [];
-    }
-    newData.stages[stageIndex].tools?.push("New Tool");
-    setEditData(newData);
-  };
-
-  const updateTool = (
-    stageIndex: number,
-    toolIndex: number,
+  const updateListItems = (
+    field: "keyStrengths" | "keyChallenges",
     value: string
-  ): void => {
-    const newData = { ...editData };
-    if (
-      !newData.stages ||
-      !newData.stages[stageIndex] ||
-      !newData.stages[stageIndex].tools ||
-      !newData.stages[stageIndex].tools[toolIndex]
-    ) {
-      return;
-    }
-    newData.stages[stageIndex].tools![toolIndex] = value;
-    setEditData(newData);
+  ) => {
+    if (!editData) return;
+
+    const items = value.split("\n").filter((item) => item.trim() !== "");
+
+    setEditData({
+      ...editData,
+      [field]: items.length > 0 ? items : null,
+    });
   };
 
-  const removeTool = (stageIndex: number, toolIndex: number): void => {
-    const newData = { ...editData };
-    if (
-      !newData.stages ||
-      !newData.stages[stageIndex] ||
-      !newData.stages[stageIndex].tools
-    ) {
-      return;
-    }
-    newData.stages[stageIndex].tools!.splice(toolIndex, 1);
-    setEditData(newData);
+  const addPrimaryActivity = () => {
+    if (!editData) return;
+
+    const updatedActivities = editData.primaryActivities
+      ? [...editData.primaryActivities]
+      : [];
+    updatedActivities.push({ name: "", description: "" });
+
+    setEditData({
+      ...editData,
+      primaryActivities: updatedActivities,
+    });
   };
 
-  // Tool logos - using placeholders
-  const toolLogos: Record<string, string> = {
-    greenhouse: "/placeholder.svg?height=20&width=80",
-    phenom: "/placeholder.svg?height=20&width=80",
-    Gem: "/placeholder.svg?height=20&width=80",
-    seekout: "/placeholder.svg?height=20&width=80",
+  const removePrimaryActivity = (index: number) => {
+    if (!editData || !editData.primaryActivities) return;
+
+    const updatedActivities = [...editData.primaryActivities];
+    updatedActivities.splice(index, 1);
+
+    setEditData({
+      ...editData,
+      primaryActivities:
+        updatedActivities.length > 0 ? updatedActivities : null,
+    });
   };
 
-  // Create a safe reference to stages that's guaranteed to be an array
-  const stages = data.stages || [];
+  const addSupportActivity = () => {
+    if (!editData) return;
 
-  // Check if the value chain is empty
-  const isValueChainEmpty =
-    !data.industry && (!data.stages || data.stages.length === 0);
+    const updatedActivities = editData.supportActivities
+      ? [...editData.supportActivities]
+      : [];
+    updatedActivities.push({ name: "", description: "" });
+
+    setEditData({
+      ...editData,
+      supportActivities: updatedActivities,
+    });
+  };
+
+  const removeSupportActivity = (index: number) => {
+    if (!editData || !editData.supportActivities) return;
+
+    const updatedActivities = [...editData.supportActivities];
+    updatedActivities.splice(index, 1);
+
+    setEditData({
+      ...editData,
+      supportActivities:
+        updatedActivities.length > 0 ? updatedActivities : null,
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-4xl font-semibold text-[#445963]">
+          Value Chain Analysis
+        </h1>
+        <Separator className="my-4" />
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-8 w-3/4" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-40 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!data && !editMode) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-semibold text-[#445963]">
+            Value Chain Analysis
+          </h1>
+          <Button
+            onClick={handleAddData}
+            className="bg-[#156082] hover:bg-[#092a38]"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Add Value Chain Data
+          </Button>
+        </div>
+        <Separator className="my-4" />
+        <Card>
+          <CardContent className="flex items-center justify-center p-12">
+            <div className="text-center">
+              <h3 className="text-xl font-medium text-[#35454c]">
+                No value chain data available
+              </h3>
+              <p className="text-[#57727e] mt-2">
+                Click the button above to add value chain information
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-[#445963] text-6xl font-normal">Value Chain</h1>
-        {!isEditing ? (
-          <Button
-            onClick={startEditing}
-            className="bg-[#156082] hover:bg-[#092a38] text-white"
-          >
-            <PencilIcon className="mr-2 h-4 w-4" /> Edit
-          </Button>
-        ) : (
-          <div className="flex gap-2">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-4xl font-semibold text-[#445963]">
+          Value Chain Analysis
+        </h1>
+        {!editMode ? (
+          <div className="space-x-2">
             <Button
-              onClick={saveChanges}
-              className="bg-[#156082] hover:bg-[#092a38] text-white"
+              onClick={handleEdit}
+              variant="outline"
+              className="border-[#156082] text-[#156082]"
             >
-              <SaveIcon className="mr-2 h-4 w-4" /> Save
+              <Edit className="mr-2 h-4 w-4" /> Edit Data
+            </Button>
+            {!data && (
+              <Button
+                onClick={handleAddData}
+                className="bg-[#156082] hover:bg-[#092a38]"
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Value Chain Data
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="space-x-2">
+            <Button
+              onClick={handleCancel}
+              variant="outline"
+              className="border-red-500 text-red-500"
+            >
+              <X className="mr-2 h-4 w-4" /> Cancel
             </Button>
             <Button
-              onClick={cancelEditing}
-              variant="outline"
-              className="border-[#ced7db] text-[#445963]"
+              onClick={handleSave}
+              className="bg-[#156082] hover:bg-[#092a38]"
             >
-              <XIcon className="mr-2 h-4 w-4" /> Cancel
+              <Save className="mr-2 h-4 w-4" /> Save
             </Button>
           </div>
         )}
       </div>
-      <div className="border-t border-[#ced7db] mb-12"></div>
+      <Separator className="my-4" />
 
-      {isEditing ? (
-        <div className="space-y-8">
-          <div>
-            <h2 className="text-[#445963] text-xl font-medium mb-4">
-              Industry
-            </h2>
-            <input
-              type="text"
-              value={editData.industry || ""}
-              onChange={(e) => updateIndustry(e.target.value)}
-              className="w-full border border-[#ced7db] p-2 rounded mb-4"
-            />
-          </div>
+      {editMode ? (
+        <EditValueChain
+          data={editData}
+          updateSummary={updateSummary}
+          updatePrimaryActivity={updatePrimaryActivity}
+          updateSupportActivity={updateSupportActivity}
+          updateListItems={updateListItems}
+          addPrimaryActivity={addPrimaryActivity}
+          removePrimaryActivity={removePrimaryActivity}
+          addSupportActivity={addSupportActivity}
+          removeSupportActivity={removeSupportActivity}
+        />
+      ) : (
+        <ViewValueChain data={data} />
+      )}
+    </div>
+  );
+}
 
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[#445963] text-xl font-medium">
-              Value Chain Stages
-            </h2>
+interface EditValueChainProps {
+  data: ValueChain | null;
+  updateSummary: (value: string) => void;
+  updatePrimaryActivity: (
+    index: number,
+    field: keyof PrimaryActivity,
+    value: string
+  ) => void;
+  updateSupportActivity: (
+    index: number,
+    field: keyof SupportActivity,
+    value: string
+  ) => void;
+  updateListItems: (
+    field: "keyStrengths" | "keyChallenges",
+    value: string
+  ) => void;
+  addPrimaryActivity: () => void;
+  removePrimaryActivity: (index: number) => void;
+  addSupportActivity: () => void;
+  removeSupportActivity: (index: number) => void;
+}
+
+function EditValueChain({
+  data,
+  updateSummary,
+  updatePrimaryActivity,
+  updateSupportActivity,
+  updateListItems,
+  addPrimaryActivity,
+  removePrimaryActivity,
+  addSupportActivity,
+  removeSupportActivity,
+}: EditValueChainProps) {
+  if (!data) return null;
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Company Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            value={data.summary || ""}
+            onChange={(e) => updateSummary(e.target.value)}
+            placeholder="Enter company summary"
+            rows={4}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex justify-between items-center">
+            <span>Primary Activities</span>
             <Button
-              onClick={addStage}
+              onClick={addPrimaryActivity}
               size="sm"
-              className="bg-[#156082] hover:bg-[#092a38] text-white"
+              variant="outline"
+              className="border-[#156082] text-[#156082]"
             >
-              <PlusIcon className="mr-2 h-4 w-4" /> Add Stage
+              <Plus className="h-4 w-4 mr-1" /> Add Activity
             </Button>
-          </div>
-
-          <div className="space-y-6">
-            {(editData.stages || []).map((stage, stageIndex) => (
-              <div
-                key={stageIndex}
-                className="border border-[#ced7db] rounded-md p-4"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-[#445963] mb-1">
-                      Stage Name:
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {data.primaryActivities?.map((activity, index) => (
+              <div key={index} className="p-4 border rounded-md relative">
+                <Button
+                  onClick={() => removePrimaryActivity(index)}
+                  size="sm"
+                  variant="ghost"
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Activity Name
                     </label>
-                    <input
-                      type="text"
-                      value={stage.name || ""}
+                    <Input
+                      value={activity.name || ""}
                       onChange={(e) =>
-                        updateStageName(stageIndex, e.target.value)
+                        updatePrimaryActivity(index, "name", e.target.value)
                       }
-                      className="w-full border border-[#ced7db] p-2 rounded"
+                      placeholder="e.g. Inbound Logistics"
                     />
                   </div>
-                  <button
-                    onClick={() => removeStage(stageIndex)}
-                    className="ml-2 text-[#445963] hover:text-red-500"
-                  >
-                    <TrashIcon size={16} />
-                  </button>
-                </div>
-
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-sm font-medium text-[#445963]">
-                      Activities:
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Description
                     </label>
-                    <Button
-                      onClick={() => addActivity(stageIndex)}
-                      size="sm"
-                      variant="outline"
-                      className="border-[#ced7db] text-[#445963] text-xs py-1 h-7"
-                    >
-                      <PlusIcon className="mr-1 h-3 w-3" /> Add Activity
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    {(stage.activities || []).map((activity, activityIndex) => (
-                      <div
-                        key={activityIndex}
-                        className="flex items-center gap-2"
-                      >
-                        <input
-                          type="text"
-                          value={activity.name || ""}
-                          onChange={(e) =>
-                            updateActivity(
-                              stageIndex,
-                              activityIndex,
-                              e.target.value
-                            )
-                          }
-                          className="flex-1 border border-[#ced7db] p-2 rounded"
-                        />
-                        <button
-                          onClick={() =>
-                            removeActivity(stageIndex, activityIndex)
-                          }
-                          className="text-[#445963] hover:text-red-500"
-                        >
-                          <TrashIcon size={14} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-sm font-medium text-[#445963]">
-                      Tools:
-                    </label>
-                    <Button
-                      onClick={() => addTool(stageIndex)}
-                      size="sm"
-                      variant="outline"
-                      className="border-[#ced7db] text-[#445963] text-xs py-1 h-7"
-                    >
-                      <PlusIcon className="mr-1 h-3 w-3" /> Add Tool
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    {(stage.tools || []).map((tool, toolIndex) => (
-                      <div key={toolIndex} className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={tool || ""}
-                          onChange={(e) =>
-                            updateTool(stageIndex, toolIndex, e.target.value)
-                          }
-                          className="flex-1 border border-[#ced7db] p-2 rounded"
-                        />
-                        <button
-                          onClick={() => removeTool(stageIndex, toolIndex)}
-                          className="text-[#445963] hover:text-red-500"
-                        >
-                          <TrashIcon size={14} />
-                        </button>
-                      </div>
-                    ))}
+                    <Textarea
+                      value={activity.description || ""}
+                      onChange={(e) =>
+                        updatePrimaryActivity(
+                          index,
+                          "description",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Describe this activity"
+                      rows={3}
+                    />
                   </div>
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      ) : (
-        <>
-          {isValueChainEmpty ? (
-            <div className="text-center py-12 text-[#57727e] text-lg">
-              No value chain data present
-            </div>
-          ) : (
-            <>
-              <div className="mb-8 border-b border-[#ced7db] pb-4">
-                <h2 className="text-[#445963] text-xl">
-                  Industry :{" "}
-                  <span className="font-medium">{data.industry || "N/A"}</span>
-                </h2>
+            {!data.primaryActivities?.length && (
+              <div className="text-center py-4 text-[#57727e]">
+                No primary activities added. Click &quot;Add Activity&quot; to
+                add one.
               </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
-              <div className="flex flex-col md:flex-row justify-between gap-4 mb-8">
-                {stages.map((stage, stageIndex) => (
-                  <div key={stageIndex} className="flex-1 flex flex-col">
-                    <div className="bg-[#002169] text-white p-4 rounded-t-md text-center">
-                      <h3 className="font-medium">{stage.name || "N/A"}</h3>
-                    </div>
-                    <div className="bg-[#f8f9fa] flex-1 p-4 rounded-b-md border border-[#ced7db] border-t-0">
-                      <div className="space-y-3">
-                        {stage.activities && stage.activities.length > 0 ? (
-                          stage.activities.map((activity, activityIndex) => (
-                            <div
-                              key={activityIndex}
-                              className="flex items-start gap-2"
-                            >
-                              <div className="mt-1.5 flex-shrink-0">
-                                <div className="w-2 h-2 rounded-full bg-[#17b26a]"></div>
-                              </div>
-                              <p className="text-[#445963]">
-                                {activity.name || "N/A"}
-                              </p>
-                            </div>
-                          ))
-                        ) : (
-                          <p className="text-[#57727e] text-center">
-                            No activities available
-                          </p>
-                        )}
-                      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex justify-between items-center">
+            <span>Support Activities</span>
+            <Button
+              onClick={addSupportActivity}
+              size="sm"
+              variant="outline"
+              className="border-[#156082] text-[#156082]"
+            >
+              <Plus className="h-4 w-4 mr-1" /> Add Activity
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {data.supportActivities?.map((activity, index) => (
+              <div key={index} className="p-4 border rounded-md relative">
+                <Button
+                  onClick={() => removeSupportActivity(index)}
+                  size="sm"
+                  variant="ghost"
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Activity Name
+                    </label>
+                    <Input
+                      value={activity.name || ""}
+                      onChange={(e) =>
+                        updateSupportActivity(index, "name", e.target.value)
+                      }
+                      placeholder="e.g. Firm Infrastructure"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Description
+                    </label>
+                    <Textarea
+                      value={activity.description || ""}
+                      onChange={(e) =>
+                        updateSupportActivity(
+                          index,
+                          "description",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Describe this activity"
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            {!data.supportActivities?.length && (
+              <div className="text-center py-4 text-[#57727e]">
+                No support activities added. Click &quot;Add Activity&quot; to
+                add one.
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
-                      <div className="mt-8 pt-4 border-t border-[#ced7db] flex justify-center gap-4">
-                        {stage.tools && stage.tools.length > 0 ? (
-                          stage.tools.map((tool, toolIndex) => (
-                            <img
-                              key={toolIndex}
-                              src={
-                                toolLogos[tool] ||
-                                "/placeholder.svg?height=20&width=80"
-                              }
-                              alt={`${tool} logo`}
-                              className="h-5"
-                            />
-                          ))
-                        ) : (
-                          <p className="text-[#57727e] text-sm text-center">
-                            No tools available
-                          </p>
-                        )}
-                      </div>
-                    </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Key Strengths</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              value={data.keyStrengths?.join("\n") || ""}
+              onChange={(e) => updateListItems("keyStrengths", e.target.value)}
+              placeholder="Enter key strengths (one per line)"
+              rows={6}
+            />
+            <p className="text-sm text-[#57727e] mt-2">
+              Enter each strength on a new line
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Key Challenges</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              value={data.keyChallenges?.join("\n") || ""}
+              onChange={(e) => updateListItems("keyChallenges", e.target.value)}
+              placeholder="Enter key challenges (one per line)"
+              rows={6}
+            />
+            <p className="text-sm text-[#57727e] mt-2">
+              Enter each challenge on a new line
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+interface ViewValueChainProps {
+  data: ValueChain | null;
+}
+
+function ViewValueChain({ data }: ViewValueChainProps) {
+  if (!data) return null;
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Company Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {data.summary ? (
+            <p className="text-[#35454c]">{data.summary}</p>
+          ) : (
+            <p className="text-[#8097a2]">Not available</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="lg:col-span-2">
+          <CardHeader className="bg-[#f8f9fa]">
+            <CardTitle>Primary Activities</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            {data.primaryActivities && data.primaryActivities.length > 0 ? (
+              <div className="divide-y">
+                {data.primaryActivities.map((activity, index) => (
+                  <div key={index} className="p-4">
+                    <h3 className="font-semibold text-[#156082] mb-2">
+                      {activity.name || "Unnamed Activity"}
+                    </h3>
+                    <p className="text-[#35454c]">
+                      {activity.description || "No description available"}
+                    </p>
                   </div>
                 ))}
               </div>
-            </>
-          )}
-        </>
-      )}
+            ) : (
+              <div className="p-4 text-center text-[#8097a2]">
+                No primary activities available
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-      <div className="mt-8 text-[#57727e] text-sm">
-        Source: 1.PromenadeAI, 2.Crunchbase
+        <Card className="lg:col-span-2">
+          <CardHeader className="bg-[#f8f9fa]">
+            <CardTitle>Support Activities</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            {data.supportActivities && data.supportActivities.length > 0 ? (
+              <div className="divide-y">
+                {data.supportActivities.map((activity, index) => (
+                  <div key={index} className="p-4">
+                    <h3 className="font-semibold text-[#156082] mb-2">
+                      {activity.name || "Unnamed Activity"}
+                    </h3>
+                    <p className="text-[#35454c]">
+                      {activity.description || "No description available"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-4 text-center text-[#8097a2]">
+                No support activities available
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="bg-[#f8f9fa]">
+            <CardTitle>Key Strengths</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.keyStrengths && data.keyStrengths.length > 0 ? (
+              <ul className="list-disc pl-5 space-y-2">
+                {data.keyStrengths.map((strength, index) => (
+                  <li key={index} className="text-[#35454c]">
+                    {strength}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-[#8097a2]">No key strengths available</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="bg-[#f8f9fa]">
+            <CardTitle>Key Challenges</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.keyChallenges && data.keyChallenges.length > 0 ? (
+              <ul className="list-disc pl-5 space-y-2">
+                {data.keyChallenges.map((challenge, index) => (
+                  <li key={index} className="text-[#35454c]">
+                    {challenge}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-[#8097a2]">No key challenges available</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

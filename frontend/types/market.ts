@@ -1,18 +1,3 @@
-export interface ValueChainActivity {
-  name: string | null;
-}
-
-export interface ValueChainStage {
-  name: string | null;
-  activities: ValueChainActivity[] | null;
-  tools?: string[] | null;
-}
-
-export interface ValueChain {
-  industry: string | null;
-  stages: ValueChainStage[] | null;
-}
-
 export interface MarketMap {
   industry: string | null;
   segments: string[] | null;
@@ -49,8 +34,25 @@ export interface YearData {
   keyIndustryTrends: string[] | null;
   keyExcerpt: string | null;
 }
+export interface ValueChain {
+  summary: string | null;
+  primaryActivities: PrimaryActivity[] | null;
+  supportActivities: SupportActivity[] | null;
+  keyStrengths: string[] | null;
+  keyChallenges: string[] | null;
+}
+
+export interface PrimaryActivity {
+  name: string | null;
+  description: string | null;
+}
+
+export interface SupportActivity {
+  name: string | null;
+  description: string | null;
+}
 export interface MarketInfo {
   size: SizeData | null;
-  valueChain: ValueChain | null;
+  value_chain: ValueChain | null;
   market_map: MarketMap | null;
 }
