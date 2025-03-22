@@ -20,7 +20,6 @@ import StrategyPage from "./sections/strategy/strategy";
 import StrategicDevelopmentTimeline from "./sections/strategy/strategicDevelopment";
 import KeyTechnologyPage from "./sections/technology/technology";
 import MarketLeadershipPage from "./sections/market-leadership/marketLeadership";
-import StrategicAlliancePage from "./sections/strategic-partnership/strategicPartnership";
 import ReportHeader from "./reportheader";
 import { FinancialSummary } from "./sections/financial/financial-summary";
 import WebTraffic from "./sections/webtraffic/web-traffic";
@@ -42,6 +41,7 @@ import CompanyOverview from "./sections/company/company-overview";
 import CompanyProfile from "./sections/company/company-profile";
 import { FinancialSummaryDetail } from "./sections/financial/financial-details";
 import { LeadershipExecutivesPage } from "./sections/employee/employee-leadership";
+import { StrategicAlliancePage } from "./sections/strategic-partnership/strategicPartnership";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -143,7 +143,9 @@ export function Sections({ searchResults }: SectionsProps) {
         />
       </section>
       <section id="strategic-partnership-component" className="p-6">
-        <StrategicAlliancePage />
+        <StrategicAlliancePage
+          initialData={searchResults?.strategic_alliances}
+        />
       </section>
       <section id="market-leadership-component" className="p-6">
         <MarketLeadershipPage initialData={searchResults?.market_leadership} />{" "}

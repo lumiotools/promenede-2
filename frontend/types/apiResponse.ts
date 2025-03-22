@@ -20,6 +20,7 @@ import { MarketLeadership } from "./market_leadership";
 import { OpportunitiesRisks } from "./opportunitiesRisks";
 import { QAItem } from "./qa";
 import { RegulationItem } from "./regulation";
+import { StrategicAlliance } from "./strategicAlliance";
 import { StrategicDevelopment } from "./strategicDevelopment";
 import { KeyTechnology } from "./technology";
 
@@ -52,6 +53,7 @@ export type CompanyData = {
   web_traffic: WebTrafficItem;
   products_services: ProductsServices;
   strategic_development: StrategicDevelopment | null;
+  strategic_alliances: StrategicAlliance[] | null;
 };
 
 export type CompanyApiResponse = ApiResponse<CompanyData | null>;

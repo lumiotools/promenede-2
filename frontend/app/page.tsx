@@ -23,7 +23,7 @@ export default function Home() {
       },
     },
     strategic_development: null,
-
+    strategic_alliances: null,
     organization: {
       leadership_executives: null,
       employee_reviews2: {
