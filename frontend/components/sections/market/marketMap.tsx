@@ -9,7 +9,7 @@ import type { MarketInfo, MarketMap } from "@/types/market";
 // Default state for the component
 const defaultState: MarketInfo = {
   size: null,
-  valueChain: null,
+  value_chain: null,
   market_map: {
     industry: "",
     segments: [],
