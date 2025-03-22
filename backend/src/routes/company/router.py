@@ -7,6 +7,7 @@ from src.utils.crunchbase.company import get_organization_data
 from src.utils.secFilings.getCik import get_cik_by_company_name
 from src.utils.secFilings.analyse10K import analyze_10K_filing
 from src.utils.coresignal.company import get_company_details,get_company_id
+from src.utils.yahoo.shareholder import get_shareholder_info
 from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer,convert_null_to_none
 # Load environment variables from .env file
 load_dotenv()
@@ -29,6 +30,10 @@ async def get_company_data(request: CompanyRequest):
     # Get data from different sources
     crunchbase_data = get_organization_data(company_name)
     print("crunchbase data",crunchbase_data)
+    stock_name=crunchbase_data.get("cards", {}).get("fields", {}).get("stock_symbol", {}).get("value", "")
+    print("stock name",stock_name)
+    yahooData=get_shareholder_info(stock_name)
+    print("yahoo data",yahooData)
     
     # Only get SEC data as fallback
     company_cik = None
@@ -101,7 +106,7 @@ async def get_company_data(request: CompanyRequest):
             },
             
             # c. Shareholders
-            "shareholders": crunchbase_data.get("investors", []) or sec_10k_data.get("shareholders", [])
+            "shareholders": yahooData
         },
         
         # 3. Company Overview

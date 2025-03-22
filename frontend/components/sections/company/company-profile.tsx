@@ -2,100 +2,62 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import {
+import type {
   CompanyProfiles,
   Firmographic,
   KeyFinancials,
   ProductService,
 } from "@/types/company";
-import { Edit, Save, X } from "lucide-react";
+import type {
+  InstitutionalHolder,
+  MajorHolders,
+  ShareholderData,
+} from "@/types/shareholder";
+import { Edit, Save, X, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
-
-// Define interface for shareholder data
-interface Shareholder {
-  name: string | null;
-  shares: number | null;
-  percentage: number | null;
-  type: string | null;
-}
 
 // Modify the CompanyProfileProps type to match the actual data structure
 type CompanyProfileProps = {
-  initialData?:
-    | CompanyProfiles
-    | {
-        data: {
-          company_profile: {
-            firmographic: Firmographic;
-            key_financials: KeyFinancials;
-            shareholders: Shareholder[];
-          };
-        };
-      };
+  initialData?: CompanyProfiles;
 };
 
 // Define consistent data structure to be used in the component
 interface NormalizedCompanyData {
-  data: {
-    company_profile: {
-      firmographic: Firmographic;
-      key_financials: KeyFinancials;
-      shareholders: Shareholder[];
-    };
-  };
+  firmographic: Firmographic;
+  key_financials: KeyFinancials;
+  shareholder_data: ShareholderData;
 }
 
 export default function CompanyProfile({ initialData }: CompanyProfileProps) {
   // Transform the data to ensure consistent structure
-  type CompanyDataInput =
-    | NormalizedCompanyData
-    | CompanyProfiles
-    | undefined
-    | null;
-
-  const transformData = (data: CompanyDataInput): NormalizedCompanyData => {
+  const transformData = (
+    data: CompanyProfiles | undefined | null
+  ): NormalizedCompanyData => {
     if (!data) return createEmptyCompanyProfile();
 
     // Check if data already has the expected structure
-    if ("data" in data && data.data && data.data.company_profile) {
-      return data as NormalizedCompanyData;
+    if (data.firmographic || data.key_financials) {
+      // Check if the data has the new shareholder_data structure
+      if (data.shareholders) {
+        return {
+          firmographic: data.firmographic || createEmptyFirmographic(),
+          key_financials: data.key_financials || createEmptyKeyFinancials(),
+          shareholder_data: data.shareholders || createEmptyShareholderData(),
+        };
+      }
+
+      // If it doesn't have shareholder data, create empty shareholder data
+      return {
+        firmographic: data.firmographic || createEmptyFirmographic(),
+        key_financials: data.key_financials || createEmptyKeyFinancials(),
+        shareholder_data: createEmptyShareholderData(),
+      };
     }
 
-    // Transform the shareholders array from string[] to Shareholder[]
-    let transformedShareholders: Shareholder[] = [];
-    if ("shareholders" in data && Array.isArray(data.shareholders)) {
-      // Convert string[] to Shareholder[] if needed
-      transformedShareholders = data.shareholders.map((item) => {
-        if (typeof item === "string") {
-          // Convert string to Shareholder object
-          return {
-            name: item,
-            shares: null,
-            percentage: null,
-            type: null,
-          };
-        } else {
-          // Item is already a Shareholder object
-          return item as Shareholder;
-        }
-      });
-    }
-
-    // Transform the data to match the expected structure
-    return {
-      data: {
-        company_profile: {
-          firmographic:
-            ("firmographic" in data ? data.firmographic : null) ||
-            createEmptyFirmographic(),
-          key_financials:
-            ("key_financials" in data ? data.key_financials : null) ||
-            createEmptyKeyFinancials(),
-          shareholders: transformedShareholders,
-        },
-      },
-    };
+    // Handle other data formats or create empty data
+    return createEmptyCompanyProfile();
   };
+
   // Add these helper functions after transformData:
   const createEmptyFirmographic = (): Firmographic => ({
     name: null,
@@ -123,22 +85,28 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
     per: null,
   });
 
-  const createEmptyCompanyProfile = (): NormalizedCompanyData => ({
-    data: {
-      company_profile: {
-        firmographic: createEmptyFirmographic(),
-        key_financials: createEmptyKeyFinancials(),
-        shareholders: [],
-      },
+  const createEmptyShareholderData = (): ShareholderData => ({
+    major_holders: {
+      insidersPercentHeld: null,
+      institutionsPercentHeld: null,
+      institutionsFloatPercentHeld: null,
+      institutionsCount: null,
     },
+    institutional_holders: [],
+  });
+
+  const createEmptyCompanyProfile = (): NormalizedCompanyData => ({
+    firmographic: createEmptyFirmographic(),
+    key_financials: createEmptyKeyFinancials(),
+    shareholder_data: createEmptyShareholderData(),
   });
 
   // Initialize state with transformed initialData if provided
   const [data, setData] = useState<NormalizedCompanyData>(
-    initialData ? transformData(initialData) : createEmptyCompanyProfile()
+    transformData(initialData)
   );
   const [editData, setEditData] = useState<NormalizedCompanyData>(
-    initialData ? transformData(initialData) : createEmptyCompanyProfile()
+    transformData(initialData)
   );
 
   // Fetch data if not provided as initialData
@@ -157,16 +125,19 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
     financials: false,
   });
 
-  // Ensure we have the required data structure
-  const companyProfile = data.data.company_profile;
-
-  // Update these lines to use the companyProfile variable:
-  const firmographic = companyProfile.firmographic || createEmptyFirmographic();
-  const keyFinancials =
-    companyProfile.key_financials || createEmptyKeyFinancials();
+  // Update these lines to use the new structure:
+  const firmographic = data.firmographic || createEmptyFirmographic();
+  const keyFinancials = data.key_financials || createEmptyKeyFinancials();
   const incomeStatements = keyFinancials.income_statements || [];
   const revenueGrowth = keyFinancials.revenue_growth || [];
-  const shareholders = companyProfile.shareholders || [];
+  const shareholderData = data.shareholder_data || createEmptyShareholderData();
+  const majorHolders = shareholderData.major_holders || {
+    insidersPercentHeld: null,
+    institutionsPercentHeld: null,
+    institutionsFloatPercentHeld: null,
+    institutionsCount: null,
+  };
+  const institutionalHolders = shareholderData.institutional_holders || [];
 
   // Format date with null check
   const formatDate = (dateString: string | null) => {
@@ -196,22 +167,23 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
   };
 
   // Calculate quarterly data for 2024 with null checks
-  const q2024Data = incomeStatements
-    .filter(
-      (statement) =>
-        statement &&
-        statement.period_type &&
-        statement.period_type.startsWith("q") &&
-        statement.period_end_date &&
-        statement.period_end_date.startsWith("2024")
-    )
-    .sort((a, b) => {
-      if (!a.period_end_date || !b.period_end_date) return 0;
-      return (
-        new Date(a.period_end_date).getTime() -
-        new Date(b.period_end_date).getTime()
-      );
-    });
+  const q2024Data =
+    incomeStatements
+      ?.filter(
+        (statement) =>
+          statement &&
+          statement.period_type &&
+          statement.period_type.startsWith("q") &&
+          statement.period_end_date &&
+          statement.period_end_date.startsWith("2024")
+      )
+      .sort((a, b) => {
+        if (!a.period_end_date || !b.period_end_date) return 0;
+        return (
+          new Date(a.period_end_date).getTime() -
+          new Date(b.period_end_date).getTime()
+        );
+      }) || [];
 
   // Calculate total for 2024 quarters with null checks
   const q2024Revenue = q2024Data.reduce(
@@ -228,22 +200,23 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
   );
 
   // Get annual revenue growth rates with null checks
-  const annualGrowthRates = revenueGrowth.filter(
-    (growth) =>
-      growth &&
-      growth.previous_period &&
-      growth.current_period &&
-      growth.previous_period.endsWith("-12-31") &&
-      growth.current_period.endsWith("-12-31")
-  );
+  const annualGrowthRates =
+    revenueGrowth?.filter(
+      (growth) =>
+        growth &&
+        growth.previous_period &&
+        growth.current_period &&
+        growth.previous_period.endsWith("-12-31") &&
+        growth.current_period.endsWith("-12-31")
+    ) || [];
 
   // Calculate total shares and percentage with null checks
-  const totalShares = shareholders.reduce(
-    (sum, shareholder) => sum + (shareholder.shares || 0),
+  const totalShares = institutionalHolders.reduce(
+    (sum, holder) => sum + (holder.Shares || 0),
     0
   );
-  const totalPercentage = shareholders.reduce(
-    (sum, shareholder) => sum + (shareholder.percentage || 0),
+  const totalPercentage = institutionalHolders.reduce(
+    (sum, holder) => sum + (holder.pctHeld || 0),
     0
   );
 
@@ -267,43 +240,106 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
     field: keyof Firmographic,
     value: string | number
   ) => {
-    if (!editData?.data?.company_profile?.firmographic) return;
+    if (!editData?.firmographic) return;
 
     const newEditData = { ...editData };
 
     // Check if field is employees_count which is numeric
     if (field === "employees_count") {
-      newEditData.data.company_profile.firmographic[field] =
+      newEditData.firmographic[field] =
         typeof value === "string" ? Number(value) : value;
     } else {
       // Handle all other string fields
-      (newEditData.data.company_profile.firmographic[field] as string | null) =
-        value as string | null;
-    }
-
-    setEditData(newEditData);
-  };
-
-  const updateShareholderField = (
-    index: number,
-    field: keyof Shareholder,
-    value: string | number
-  ) => {
-    if (!editData?.data?.company_profile?.shareholders) return;
-
-    const newEditData = { ...editData };
-    if (field === "shares" || field === "percentage") {
-      newEditData.data.company_profile.shareholders[index][field] =
-        typeof value === "string" ? Number(value) : value;
-    } else if (field === "name" || field === "type") {
-      newEditData.data.company_profile.shareholders[index][field] = value as
+      (newEditData.firmographic[field] as string | null) = value as
         | string
         | null;
     }
+
     setEditData(newEditData);
   };
+
+  const updateMajorHoldersField = (
+    field: keyof MajorHolders,
+    value: number | null
+  ) => {
+    if (!editData?.shareholder_data) return;
+
+    const newEditData = { ...editData };
+
+    if (!newEditData.shareholder_data.major_holders) {
+      newEditData.shareholder_data.major_holders = {
+        insidersPercentHeld: null,
+        institutionsPercentHeld: null,
+        institutionsFloatPercentHeld: null,
+        institutionsCount: null,
+      };
+    }
+
+    newEditData.shareholder_data.major_holders[field] =
+      typeof value === "string" ? Number(value) : value;
+
+    setEditData(newEditData);
+  };
+
+  const updateInstitutionalHolderField = (
+    index: number,
+    field: keyof InstitutionalHolder,
+    value: string | number | null
+  ) => {
+    if (!editData?.shareholder_data?.institutional_holders) return;
+
+    const newEditData = { ...editData };
+    const holders = newEditData.shareholder_data.institutional_holders;
+
+    if (!holders || !holders[index]) return;
+
+    if (
+      field === "Shares" ||
+      field === "Value" ||
+      field === "pctHeld" ||
+      field === "pctChange"
+    ) {
+      holders[index][field] = typeof value === "string" ? Number(value) : value;
+    } else {
+      holders[index][field] = value as string | null;
+    }
+
+    setEditData(newEditData);
+  };
+
+  const addInstitutionalHolder = () => {
+    const newEditData = { ...editData };
+
+    if (!newEditData.shareholder_data) {
+      newEditData.shareholder_data = createEmptyShareholderData();
+    }
+
+    if (!newEditData.shareholder_data.institutional_holders) {
+      newEditData.shareholder_data.institutional_holders = [];
+    }
+
+    newEditData.shareholder_data.institutional_holders.push({
+      "Date Reported": new Date().toISOString().split("T")[0],
+      Holder: "",
+      pctHeld: 0,
+      Shares: 0,
+      Value: 0,
+      pctChange: 0,
+    });
+
+    setEditData(newEditData);
+  };
+
+  const removeInstitutionalHolder = (index: number) => {
+    const newEditData = { ...editData };
+    if (!newEditData.shareholder_data?.institutional_holders) return;
+
+    newEditData.shareholder_data.institutional_holders.splice(index, 1);
+    setEditData(newEditData);
+  };
+
   // Define fiscalYears based on incomeStatements
-  const fiscalYears = [...incomeStatements].sort((a, b) => {
+  const fiscalYears = [...(incomeStatements || [])].sort((a, b) => {
     if (!a?.period_end_date || !b?.period_end_date) return 0;
     return (
       new Date(b.period_end_date).getTime() -
@@ -368,10 +404,7 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                       <input
                         type="text"
                         className="w-full p-1 border border-gray-300 rounded"
-                        value={
-                          editData?.data?.company_profile?.firmographic
-                            ?.legal_name || ""
-                        }
+                        value={editData?.firmographic?.legal_name || ""}
                         onChange={(e) =>
                           updateFirmographicField("legal_name", e.target.value)
                         }
@@ -390,10 +423,7 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                       <input
                         type="text"
                         className="w-full p-1 border border-gray-300 rounded"
-                        value={
-                          editData?.data?.company_profile?.firmographic
-                            ?.incorporation_date || ""
-                        }
+                        value={editData?.firmographic?.incorporation_date || ""}
                         onChange={(e) =>
                           updateFirmographicField(
                             "incorporation_date",
@@ -415,10 +445,7 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                       <input
                         type="text"
                         className="w-full p-1 border border-gray-300 rounded"
-                        value={
-                          editData?.data?.company_profile?.firmographic
-                            ?.hq_address || ""
-                        }
+                        value={editData?.firmographic?.hq_address || ""}
                         onChange={(e) =>
                           updateFirmographicField("hq_address", e.target.value)
                         }
@@ -484,10 +511,7 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                       <input
                         type="number"
                         className="w-full p-1 border border-gray-300 rounded"
-                        value={
-                          editData?.data?.company_profile?.firmographic
-                            ?.employees_count || 0
-                        }
+                        value={editData?.firmographic?.employees_count || 0}
                         onChange={(e) =>
                           updateFirmographicField(
                             "employees_count",
@@ -509,8 +533,8 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                       <textarea
                         className="w-full p-1 border border-gray-300 rounded"
                         value={
-                          editData?.data?.company_profile?.firmographic?.products_services
-                            ?.filter((ps) => ps.value !== null)
+                          editData?.firmographic?.products_services
+                            ?.filter((ps) => ps && ps.value !== null)
                             .map((ps) => ps.value)
                             .join(", ") || ""
                         }
@@ -521,8 +545,8 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                           const newProducts: ProductService[] = values.map(
                             (value, i) => ({
                               uuid:
-                                editData?.data?.company_profile?.firmographic
-                                  ?.products_services?.[i]?.uuid || `new-${i}`,
+                                editData?.firmographic?.products_services?.[i]
+                                  ?.uuid || `new-${i}`,
                               value,
                               image_id: null,
                               permalink: null,
@@ -530,10 +554,8 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                             })
                           );
                           const newEditData = { ...editData };
-                          if (
-                            newEditData?.data?.company_profile?.firmographic
-                          ) {
-                            newEditData.data.company_profile.firmographic.products_services =
+                          if (newEditData?.firmographic) {
+                            newEditData.firmographic.products_services =
                               newProducts;
                             setEditData(newEditData);
                           }
@@ -551,27 +573,20 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
             </table>
           </div>
 
-          {/* Shareholders Table */}
+          {/* Institutional Holders Table */}
           <div className="border border-[#e5e7eb] rounded-md overflow-hidden">
             <div className="flex items-center justify-between p-4">
               <h2 className="text-base font-medium text-[#475467]">
-                Shareholders
+                Institutional Holders
               </h2>
               {isEditing.shareholders ? (
                 <div className="flex gap-2">
                   <button
-                    onClick={() => saveChanges("shareholders")}
-                    className="text-green-600 hover:text-green-800 flex items-center gap-1"
+                    onClick={() => addInstitutionalHolder()}
+                    className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
                   >
-                    <Save className="h-4 w-4" />
-                    <span className="text-xs">Save</span>
-                  </button>
-                  <button
-                    onClick={() => cancelEditing("shareholders")}
-                    className="text-red-600 hover:text-red-800 flex items-center gap-1"
-                  >
-                    <X className="h-4 w-4" />
-                    <span className="text-xs">Cancel</span>
+                    <Plus className="h-4 w-4" />
+                    <span className="text-xs">Add</span>
                   </button>
                 </div>
               ) : (
@@ -587,117 +602,188 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-[#002169] text-white">
-                  <th className="py-3 px-4 text-left font-medium">Name</th>
-                  <th className="py-3 px-4 text-left font-medium">
-                    # of Shares
-                  </th>
-                  <th className="py-3 px-4 text-left font-medium">%</th>
-                  <th className="py-3 px-4 text-left font-medium">Types</th>
+                  <th className="py-3 px-4 text-left font-medium">Holder</th>
+                  <th className="py-3 px-4 text-right font-medium">Shares</th>
+                  <th className="py-3 px-4 text-right font-medium">% Held</th>
+                  <th className="py-3 px-4 text-right font-medium">Value</th>
+                  <th className="py-3 px-4 text-right font-medium">% Change</th>
+                  <th className="py-3 px-4 text-right font-medium">Date</th>
+                  {isEditing.shareholders && (
+                    <th className="py-3 px-4 text-center font-medium">
+                      Actions
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
                 {(isEditing.shareholders &&
-                editData?.data?.company_profile?.shareholders
-                  ? editData.data.company_profile.shareholders
-                  : shareholders
-                ).map((shareholder, index) => (
+                editData?.shareholder_data?.institutional_holders
+                  ? editData.shareholder_data.institutional_holders
+                  : institutionalHolders
+                ).map((holder, index) => (
                   <tr key={index}>
                     <td className="py-3 px-4 border-t border-r border-[#e5e7eb] text-black">
                       {isEditing.shareholders ? (
                         <input
                           type="text"
                           className="w-full p-1 border border-gray-300 rounded"
-                          value={shareholder.name || ""}
+                          value={holder.Holder || ""}
                           onChange={(e) =>
-                            updateShareholderField(
+                            updateInstitutionalHolderField(
                               index,
-                              "name",
+                              "Holder",
                               e.target.value
                             )
                           }
                         />
                       ) : (
-                        shareholder.name || "N/A"
+                        holder.Holder || "N/A"
                       )}
                     </td>
-                    <td className="py-3 px-4 border-t border-r border-[#e5e7eb] text-black">
+                    <td className="py-3 px-4 border-t border-r border-[#e5e7eb] text-right text-black">
                       {isEditing.shareholders ? (
                         <input
                           type="number"
-                          className="w-full p-1 border border-gray-300 rounded"
-                          value={shareholder.shares || 0}
+                          className="w-full p-1 border border-gray-300 rounded text-right"
+                          value={holder.Shares || 0}
                           onChange={(e) =>
-                            updateShareholderField(
+                            updateInstitutionalHolderField(
                               index,
-                              "shares",
-                              Number.parseInt(e.target.value) || 0
+                              "Shares",
+                              Number(e.target.value) || 0
                             )
                           }
                         />
                       ) : (
-                        (shareholder.shares || 0).toLocaleString()
+                        (holder.Shares || 0).toLocaleString()
                       )}
                     </td>
-                    <td className="py-3 px-4 border-t border-r border-[#e5e7eb] text-black">
+                    <td className="py-3 px-4 border-t border-r border-[#e5e7eb] text-right text-black">
                       {isEditing.shareholders ? (
                         <input
                           type="number"
                           step="0.01"
-                          className="w-full p-1 border border-gray-300 rounded"
-                          value={shareholder.percentage || 0}
+                          className="w-full p-1 border border-gray-300 rounded text-right"
+                          value={holder.pctHeld || 0}
                           onChange={(e) =>
-                            updateShareholderField(
+                            updateInstitutionalHolderField(
                               index,
-                              "percentage",
-                              Number.parseFloat(e.target.value) || 0
+                              "pctHeld",
+                              Number(e.target.value) || 0
                             )
                           }
                         />
                       ) : (
-                        `${shareholder.percentage || 0}%`
+                        `${holder.pctHeld?.toFixed(2) || 0}%`
                       )}
                     </td>
-                    <td className="py-3 px-4 border-t border-[#e5e7eb] text-black">
+                    <td className="py-3 px-4 border-t border-r border-[#e5e7eb] text-right text-black">
                       {isEditing.shareholders ? (
                         <input
-                          type="text"
-                          className="w-full p-1 border border-gray-300 rounded"
-                          value={shareholder.type || ""}
+                          type="number"
+                          className="w-full p-1 border border-gray-300 rounded text-right"
+                          value={holder.Value || 0}
                           onChange={(e) =>
-                            updateShareholderField(
+                            updateInstitutionalHolderField(
                               index,
-                              "type",
+                              "Value",
+                              Number(e.target.value) || 0
+                            )
+                          }
+                        />
+                      ) : (
+                        formatCurrency(holder.Value)
+                      )}
+                    </td>
+                    <td className="py-3 px-4 border-t border-r border-[#e5e7eb] text-right text-black">
+                      {isEditing.shareholders ? (
+                        <input
+                          type="number"
+                          step="0.01"
+                          className="w-full p-1 border border-gray-300 rounded text-right"
+                          value={holder.pctChange || 0}
+                          onChange={(e) =>
+                            updateInstitutionalHolderField(
+                              index,
+                              "pctChange",
+                              Number(e.target.value) || 0
+                            )
+                          }
+                        />
+                      ) : (
+                        `${holder.pctChange?.toFixed(2) || 0}%`
+                      )}
+                    </td>
+                    <td className="py-3 px-4 border-t border-r border-[#e5e7eb] text-right text-black">
+                      {isEditing.shareholders ? (
+                        <input
+                          type="date"
+                          className="w-full p-1 border border-gray-300 rounded"
+                          value={holder["Date Reported"] || ""}
+                          onChange={(e) =>
+                            updateInstitutionalHolderField(
+                              index,
+                              "Date Reported",
                               e.target.value
                             )
                           }
                         />
                       ) : (
-                        shareholder.type || "N/A"
+                        formatDate(holder["Date Reported"])
                       )}
                     </td>
+                    {isEditing.shareholders && (
+                      <td className="py-3 px-4 border-t border-[#e5e7eb] text-center">
+                        <button
+                          onClick={() => removeInstitutionalHolder(index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
                 <tr>
                   <td className="py-3 px-4 font-medium border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-black">
                     Total
                   </td>
-                  <td className="py-3 px-4 border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-black">
+                  <td className="py-3 px-4 border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-right text-black">
                     {isEditing.shareholders &&
-                    editData?.data?.company_profile?.shareholders
-                      ? editData.data.company_profile.shareholders
-                          .reduce((sum, s) => sum + (s.shares || 0), 0)
+                    editData?.shareholder_data?.institutional_holders
+                      ? editData.shareholder_data.institutional_holders
+                          .reduce((sum, h) => sum + (h.Shares || 0), 0)
                           .toLocaleString()
                       : totalShares.toLocaleString()}
                   </td>
-                  <td className="py-3 px-4 border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-black">
+                  <td className="py-3 px-4 border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-right text-black">
                     {isEditing.shareholders &&
-                    editData?.data?.company_profile?.shareholders
-                      ? editData.data.company_profile.shareholders
-                          .reduce((sum, s) => sum + (s.percentage || 0), 0)
-                          .toFixed(1) + "%"
-                      : totalPercentage.toFixed(1) + "%"}
+                    editData?.shareholder_data?.institutional_holders
+                      ? editData.shareholder_data.institutional_holders
+                          .reduce((sum, h) => sum + (h.pctHeld || 0), 0)
+                          .toFixed(2) + "%"
+                      : totalPercentage.toFixed(2) + "%"}
                   </td>
-                  <td className="py-3 px-4 border-t-2 border-t-[#002169]"></td>
+                  <td className="py-3 px-4 border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-right text-black">
+                    {isEditing.shareholders &&
+                    editData?.shareholder_data?.institutional_holders
+                      ? formatCurrency(
+                          editData.shareholder_data.institutional_holders.reduce(
+                            (sum, h) => sum + (h.Value || 0),
+                            0
+                          )
+                        )
+                      : formatCurrency(
+                          institutionalHolders.reduce(
+                            (sum, h) => sum + (h.Value || 0),
+                            0
+                          )
+                        )}
+                  </td>
+                  <td
+                    className="py-3 px-4 border-t-2 border-t-[#002169] text-right"
+                    colSpan={isEditing.shareholders ? 3 : 2}
+                  ></td>
                 </tr>
               </tbody>
             </table>

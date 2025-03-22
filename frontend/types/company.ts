@@ -1,3 +1,5 @@
+import { ShareholderData } from "./shareholder";
+
 export interface RevenueRange {
   annual_revenue_range_from: number | null;
   annual_revenue_range_to: number | null;
@@ -104,7 +106,7 @@ export interface CompanyOverviewItem {
 export interface CompanyProfiles {
   firmographic?: Firmographic | null;
   key_financials?: KeyFinancials | null;
-  shareholders?: string[] | null;
+  shareholders?: ShareholderData | null;
 }
 
 export interface TimelineEvent {
