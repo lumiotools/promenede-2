@@ -13,6 +13,7 @@ import {
   EmployeeReviewsData,
 } from "./employeeTrend";
 import { ExecutiveSummary } from "./executive";
+import { LeadershipExecutive } from "./leadership_executives";
 import { MAActivity } from "./maActivity";
 import { MarketInfo } from "./market";
 import { MarketLeadership } from "./market_leadership";
@@ -32,12 +33,13 @@ export type CompanyData = {
     employees_trend: EmployeesTrend;
     key_members: KeyMember[] | null;
     employee_reviews: EmployeeReviewsData | null;
+    leadership_executives: LeadershipExecutive[] | null;
+    employee_reviews2: EmployeeReviews;
   };
   executive_summary: ExecutiveSummary;
   market_leadership: MarketLeadership;
   key_technology: KeyTechnology;
   ma_activity: MAActivity;
-  employee_reviews2: EmployeeReviews;
   market_info: MarketInfo;
   competitive_analysis: CompetitiveAnalysis;
   regulation: RegulationItem[];

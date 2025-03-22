@@ -23,6 +23,76 @@ export default function Home() {
       },
     },
     organization: {
+      leadership_executives: null,
+      employee_reviews2: {
+        count: null,
+        score: null,
+        breakdown: {
+          business_outlook: null,
+          career_opportunities: null,
+          ceo_approval: null,
+          compensation_benefits: null,
+          culture_values: null,
+          diversity_inclusion: null,
+          recommend: null,
+          senior_management: null,
+          work_life_balance: null,
+        },
+        distribution: {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+        },
+        by_category: {
+          business_outlook: {
+            current: null,
+            change: { monthly: null, quarterly: null, yearly: null },
+            trend: null,
+          },
+          career_opportunities: {
+            current: null,
+            change: { monthly: null, quarterly: null, yearly: null },
+            trend: null,
+          },
+          ceo_approval: {
+            current: null,
+            change: { monthly: null, quarterly: null, yearly: null },
+            trend: null,
+          },
+          compensation_benefits: {
+            current: null,
+            change: { monthly: null, quarterly: null, yearly: null },
+            trend: null,
+          },
+          culture_values: {
+            current: null,
+            change: { monthly: null, quarterly: null, yearly: null },
+            trend: null,
+          },
+          diversity_inclusion: {
+            current: null,
+            change: { monthly: null, quarterly: null, yearly: null },
+            trend: null,
+          },
+          recommend: {
+            current: null,
+            change: { monthly: null, quarterly: null, yearly: null },
+            trend: null,
+          },
+          senior_management: {
+            current: null,
+            change: { monthly: null, quarterly: null, yearly: null },
+            trend: null,
+          },
+          work_life_balance: {
+            current: null,
+            change: { monthly: null, quarterly: null, yearly: null },
+            trend: null,
+          },
+        },
+      },
       employees_trend: {
         count_by_month: null,
         count_change: null,
@@ -105,75 +175,7 @@ export default function Home() {
       pages_per_visit: null,
       average_visit_duration: null,
     },
-    employee_reviews2: {
-      count: null,
-      score: null,
-      breakdown: {
-        business_outlook: null,
-        career_opportunities: null,
-        ceo_approval: null,
-        compensation_benefits: null,
-        culture_values: null,
-        diversity_inclusion: null,
-        recommend: null,
-        senior_management: null,
-        work_life_balance: null,
-      },
-      distribution: {
-        "1": null,
-        "2": null,
-        "3": null,
-        "4": null,
-        "5": null,
-      },
-      by_category: {
-        business_outlook: {
-          current: null,
-          change: { monthly: null, quarterly: null, yearly: null },
-          trend: null,
-        },
-        career_opportunities: {
-          current: null,
-          change: { monthly: null, quarterly: null, yearly: null },
-          trend: null,
-        },
-        ceo_approval: {
-          current: null,
-          change: { monthly: null, quarterly: null, yearly: null },
-          trend: null,
-        },
-        compensation_benefits: {
-          current: null,
-          change: { monthly: null, quarterly: null, yearly: null },
-          trend: null,
-        },
-        culture_values: {
-          current: null,
-          change: { monthly: null, quarterly: null, yearly: null },
-          trend: null,
-        },
-        diversity_inclusion: {
-          current: null,
-          change: { monthly: null, quarterly: null, yearly: null },
-          trend: null,
-        },
-        recommend: {
-          current: null,
-          change: { monthly: null, quarterly: null, yearly: null },
-          trend: null,
-        },
-        senior_management: {
-          current: null,
-          change: { monthly: null, quarterly: null, yearly: null },
-          trend: null,
-        },
-        work_life_balance: {
-          current: null,
-          change: { monthly: null, quarterly: null, yearly: null },
-          trend: null,
-        },
-      },
-    },
+
     products_services: {
       services: null,
       details: [],

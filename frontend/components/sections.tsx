@@ -33,7 +33,6 @@ import EmployeeBreakdown from "./sections/employee/employee-breakdown";
 import { ExecutiveSummaryPage } from "./sections/executive/executive-summary";
 import { EmployeeTrendChart } from "./sections/employee/employee-trend-chart";
 import { EmployeeKeyMembers } from "./sections/employee/employee-keymember";
-import { LeadershipExecutives } from "./sections/employee/employee-leadership";
 import { EmployeeReviewsPage } from "./sections/employee/employee-review";
 import { EmployeeReviewImprovements } from "./sections/employee/employee-review-improvement";
 import { EmployeeReviewsTable } from "./sections/employee/employee-review-table";
@@ -42,6 +41,7 @@ import { CompanyData } from "@/types/apiResponse";
 import CompanyOverview from "./sections/company/company-overview";
 import CompanyProfile from "./sections/company/company-profile";
 import { FinancialSummaryDetail } from "./sections/financial/financial-details";
+import { LeadershipExecutivesPage } from "./sections/employee/employee-leadership";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -119,10 +119,14 @@ export function Sections({ searchResults }: SectionsProps) {
         />
       </section>
       <section id="employee-leadership" className="p-6">
-        <LeadershipExecutives />
+        <LeadershipExecutivesPage
+          initialData={searchResults?.organization.leadership_executives}
+        />
       </section>
       <section id="employee-review" className="p-6">
-        <EmployeeReviewsPage initialData={searchResults?.employee_reviews2} />
+        <EmployeeReviewsPage
+          initialData={searchResults?.organization.employee_reviews2}
+        />
       </section>
       {/* <section id="employee-review-improve" className="p-6">
         <EmployeeReviewImprovements />
