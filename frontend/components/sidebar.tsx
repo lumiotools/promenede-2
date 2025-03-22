@@ -139,13 +139,16 @@ export function Sidebar({
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:8000/company/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ company_name: searchQuery }),
-      });
+      const response = await fetch(
+        "https://promenede-2.onrender.com/company/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_name: searchQuery }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
