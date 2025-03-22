@@ -171,11 +171,16 @@ export interface ProductReviews {
     [key: string]: number;
   };
 }
-
+export interface LaunchTimelineItem {
+  productName: string | null;
+  description: string | null;
+  referenceLink: string | null;
+  date: string | null;
+}
 export interface ProductsServices {
   services: Service[] | null;
   details: ProductDetail[];
-  launch_timeline: string | null; // You might want to define a more specific type here
+  launch_timeline: LaunchTimelineItem[] | null; // You might want to define a more specific type here
   pricing_available: boolean | null;
   free_trial_available: boolean | null;
   demo_available: boolean | null;

@@ -99,11 +99,13 @@ export function Sections({ searchResults }: SectionsProps) {
           initialData={searchResults?.products_services.services}
         />
       </section>
-      <section id="product-launch-timeline" className="p-6">
+      {/* <section id="product-launch-timeline" className="p-6">
         <ProductLaunchesTimeline />
-      </section>
+      </section> */}
       <section id="product-timeline-table" className="p-6">
-        <ProductTimelineTable />
+        <ProductTimelineTable
+          initialData={searchResults?.products_services.launch_timeline}
+        />
       </section>
       <EmployeeBreakdown
         initialData={searchResults?.organization.employees_trend}

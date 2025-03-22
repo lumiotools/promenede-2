@@ -2,190 +2,297 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Edit, Save, X } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Pencil, Plus, ExternalLink, Loader2 } from "lucide-react";
+import { LaunchTimelineItem } from "@/types/company";
 
-// Define interface for the timeline API response
-interface ApiTimelineItem {
-  date: string;
-  event: string | null;
-  link?: string;
+interface ProductTimelineTableProps {
+  initialData?: LaunchTimelineItem[] | null | undefined;
 }
 
-// Interface for the company data structure
-interface CompanyData {
-  data: {
-    company_timeline?: ApiTimelineItem[];
-  };
-}
-
-// Interface for the processed product launch data
-interface ProductLaunch {
-  id: number;
-  year: string;
-  description: string;
-  link?: string;
-}
-
-export function ProductTimelineTable() {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<ProductLaunch[]>([]);
-  const [editData, setEditData] = useState<ProductLaunch[]>([]);
-  const [isEditing, setIsEditing] = useState(false);
+export function ProductTimelineTable({
+  initialData,
+}: ProductTimelineTableProps) {
+  const [timelineData, setTimelineData] = useState<LaunchTimelineItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+  const [currentItem, setCurrentItem] = useState<LaunchTimelineItem | null>(
+    null
+  );
+  const [isNewItem, setIsNewItem] = useState<boolean>(false);
+  const [currentIndex, setCurrentIndex] = useState<number>(-1);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch("/paypal.json");
-        if (!response.ok)
-          throw new Error(`Failed to fetch data: ${response.status}`);
+    // Simulate loading data
+    const timer = setTimeout(() => {
+      if (initialData && initialData.length > 0) {
+        setTimelineData(initialData);
+      }
+      setLoading(false);
+    }, 1000);
 
-        const jsonData: CompanyData = await response.json();
+    return () => clearTimeout(timer);
+  }, [initialData]);
 
-        if (
-          jsonData?.data?.company_timeline &&
-          Array.isArray(jsonData.data.company_timeline)
-        ) {
-          const timelineEvents = jsonData.data.company_timeline
-            .filter((item: ApiTimelineItem) => item.event !== null)
-            .slice(0, 5)
-            .map((item: ApiTimelineItem, index: number) => ({
-              id: index + 1,
-              year: new Date(item.date).getFullYear().toString(),
-              description: item.event as string, // Safe assertion since we filtered nulls
-              link: item.link || "#",
-            }));
+  const handleEditClick = (item: LaunchTimelineItem, index: number) => {
+    setCurrentItem(item);
+    setCurrentIndex(index);
+    setIsNewItem(false);
+    setIsEditDialogOpen(true);
+  };
 
-          setData(timelineEvents);
-          setEditData(timelineEvents);
-        } else {
-          setData([]);
-        }
-      } catch (error) {
-        console.error("Error fetching timeline data:", error);
-        setError("Failed to load timeline data");
-        setData([]);
-      } finally {
-        setLoading(false);
+  const handleAddClick = () => {
+    setCurrentItem({
+      productName: null,
+      description: null,
+      referenceLink: null,
+      date: null,
+    });
+    setIsNewItem(true);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSave = () => {
+    if (currentItem) {
+      if (isNewItem) {
+        setTimelineData([...timelineData, currentItem]);
+      } else if (currentIndex >= 0) {
+        const updatedData = [...timelineData];
+        updatedData[currentIndex] = currentItem;
+        setTimelineData(updatedData);
       }
     }
-
-    fetchData();
-  }, []);
-
-  const startEditing = () => {
-    setIsEditing(true);
-    setEditData([...data]);
+    setIsEditDialogOpen(false);
   };
 
-  const cancelEditing = () => {
-    setIsEditing(false);
-    setEditData([...data]);
+  const getYear = (dateString: string | null): string => {
+    if (!dateString) return "Not available";
+    try {
+      return new Date(dateString).getFullYear().toString();
+    } catch (e) {
+      return "Invalid date";
+    }
   };
 
-  const saveChanges = () => {
-    setData([...editData]);
-    setIsEditing(false);
+  const formatDate = (dateString: string | null): string => {
+    if (!dateString) return "Not available";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch (e) {
+      return "Invalid date";
+    }
   };
 
-  const updateField = (
-    id: number,
-    field: keyof ProductLaunch,
-    value: string
-  ) => {
-    setEditData((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-[#002169]" />
+        <p className="mt-2 text-[#35454c]">Loading product timeline...</p>
+      </div>
     );
-  };
-
-  if (loading)
-    return <div className="p-6">Loading product timeline data...</div>;
-  if (error && data.length === 0)
-    return <div className="p-6 text-red-500">{error}</div>;
+  }
 
   return (
-    <div className="space-y-6 bg-white">
-      <h1 className="text-4xl font-medium text-[#475467]">Product Timeline</h1>
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-4xl font-medium text-[#35454c]">
+          Product Timeline
+        </h2>
+        <Button
+          onClick={handleAddClick}
+          className="bg-[#002169] hover:bg-[#156082]"
+        >
+          <Plus className="h-4 w-4 mr-2" /> Add Product
+        </Button>
+      </div>
 
-      <div className="border-t border-[#e5e7eb] w-full"></div>
+      <div className="border rounded-md">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h3 className="text-lg font-medium text-[#35454c]">
+            Product Timeline
+          </h3>
+          <Button variant="ghost" size="icon">
+            <Pencil className="h-5 w-5 text-[#57727e]" />
+          </Button>
+        </div>
 
-      {/* <div className="border border-[#e5e7eb] mx-10 rounded-md overflow-hidden">
-        {/* Table Header */}
-      {/* <div className="flex justify-between items-center px-4 py-3 border-b border-[#e5e7eb]">
-          <h2 className="text-lg font-medium text-[#475467]">Product Timeline</h2>
-          {isEditing ? (
-            <div className="flex gap-2">
-              <button onClick={saveChanges} className="text-green-600 hover:text-green-800 flex items-center gap-1">
-                <Save className="h-4 w-4" />
-                <span className="text-xs">Save</span>
-              </button>
-              <button onClick={cancelEditing} className="text-red-600 hover:text-red-800 flex items-center gap-1">
-                <X className="h-4 w-4" />
-                <span className="text-xs">Cancel</span>
-              </button>
-            </div>
-          ) : (
-            <button onClick={startEditing} className="text-[#475467]">
-              <Edit size={18} />
-            </button>
-          )}
-        </div> */}
-
-      {/* Table */}
-      {/* <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-[#002266] text-white">
-              <th className="py-2 px-4 text-left font-medium border-r border-[#1a3a80] w-12">#</th>
-              <th className="py-2 px-4 text-left font-medium border-r border-[#1a3a80] w-24">Year</th>
-              <th className="py-2 px-4 text-left font-medium">Product Launches</th>
-            </tr>
-          </thead>
-          <tbody>
-            {editData.map((item) => (
-              <tr key={item.id} className="border-b border-[#e5e7eb] last:border-b-0">
-                <td className="py-3 px-4 border-r border-[#e5e7eb] align-top">{item.id}</td>
-                <td className="py-3 px-4 border-r border-[#e5e7eb] align-top">
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={item.year}
-                      onChange={(e) => updateField(item.id, "year", e.target.value)}
-                      className="border p-1 w-full"
-                    />
-                  ) : (
-                    item.year
-                  )}
-                </td>
-                <td className="py-3 px-4 align-top">
-                  {isEditing ? (
-                    <textarea
-                      value={item.description}
-                      onChange={(e) => updateField(item.id, "description", e.target.value)}
-                      className="border p-1 w-full"
-                      rows={2}
-                    />
-                  ) : (
-                    <>
-                      {item.description}{" "}
-                      {item.link && (
-                        <a href={item.link} className="text-blue-600 hover:underline">
-                          (link)
+        {timelineData.length === 0 ? (
+          <div className="p-8 text-center text-[#57727e]">
+            No product timeline data available
+          </div>
+        ) : (
+          <Table>
+            <TableHeader className="bg-[#002169]">
+              <TableRow>
+                <TableHead className="text-white font-medium w-16 text-center">
+                  #
+                </TableHead>
+                <TableHead className="text-white font-medium">Year</TableHead>
+                <TableHead className="text-white font-medium">
+                  Product Launches
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {timelineData.map((item, index) => (
+                <TableRow
+                  key={index}
+                  className="hover:bg-[#ced7db]/20 cursor-pointer"
+                  onClick={() => handleEditClick(item, index)}
+                >
+                  <TableCell className="text-center font-medium">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell>{getYear(item.date)}</TableCell>
+                  <TableCell>
+                    <div>
+                      <span className="font-medium">
+                        {item.productName || "Not available"}
+                      </span>
+                      {item.description && (
+                        <p className="text-[#57727e] mt-1">
+                          {item.description}
+                        </p>
+                      )}
+                      {item.referenceLink && (
+                        <a
+                          href={item.referenceLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#156082] hover:underline flex items-center mt-1"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          <span>link</span>
                         </a>
                       )}
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div> */}
-
-      <div className="text-center">No Data Available</div>
-
-      <div className="text-xs text-[#8097a2] italic">
-        Source: 1.PromenadeAI, 2.Crunchbase
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
+
+      <p className="text-[#57727e] text-sm mt-4">
+        Source: Apple Product Launches
+      </p>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>
+              {isNewItem ? "Add New Product" : "Edit Product"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="productName" className="text-right">
+                Product Name
+              </label>
+              <Input
+                id="productName"
+                value={currentItem?.productName || ""}
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem!,
+                    productName: e.target.value || null,
+                  })
+                }
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="date" className="text-right">
+                Release Date
+              </label>
+              <Input
+                id="date"
+                type="date"
+                value={currentItem?.date?.split("T")[0] || ""}
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem!,
+                    date: e.target.value || null,
+                  })
+                }
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="description" className="text-right">
+                Description
+              </label>
+              <Textarea
+                id="description"
+                value={currentItem?.description || ""}
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem!,
+                    description: e.target.value || null,
+                  })
+                }
+                className="col-span-3"
+                rows={3}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="referenceLink" className="text-right">
+                Reference Link
+              </label>
+              <Input
+                id="referenceLink"
+                value={currentItem?.referenceLink || ""}
+                onChange={(e) =>
+                  setCurrentItem({
+                    ...currentItem!,
+                    referenceLink: e.target.value || null,
+                  })
+                }
+                className="col-span-3"
+                placeholder="https://..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              className="bg-[#002169] hover:bg-[#156082]"
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

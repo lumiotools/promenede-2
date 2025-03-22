@@ -62,7 +62,7 @@ def fetch_company_data_parallel(company_name, max_tokens=10000, model="gpt-4o-mi
         f"Company Name: {company_name}\nCurrent Date: {current_date}\n"
         "Please provide the company's product launch timeline as JSON. "
         "Return an array of objects with the following structure: "
-        "[{\"productName\": string, \"description\": string, \"referenceLink\": string}]"
+        "[{\"productName\": string, \"description\": string, \"referenceLink\": string,\"date\": string}]"
     )
     
     strategic_development_content = (
