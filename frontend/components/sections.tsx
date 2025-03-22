@@ -41,6 +41,7 @@ import { GroupStructure } from "./sections/group/groupstructure";
 import { CompanyData } from "@/types/apiResponse";
 import CompanyOverview from "./sections/company/company-overview";
 import CompanyProfile from "./sections/company/company-profile";
+import { FinancialSummaryDetail } from "./sections/financial/financial-details";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
@@ -71,7 +72,14 @@ export function Sections({ searchResults }: SectionsProps) {
       </section>
 
       <section id="financial-summary" className="p-6">
-        <FinancialSummary />
+        <FinancialSummary
+          initialData={searchResults?.company_profile?.key_financials}
+        />
+      </section>
+      <section id="financial-detail" className="p-6">
+        <FinancialSummaryDetail
+          initialData={searchResults?.company_profile?.key_financials}
+        />
       </section>
 
       <section id="web-traffic" className="p-6">
