@@ -35,9 +35,22 @@ export interface MarketSize {
   subtitle: string | null;
   items: MarketSizeItem[] | null;
 }
+export interface SizeData {
+  industryName: string | null;
+  pastYearData: YearData | null;
+  yearBeforeData: YearData | null;
+  projectionFor2030: YearData | null;
+}
 
+export interface YearData {
+  marketSize: string | null;
+  cagr: string | null;
+  explanation: string | null;
+  keyIndustryTrends: string[] | null;
+  keyExcerpt: string | null;
+}
 export interface MarketInfo {
-  size: MarketSize | null;
+  size: SizeData | null;
   valueChain: ValueChain | null;
   market_map: MarketMap | null;
 }

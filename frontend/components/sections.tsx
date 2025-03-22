@@ -166,7 +166,7 @@ export function Sections({ searchResults }: SectionsProps) {
         <MAStrategyPage initialData={searchResults?.ma_activity} />{" "}
       </section>
       <section id="market-size-component" className="p-6">
-        <MarketSizePage />
+        <MarketSizePage initialData={searchResults?.market_info.size} />
       </section>
       <section id="value-chain-component" className="p-6">
         <ValueChainPage />

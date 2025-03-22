@@ -1,420 +1,683 @@
 "use client";
 
-import { useState } from "react";
-import { marketInfo as initialData } from "./marketData";
+import { useEffect, useState } from "react";
+import { Edit, Plus, Save, X } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
-import type { MarketSize, MarketSizeItem } from "@/types/market";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 
-// Define default empty market size
-const defaultMarketSize: MarketSize = {
-  title: "Market Size",
-  subtitle: "",
-  items: [],
-};
+export interface SizeData {
+  industryName: string | null;
+  pastYearData: YearData | null;
+  yearBeforeData: YearData | null;
+  projectionFor2030: YearData | null;
+}
 
-export default function MarketSizePage() {
-  // Use the default market size if initialData.size is null
-  const [data, setData] = useState<MarketSize>(
-    initialData.size || defaultMarketSize
-  );
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<MarketSize>(
-    initialData.size || defaultMarketSize
-  );
+export interface YearData {
+  marketSize: string | null;
+  cagr: string | null;
+  explanation: string | null;
+  keyIndustryTrends: string[] | null;
+  keyExcerpt: string | null;
+}
 
-  const startEditing = (): void => {
-    setIsEditing(true);
-    setEditData(JSON.parse(JSON.stringify(data)));
-  };
+// Define a type that only includes the year data fields
+type YearDataField = "pastYearData" | "yearBeforeData" | "projectionFor2030";
 
-  const cancelEditing = (): void => {
-    setIsEditing(false);
-  };
+interface MarketSizePageProps {
+  initialData?: SizeData | null;
+}
 
-  const saveChanges = (): void => {
+export default function MarketSizePage({ initialData }: MarketSizePageProps) {
+  const [data, setData] = useState<SizeData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editData, setEditData] = useState<SizeData | null>(null);
+
+  useEffect(() => {
+    // Simulate loading data
+    setData(initialData || null);
+    setEditData(initialData || null);
+    setLoading(false);
+  }, [initialData]);
+
+  const handleSave = () => {
     setData(editData);
-    setIsEditing(false);
+    setEditMode(false);
   };
 
-  const updateTitle = (value: string): void => {
+  const handleCancel = () => {
+    setEditData(data);
+    setEditMode(false);
+  };
+
+  const handleEdit = () => {
+    setEditData(data);
+    setEditMode(true);
+  };
+
+  const handleAddData = () => {
+    const emptyData: SizeData = {
+      industryName: "",
+      pastYearData: {
+        marketSize: "",
+        cagr: "",
+        explanation: "",
+        keyIndustryTrends: [],
+        keyExcerpt: "",
+      },
+      yearBeforeData: {
+        marketSize: "",
+        cagr: "",
+        explanation: "",
+        keyIndustryTrends: [],
+        keyExcerpt: "",
+      },
+      projectionFor2030: {
+        marketSize: "",
+        cagr: "",
+        explanation: "",
+        keyIndustryTrends: [],
+        keyExcerpt: "",
+      },
+    };
+
+    setEditData(emptyData);
+    setEditMode(true);
+  };
+
+  const updateEditData = (field: string, value: string | null) => {
+    if (!editData) return;
+
     setEditData({
       ...editData,
-      title: value,
+      [field]: value,
     });
   };
 
-  const updateSubtitle = (value: string): void => {
+  const updateYearData = (
+    yearField: YearDataField,
+    field: keyof YearData,
+    value: string | null
+  ) => {
+    if (!editData) return;
+
+    // Create a new empty YearData object if the field is null
+    const currentYearData = editData[yearField] || {
+      marketSize: null,
+      cagr: null,
+      explanation: null,
+      keyIndustryTrends: null,
+      keyExcerpt: null,
+    };
+
     setEditData({
       ...editData,
-      subtitle: value,
+      [yearField]: {
+        ...currentYearData,
+        [field]: value,
+      },
     });
   };
 
-  const updateMarketItem = (
-    index: number,
-    field: keyof MarketSizeItem,
-    value: string
-  ): void => {
-    const newData = { ...editData };
+  const updateTrends = (yearField: YearDataField, value: string) => {
+    if (!editData) return;
 
-    // Ensure items array exists
-    if (!newData.items) {
-      newData.items = [];
-      return;
-    }
+    // Create a new empty YearData object if the field is null
+    const currentYearData = editData[yearField] || {
+      marketSize: null,
+      cagr: null,
+      explanation: null,
+      keyIndustryTrends: null,
+      keyExcerpt: null,
+    };
 
-    // Ensure the item at this index exists
-    if (!newData.items[index]) {
-      return;
-    }
+    const trends = value.split("\n").filter((trend) => trend.trim() !== "");
 
-    if (field === "keyExcerpts") return; // Handle separately
-
-    newData.items[index][field] = value as never;
-    setEditData(newData);
-  };
-
-  const addMarketItem = (): void => {
-    const newData = { ...editData };
-
-    // Ensure items array exists
-    if (!newData.items) {
-      newData.items = [];
-    }
-
-    newData.items.push({
-      marketName: "New Market",
-      source: "Source",
-      sourceLink: "link",
-      keyExcerpts: [{ text: "New excerpt" }],
+    setEditData({
+      ...editData,
+      [yearField]: {
+        ...currentYearData,
+        keyIndustryTrends: trends.length > 0 ? trends : null,
+      },
     });
-    setEditData(newData);
   };
 
-  const removeMarketItem = (index: number): void => {
-    const newData = { ...editData };
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-4xl font-semibold text-[#445963]">Market Size</h1>
+        <Separator className="my-4" />
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-8 w-3/4" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-40 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-    // Ensure items array exists
-    if (!newData.items) {
-      newData.items = [];
-      return;
-    }
-
-    newData.items.splice(index, 1);
-    setEditData(newData);
-  };
-
-  const addExcerpt = (marketIndex: number): void => {
-    const newData = { ...editData };
-
-    // Ensure items array exists
-    if (!newData.items) {
-      newData.items = [];
-      return;
-    }
-
-    // Ensure the item at this index exists
-    if (!newData.items[marketIndex]) {
-      return;
-    }
-
-    // Ensure keyExcerpts array exists
-    if (!newData.items[marketIndex].keyExcerpts) {
-      newData.items[marketIndex].keyExcerpts = [];
-    }
-
-    newData.items[marketIndex].keyExcerpts.push({ text: "New excerpt" });
-    setEditData(newData);
-  };
-
-  const updateExcerpt = (
-    marketIndex: number,
-    excerptIndex: number,
-    value: string
-  ): void => {
-    const newData = { ...editData };
-
-    // Ensure items array exists
-    if (
-      !newData.items ||
-      !newData.items[marketIndex] ||
-      !newData.items[marketIndex].keyExcerpts ||
-      !newData.items[marketIndex].keyExcerpts[excerptIndex]
-    ) {
-      return;
-    }
-
-    newData.items[marketIndex].keyExcerpts[excerptIndex].text = value;
-    setEditData(newData);
-  };
-
-  const removeExcerpt = (marketIndex: number, excerptIndex: number): void => {
-    const newData = { ...editData };
-
-    // Ensure items array exists
-    if (
-      !newData.items ||
-      !newData.items[marketIndex] ||
-      !newData.items[marketIndex].keyExcerpts
-    ) {
-      return;
-    }
-
-    newData.items[marketIndex].keyExcerpts.splice(excerptIndex, 1);
-    setEditData(newData);
-  };
-
-  // Safe access to items array
-  const items = data.items || [];
-  const editItems = editData.items || [];
-
-  // Check if data is empty
-  const isDataEmpty = !items.length;
+  if (!data && !editMode) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-semibold text-[#445963]">Market Size</h1>
+          <Button
+            onClick={handleAddData}
+            className="bg-[#156082] hover:bg-[#092a38]"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Add Market Data
+          </Button>
+        </div>
+        <Separator className="my-4" />
+        <Card>
+          <CardContent className="flex items-center justify-center p-12">
+            <div className="text-center">
+              <h3 className="text-xl font-medium text-[#35454c]">
+                No market data available
+              </h3>
+              <p className="text-[#57727e] mt-2">
+                Click the button above to add market size information
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-[#445963] text-6xl font-normal">
-          {data.title || "Market Size"}
-        </h1>
-        {!isEditing ? (
-          <Button
-            onClick={startEditing}
-            className="bg-[#156082] hover:bg-[#092a38] text-white"
-          >
-            <PencilIcon className="mr-2 h-4 w-4" /> Edit
-          </Button>
-        ) : (
-          <div className="flex gap-2">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-4xl font-semibold text-[#445963]">Market Size</h1>
+        {!editMode ? (
+          <div className="space-x-2">
             <Button
-              onClick={saveChanges}
-              className="bg-[#156082] hover:bg-[#092a38] text-white"
+              onClick={handleEdit}
+              variant="outline"
+              className="border-[#156082] text-[#156082]"
             >
-              <SaveIcon className="mr-2 h-4 w-4" /> Save
+              <Edit className="mr-2 h-4 w-4" /> Edit Data
+            </Button>
+            {!data && (
+              <Button
+                onClick={handleAddData}
+                className="bg-[#156082] hover:bg-[#092a38]"
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Market Data
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="space-x-2">
+            <Button
+              onClick={handleCancel}
+              variant="outline"
+              className="border-red-500 text-red-500"
+            >
+              <X className="mr-2 h-4 w-4" /> Cancel
             </Button>
             <Button
-              onClick={cancelEditing}
-              variant="outline"
-              className="border-[#ced7db] text-[#445963]"
+              onClick={handleSave}
+              className="bg-[#156082] hover:bg-[#092a38]"
             >
-              <XIcon className="mr-2 h-4 w-4" /> Cancel
+              <Save className="mr-2 h-4 w-4" /> Save
             </Button>
           </div>
         )}
       </div>
-      <div className="border-t border-[#ced7db] mb-12"></div>
+      <Separator className="my-4" />
 
-      {isEditing ? (
-        <div className="space-y-8">
+      {editMode ? (
+        <EditForm
+          data={editData}
+          updateEditData={updateEditData}
+          updateYearData={updateYearData}
+          updateTrends={updateTrends}
+        />
+      ) : (
+        <MarketSizeTable data={data} />
+      )}
+    </div>
+  );
+}
+
+interface EditFormProps {
+  data: SizeData | null;
+  updateEditData: (field: string, value: string | null) => void;
+  updateYearData: (
+    yearField: YearDataField,
+    field: keyof YearData,
+    value: string | null
+  ) => void;
+  updateTrends: (yearField: YearDataField, value: string) => void;
+}
+
+function EditForm({
+  data,
+  updateEditData,
+  updateYearData,
+  updateTrends,
+}: EditFormProps) {
+  if (!data) return null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Edit Market Size Data</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
           <div>
-            <h2 className="text-[#445963] text-xl font-medium mb-4">Title</h2>
-            <input
-              type="text"
-              value={editData.title || ""}
-              onChange={(e) => updateTitle(e.target.value)}
-              className="w-full border border-[#ced7db] p-2 rounded mb-4"
+            <label className="block text-sm font-medium mb-1">
+              Industry Name
+            </label>
+            <Input
+              value={data.industryName || ""}
+              onChange={(e) => updateEditData("industryName", e.target.value)}
+              placeholder="Enter industry name"
             />
           </div>
 
+          <Separator />
+
           <div>
-            <h2 className="text-[#445963] text-xl font-medium mb-4">
-              Subtitle
-            </h2>
-            <input
-              type="text"
-              value={editData.subtitle || ""}
-              onChange={(e) => updateSubtitle(e.target.value)}
-              className="w-full border border-[#ced7db] p-2 rounded mb-4"
-            />
-          </div>
-
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[#445963] text-xl font-medium">
-              Market Size Items
-            </h2>
-            <Button
-              onClick={addMarketItem}
-              size="sm"
-              className="bg-[#156082] hover:bg-[#092a38] text-white"
-            >
-              <PlusIcon className="mr-2 h-4 w-4" /> Add Market
-            </Button>
-          </div>
-
-          <div className="space-y-6">
-            {editItems.map((item, itemIndex) => (
-              <div
-                key={itemIndex}
-                className="border border-[#ced7db] rounded-md p-4"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-[#445963] mb-1">
-                      Market Name:
-                    </label>
-                    <input
-                      type="text"
-                      value={item.marketName || ""}
-                      onChange={(e) =>
-                        updateMarketItem(
-                          itemIndex,
-                          "marketName",
-                          e.target.value
-                        )
-                      }
-                      className="w-full border border-[#ced7db] p-2 rounded"
-                    />
-                  </div>
-                  <button
-                    onClick={() => removeMarketItem(itemIndex)}
-                    className="ml-2 text-[#445963] hover:text-red-500"
-                  >
-                    <TrashIcon size={16} />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[#445963] mb-1">
-                      Source:
-                    </label>
-                    <input
-                      type="text"
-                      value={item.source || ""}
-                      onChange={(e) =>
-                        updateMarketItem(itemIndex, "source", e.target.value)
-                      }
-                      className="w-full border border-[#ced7db] p-2 rounded"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#445963] mb-1">
-                      Source Link:
-                    </label>
-                    <input
-                      type="text"
-                      value={item.sourceLink || ""}
-                      onChange={(e) =>
-                        updateMarketItem(
-                          itemIndex,
-                          "sourceLink",
-                          e.target.value
-                        )
-                      }
-                      className="w-full border border-[#ced7db] p-2 rounded"
-                    />
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-sm font-medium text-[#445963]">
-                      Key Excerpts:
-                    </label>
-                    <Button
-                      onClick={() => addExcerpt(itemIndex)}
-                      size="sm"
-                      variant="outline"
-                      className="border-[#ced7db] text-[#445963] text-xs py-1 h-7"
-                    >
-                      <PlusIcon className="mr-1 h-3 w-3" /> Add Excerpt
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    {(item.keyExcerpts || []).map((excerpt, excerptIndex) => (
-                      <div
-                        key={excerptIndex}
-                        className="flex items-center gap-2"
-                      >
-                        <input
-                          type="text"
-                          value={excerpt.text || ""}
-                          onChange={(e) =>
-                            updateExcerpt(
-                              itemIndex,
-                              excerptIndex,
-                              e.target.value
-                            )
-                          }
-                          className="flex-1 border border-[#ced7db] p-2 rounded"
-                        />
-                        <button
-                          onClick={() => removeExcerpt(itemIndex, excerptIndex)}
-                          className="text-[#445963] hover:text-red-500"
-                        >
-                          <TrashIcon size={14} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            <h3 className="text-lg font-medium mb-4">Past Year Data</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Market Size
+                </label>
+                <Input
+                  value={data.pastYearData?.marketSize || ""}
+                  onChange={(e) =>
+                    updateYearData("pastYearData", "marketSize", e.target.value)
+                  }
+                  placeholder="e.g. $3,661.89 million"
+                />
               </div>
-            ))}
+              <div>
+                <label className="block text-sm font-medium mb-1">CAGR</label>
+                <Input
+                  value={data.pastYearData?.cagr || ""}
+                  onChange={(e) =>
+                    updateYearData("pastYearData", "cagr", e.target.value)
+                  }
+                  placeholder="e.g. 37.9%"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Explanation
+                </label>
+                <Textarea
+                  value={data.pastYearData?.explanation || ""}
+                  onChange={(e) =>
+                    updateYearData(
+                      "pastYearData",
+                      "explanation",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter market explanation"
+                  rows={3}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Key Industry Trends (one per line)
+                </label>
+                <Textarea
+                  value={data.pastYearData?.keyIndustryTrends?.join("\n") || ""}
+                  onChange={(e) => updateTrends("pastYearData", e.target.value)}
+                  placeholder="Enter trends, one per line"
+                  rows={4}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Key Excerpt
+                </label>
+                <Textarea
+                  value={data.pastYearData?.keyExcerpt || ""}
+                  onChange={(e) =>
+                    updateYearData("pastYearData", "keyExcerpt", e.target.value)
+                  }
+                  placeholder="Enter key excerpt"
+                  rows={3}
+                />
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <h3 className="text-lg font-medium mb-4">Year Before Data</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Market Size
+                </label>
+                <Input
+                  value={data.yearBeforeData?.marketSize || ""}
+                  onChange={(e) =>
+                    updateYearData(
+                      "yearBeforeData",
+                      "marketSize",
+                      e.target.value
+                    )
+                  }
+                  placeholder="e.g. $2,500.00 million"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">CAGR</label>
+                <Input
+                  value={data.yearBeforeData?.cagr || ""}
+                  onChange={(e) =>
+                    updateYearData("yearBeforeData", "cagr", e.target.value)
+                  }
+                  placeholder="e.g. 35.2%"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Explanation
+                </label>
+                <Textarea
+                  value={data.yearBeforeData?.explanation || ""}
+                  onChange={(e) =>
+                    updateYearData(
+                      "yearBeforeData",
+                      "explanation",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter market explanation"
+                  rows={3}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Key Industry Trends (one per line)
+                </label>
+                <Textarea
+                  value={
+                    data.yearBeforeData?.keyIndustryTrends?.join("\n") || ""
+                  }
+                  onChange={(e) =>
+                    updateTrends("yearBeforeData", e.target.value)
+                  }
+                  placeholder="Enter trends, one per line"
+                  rows={4}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Key Excerpt
+                </label>
+                <Textarea
+                  value={data.yearBeforeData?.keyExcerpt || ""}
+                  onChange={(e) =>
+                    updateYearData(
+                      "yearBeforeData",
+                      "keyExcerpt",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter key excerpt"
+                  rows={3}
+                />
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <h3 className="text-lg font-medium mb-4">Projection for 2030</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Market Size
+                </label>
+                <Input
+                  value={data.projectionFor2030?.marketSize || ""}
+                  onChange={(e) =>
+                    updateYearData(
+                      "projectionFor2030",
+                      "marketSize",
+                      e.target.value
+                    )
+                  }
+                  placeholder="e.g. $66,079.34 million"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">CAGR</label>
+                <Input
+                  value={data.projectionFor2030?.cagr || ""}
+                  onChange={(e) =>
+                    updateYearData("projectionFor2030", "cagr", e.target.value)
+                  }
+                  placeholder="e.g. 37.9%"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Explanation
+                </label>
+                <Textarea
+                  value={data.projectionFor2030?.explanation || ""}
+                  onChange={(e) =>
+                    updateYearData(
+                      "projectionFor2030",
+                      "explanation",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter market explanation"
+                  rows={3}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Key Industry Trends (one per line)
+                </label>
+                <Textarea
+                  value={
+                    data.projectionFor2030?.keyIndustryTrends?.join("\n") || ""
+                  }
+                  onChange={(e) =>
+                    updateTrends("projectionFor2030", e.target.value)
+                  }
+                  placeholder="Enter trends, one per line"
+                  rows={4}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Key Excerpt
+                </label>
+                <Textarea
+                  value={data.projectionFor2030?.keyExcerpt || ""}
+                  onChange={(e) =>
+                    updateYearData(
+                      "projectionFor2030",
+                      "keyExcerpt",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter key excerpt"
+                  rows={3}
+                />
+              </div>
+            </div>
           </div>
         </div>
-      ) : (
-        <>
-          {isDataEmpty ? (
-            <div className="text-center py-12 text-[#57727e] text-lg">
-              No market size data present
-            </div>
-          ) : (
-            <div className="border border-[#ced7db] rounded-sm overflow-hidden">
-              <div className="p-4 border-b border-[#ced7db]">
-                <h2 className="text-[#445963] text-xl">
-                  {data.subtitle || "Market Size Data"}
-                </h2>
-              </div>
+      </CardContent>
+    </Card>
+  );
+}
 
-              <div className="grid grid-cols-2 bg-[#002169] text-white font-medium text-lg">
-                <div className="p-4 border-r border-[#35454c]">Market</div>
-                <div className="p-4">Key excerpts</div>
-              </div>
+interface MarketSizeTableProps {
+  data: SizeData | null;
+}
 
-              {items.map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-2 border-t border-[#ced7db]"
-                >
-                  <div className="p-4 border-r border-[#ced7db]">
-                    <h3 className="font-medium text-[#35454c] text-lg mb-2">
-                      {item.marketName || "N/A"}
-                    </h3>
-                    <p className="text-[#57727e] text-sm">
-                      Source: {item.source || "N/A"}
-                      {item.sourceLink && (
-                        <span className="text-[#156082]">
-                          {" "}
-                          ({item.sourceLink})
-                        </span>
-                      )}
-                    </p>
-                  </div>
+function MarketSizeTable({ data }: MarketSizeTableProps) {
+  if (!data) return null;
 
-                  <div className="p-4">
-                    {item.keyExcerpts && item.keyExcerpts.length > 0 ? (
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-[#445963]">
+          Market size estimates for {data.industryName || "Industry"}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-[#002169] text-white">
+                <th className="p-3 text-left font-medium">Market</th>
+                <th className="p-3 text-left font-medium">Key excerpts</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.pastYearData && (
+                <tr className="border-b border-[#ced7db]">
+                  <td className="p-3 align-top">
+                    <div className="font-medium">
+                      {data.industryName || "Industry"} Market (Past Year)
+                    </div>
+                    {data.pastYearData.marketSize && (
+                      <div className="text-sm text-[#57727e] mt-1">
+                        Market Size: {data.pastYearData.marketSize}
+                      </div>
+                    )}
+                    {data.pastYearData.cagr && (
+                      <div className="text-sm text-[#57727e] mt-1">
+                        CAGR: {data.pastYearData.cagr}
+                      </div>
+                    )}
+                  </td>
+                  <td className="p-3">
+                    {data.pastYearData.keyExcerpt ? (
                       <ul className="list-disc pl-5 space-y-2">
-                        {item.keyExcerpts.map((excerpt, excerptIndex) => (
-                          <li key={excerptIndex} className="text-[#35454c]">
-                            {excerpt.text || "N/A"}
-                          </li>
-                        ))}
+                        <li>{data.pastYearData.keyExcerpt}</li>
+                        {data.pastYearData.explanation && (
+                          <li>{data.pastYearData.explanation}</li>
+                        )}
+                        {data.pastYearData.keyIndustryTrends?.map(
+                          (trend, index) => (
+                            <li key={index}>{trend}</li>
+                          )
+                        )}
                       </ul>
                     ) : (
-                      <p className="text-[#57727e]">No excerpts available</p>
+                      <span className="text-[#8097a2]">Not available</span>
                     )}
-                  </div>
-                </div>
-              ))}
+                  </td>
+                </tr>
+              )}
+
+              {data.yearBeforeData && (
+                <tr className="border-b border-[#ced7db] bg-[#f8f9fa]">
+                  <td className="p-3 align-top">
+                    <div className="font-medium">
+                      {data.industryName || "Industry"} Market (Year Before)
+                    </div>
+                    {data.yearBeforeData.marketSize && (
+                      <div className="text-sm text-[#57727e] mt-1">
+                        Market Size: {data.yearBeforeData.marketSize}
+                      </div>
+                    )}
+                    {data.yearBeforeData.cagr && (
+                      <div className="text-sm text-[#57727e] mt-1">
+                        CAGR: {data.yearBeforeData.cagr}
+                      </div>
+                    )}
+                  </td>
+                  <td className="p-3">
+                    {data.yearBeforeData.keyExcerpt ? (
+                      <ul className="list-disc pl-5 space-y-2">
+                        <li>{data.yearBeforeData.keyExcerpt}</li>
+                        {data.yearBeforeData.explanation && (
+                          <li>{data.yearBeforeData.explanation}</li>
+                        )}
+                        {data.yearBeforeData.keyIndustryTrends?.map(
+                          (trend, index) => (
+                            <li key={index}>{trend}</li>
+                          )
+                        )}
+                      </ul>
+                    ) : (
+                      <span className="text-[#8097a2]">Not available</span>
+                    )}
+                  </td>
+                </tr>
+              )}
+
+              {data.projectionFor2030 && (
+                <tr>
+                  <td className="p-3 align-top">
+                    <div className="font-medium">
+                      {data.industryName || "Industry"} Market (Projection for
+                      2030)
+                    </div>
+                    {data.projectionFor2030.marketSize && (
+                      <div className="text-sm text-[#57727e] mt-1">
+                        Market Size: {data.projectionFor2030.marketSize}
+                      </div>
+                    )}
+                    {data.projectionFor2030.cagr && (
+                      <div className="text-sm text-[#57727e] mt-1">
+                        CAGR: {data.projectionFor2030.cagr}
+                      </div>
+                    )}
+                  </td>
+                  <td className="p-3">
+                    {data.projectionFor2030.keyExcerpt ? (
+                      <ul className="list-disc pl-5 space-y-2">
+                        <li>{data.projectionFor2030.keyExcerpt}</li>
+                        {data.projectionFor2030.explanation && (
+                          <li>{data.projectionFor2030.explanation}</li>
+                        )}
+                        {data.projectionFor2030.keyIndustryTrends?.map(
+                          (trend, index) => (
+                            <li key={index}>{trend}</li>
+                          )
+                        )}
+                      </ul>
+                    ) : (
+                      <span className="text-[#8097a2]">Not available</span>
+                    )}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {!data.pastYearData &&
+          !data.yearBeforeData &&
+          !data.projectionFor2030 && (
+            <div className="text-center py-8">
+              <p className="text-[#57727e]">No market data available</p>
             </div>
           )}
-        </>
-      )}
-
-      <div className="mt-8 text-[#57727e] text-sm">
-        Source: 1.PromenadeAI, 2.Crunchbase
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
