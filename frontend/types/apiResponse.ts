@@ -20,6 +20,7 @@ import { MarketLeadership } from "./market_leadership";
 import { OpportunitiesRisks } from "./opportunitiesRisks";
 import { QAItem } from "./qa";
 import { RegulationItem } from "./regulation";
+import { StrategicDevelopment } from "./strategicDevelopment";
 import { KeyTechnology } from "./technology";
 
 export type ApiResponse<T> = {
@@ -50,6 +51,7 @@ export type CompanyData = {
   company_timeline: TimelineEvent;
   web_traffic: WebTrafficItem;
   products_services: ProductsServices;
+  strategic_development: StrategicDevelopment | null;
 };
 
 export type CompanyApiResponse = ApiResponse<CompanyData | null>;

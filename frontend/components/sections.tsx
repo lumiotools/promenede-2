@@ -138,7 +138,9 @@ export function Sections({ searchResults }: SectionsProps) {
       </section> */}
 
       <section id="strategic-development-component" className="p-6">
-        <StrategicDevelopmentTimeline />
+        <StrategicDevelopmentTimeline
+          initialData={searchResults?.strategic_development}
+        />
       </section>
       <section id="strategic-partnership-component" className="p-6">
         <StrategicAlliancePage />

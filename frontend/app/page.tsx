@@ -22,6 +22,8 @@ export default function Home() {
         per: null,
       },
     },
+    strategic_development: null,
+
     organization: {
       leadership_executives: null,
       employee_reviews2: {
