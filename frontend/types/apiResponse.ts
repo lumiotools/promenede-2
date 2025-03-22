@@ -22,6 +22,7 @@ import { QAItem } from "./qa";
 import { RegulationItem } from "./regulation";
 import { StrategicAlliance } from "./strategicAlliance";
 import { StrategicDevelopment } from "./strategicDevelopment";
+import { Strategy } from "./strategy";
 import { KeyTechnology } from "./technology";
 
 export type ApiResponse<T> = {
@@ -54,6 +55,7 @@ export type CompanyData = {
   products_services: ProductsServices;
   strategic_development: StrategicDevelopment | null;
   strategic_alliances: StrategicAlliance[] | null;
+  strategy: Strategy | null;
 };
 
 export type CompanyApiResponse = ApiResponse<CompanyData | null>;

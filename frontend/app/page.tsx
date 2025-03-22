@@ -22,6 +22,7 @@ export default function Home() {
         per: null,
       },
     },
+    strategy: null,
     strategic_development: null,
     strategic_alliances: null,
     organization: {

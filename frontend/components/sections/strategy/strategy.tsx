@@ -1,581 +1,653 @@
-import React, { useState } from "react";
+"use client";
 
-// Define interfaces for type safety
-export interface StrategyPoint {
-  id: string;
-  title: string | null;
-  description: string | null;
+import type React from "react";
+
+import { useState, useEffect } from "react";
+import { Edit, Plus, Check, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { KeyInitiative, Strategy } from "@/types/strategy";
+
+interface StrategyPageProps {
+  initialData?: Strategy | null;
 }
 
-export interface StrategySection {
-  id: string;
-  title: string;
-  points: StrategyPoint[];
-}
+const StrategyPage: React.FC<StrategyPageProps> = ({ initialData }) => {
+  const [strategy, setStrategy] = useState<Strategy | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [editSection, setEditSection] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState<string>("");
+  const [editInitiative, setEditInitiative] = useState<KeyInitiative | null>(
+    null
+  );
+  const [editInitiativeIndex, setEditInitiativeIndex] = useState<number | null>(
+    null
+  );
+  const [editCoreValueIndex, setEditCoreValueIndex] = useState<number | null>(
+    null
+  );
+  const [editCoreValue, setEditCoreValue] = useState<string>("");
 
-export interface StrategyComment {
-  id: string;
-  title: string;
-  content: string | null;
-}
+  useEffect(() => {
+    if (initialData) {
+      setStrategy(initialData);
+    }
+    setLoading(false);
+  }, [initialData]);
 
-export interface StrategyData {
-  latestStrategy: StrategyComment | null;
-  strategicFocus: StrategyComment | null;
-  strategySections: StrategySection[];
-}
-
-// Sample initial data
-// const initialData: StrategyData = {
-//   latestStrategy: {
-//     id: "latest-strategy-1",
-//     title: "Latest Strategy",
-//     content: "Comment A",
-//   },
-//   strategicFocus: {
-//     id: "strategic-focus-1",
-//     title: "Strategic Focus going forward",
-//     content: "Comment A",
-//   },
-//   strategySections: [
-//     {
-//       id: "recent-strategy",
-//       title: "Recent Strategy and Outcomes Digital Focus",
-//       points: [
-//         {
-//           id: "digital-focus",
-//           title: "Digital Focus:",
-//           description:
-//             "Significant investments in e-commerce and digital platforms, resulting in robust online sales growth.",
-//         },
-//         {
-//           id: "sustainability-efforts",
-//           title: "Sustainability Efforts:",
-//           description:
-//             "Increased investment in sustainable practices and eco-friendly product lines.",
-//         },
-//         {
-//           id: "luxury-segments",
-//           title: "Luxury and Professional Segments:",
-//           description:
-//             "Luxury and Professional Segments: Strong performance in luxury cosmetics and professional haircare sectors, driving overall revenue growth.",
-//         },
-//         {
-//           id: "innovation",
-//           title: "Innovation:",
-//           description:
-//             "Continuous focus on research and development, introducing new, innovative beauty products to the market.",
-//         },
-//         {
-//           id: "financial-performance",
-//           title: "Financial Performance:",
-//           description:
-//             "Achieved solid financial results in 2022, reflecting successful strategic initiatives.",
-//         },
-//       ],
-//     },
-//     {
-//       id: "strategic-focus-forward",
-//       title: "Strategic Focus Going Forward",
-//       points: [
-//         {
-//           id: "digital-transformation",
-//           title: "Digital Transformation:",
-//           description:
-//             "Achieved solid financial results in 2022, reflecting successful strategic initiatives.",
-//         },
-//         {
-//           id: "emerging-markets",
-//           title: "Emerging Markets",
-//           description:
-//             "Strengthen presence and expand operations in emerging economies.",
-//         },
-//         {
-//           id: "sustainability",
-//           title: "Sustainability:",
-//           description:
-//             "Maintain commitment to sustainability through eco-friendly products and practices.",
-//         },
-//         {
-//           id: "innovation-forward",
-//           title: "Innovation:",
-//           description:
-//             "Continue investment in R&D for cutting-edge beauty technologies.",
-//         },
-//         {
-//           id: "consumer-engagement",
-//           title: "Consumer Engagement:",
-//           description:
-//             "Enhance direct-to-consumer channels to improve customer experience and personalization.",
-//         },
-//       ],
-//     },
-//   ],
-// };
-const initialData: StrategyData = {
-  latestStrategy: {
-    id: "",
-    title: "",
-    content: "",
-  },
-  strategicFocus: {
-    id: "",
-    title: "",
-    content: "",
-  },
-  strategySections: [
-    {
-      id: "",
-      title: "",
-      points: [
-        {
-          id: "",
-          title: "",
-          description: "",
-        },
-      ],
-    },
-  ],
-};
-
-const StrategyPage: React.FC = () => {
-  const [data, setData] = useState<StrategyData>(initialData);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<StrategyData>(initialData);
-
-  // Start editing mode
-  const startEditing = (): void => {
-    setIsEditing(true);
-    setEditData(JSON.parse(JSON.stringify(data)));
+  const handleEdit = (section: string, value: string | null) => {
+    setEditSection(section);
+    setEditValue(value || "");
   };
 
-  // Cancel editing (discard changes)
-  const cancelEditing = (): void => {
-    setIsEditing(false);
+  const handleSave = () => {
+    if (!strategy || !editSection) return;
+
+    const updatedStrategy = { ...strategy } as Strategy;
+
+    // Handle different property types correctly
+    if (
+      editSection === "mission" ||
+      editSection === "vision" ||
+      editSection === "businessModel" ||
+      editSection === "growthStrategy" ||
+      editSection === "competitiveAdvantage"
+    ) {
+      updatedStrategy[editSection] = editValue;
+    }
+    setStrategy(updatedStrategy);
+    setEditSection(null);
   };
 
-  // Save changes
-  const saveChanges = (): void => {
-    setData(editData);
-    setIsEditing(false);
+  const handleCancel = () => {
+    setEditSection(null);
+    setEditInitiative(null);
+    setEditInitiativeIndex(null);
+    setEditCoreValueIndex(null);
   };
 
-  // Update comment data
-  const updateComment = (
-    commentType: "latestStrategy" | "strategicFocus",
-    field: keyof StrategyComment,
-    value: string | null
-  ): void => {
-    if (!editData[commentType]) return;
+  const handleEditInitiative = (initiative: KeyInitiative, index: number) => {
+    setEditInitiative({ ...initiative });
+    setEditInitiativeIndex(index);
+  };
 
-    const newData = { ...editData };
-    newData[commentType] = {
-      ...newData[commentType]!,
-      [field]: value,
+  const handleSaveInitiative = () => {
+    if (!strategy || editInitiativeIndex === null || !editInitiative) return;
+
+    const updatedInitiatives = [...(strategy.keyInitiatives || [])];
+    updatedInitiatives[editInitiativeIndex] = editInitiative;
+
+    const updatedStrategy = { ...strategy };
+    updatedStrategy.keyInitiatives = updatedInitiatives;
+
+    setStrategy(updatedStrategy);
+    setEditInitiative(null);
+    setEditInitiativeIndex(null);
+  };
+
+  const handleAddInitiative = () => {
+    if (!strategy) return;
+
+    const newInitiative: KeyInitiative = {
+      name: "",
+      description: "",
+      expectedOutcome: "",
     };
-    setEditData(newData);
+
+    const updatedStrategy = { ...strategy };
+    updatedStrategy.keyInitiatives = [
+      ...(strategy.keyInitiatives || []),
+      newInitiative,
+    ];
+
+    setStrategy(updatedStrategy);
+    setEditInitiative(newInitiative);
+    setEditInitiativeIndex((strategy.keyInitiatives || []).length);
   };
 
-  // Update section title
-  const updateSectionTitle = (sectionId: string, value: string): void => {
-    const newData = { ...editData };
-    const sectionIndex = newData.strategySections.findIndex(
-      (section) => section.id === sectionId
+  const handleEditCoreValue = (value: string, index: number) => {
+    setEditCoreValueIndex(index);
+    setEditCoreValue(value || "");
+  };
+
+  const handleSaveCoreValue = () => {
+    if (!strategy || editCoreValueIndex === null) return;
+
+    const updatedCoreValues = [...(strategy.coreValues || [])];
+    updatedCoreValues[editCoreValueIndex] = editCoreValue;
+
+    const updatedStrategy = { ...strategy };
+    updatedStrategy.coreValues = updatedCoreValues;
+
+    setStrategy(updatedStrategy);
+    setEditCoreValueIndex(null);
+  };
+
+  const handleAddCoreValue = () => {
+    if (!strategy) return;
+
+    const updatedStrategy = { ...strategy };
+    updatedStrategy.coreValues = [...(strategy.coreValues || []), ""];
+
+    setStrategy(updatedStrategy);
+    setEditCoreValueIndex((strategy.coreValues || []).length - 1);
+    setEditCoreValue("");
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-pulse text-[#445963]">
+          Loading strategy data...
+        </div>
+      </div>
     );
+  }
 
-    if (sectionIndex !== -1) {
-      newData.strategySections[sectionIndex].title = value;
-      setEditData(newData);
-    }
-  };
-
-  // Update strategy point
-  const updateStrategyPoint = (
-    sectionId: string,
-    pointId: string,
-    field: keyof StrategyPoint,
-    value: string | null
-  ): void => {
-    const newData = { ...editData };
-    const sectionIndex = newData.strategySections.findIndex(
-      (section) => section.id === sectionId
+  if (!strategy) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <div className="text-[#445963] text-xl">No strategy data available</div>
+        <Button
+          onClick={() => {
+            setStrategy({
+              mission: null,
+              vision: null,
+              coreValues: [],
+              businessModel: null,
+              growthStrategy: null,
+              competitiveAdvantage: null,
+              keyInitiatives: [],
+            });
+          }}
+          className="bg-[#156082] hover:bg-[#092a38] text-white"
+        >
+          Create Strategy
+        </Button>
+      </div>
     );
-
-    if (sectionIndex !== -1) {
-      const pointIndex = newData.strategySections[
-        sectionIndex
-      ].points.findIndex((point) => point.id === pointId);
-      if (pointIndex !== -1) {
-        newData.strategySections[sectionIndex].points[pointIndex] = {
-          ...newData.strategySections[sectionIndex].points[pointIndex],
-          [field]: value,
-        };
-        setEditData(newData);
-      }
-    }
-  };
-
-  // Add new strategy point
-  const addStrategyPoint = (sectionId: string): void => {
-    const newData = { ...editData };
-    const sectionIndex = newData.strategySections.findIndex(
-      (section) => section.id === sectionId
-    );
-
-    if (sectionIndex !== -1) {
-      const newId = `point-${Date.now()}`;
-      newData.strategySections[sectionIndex].points.push({
-        id: newId,
-        title: "New Point:",
-        description: "Description for the new point.",
-      });
-      setEditData(newData);
-    }
-  };
-
-  // Remove strategy point
-  const removeStrategyPoint = (sectionId: string, pointId: string): void => {
-    const newData = { ...editData };
-    const sectionIndex = newData.strategySections.findIndex(
-      (section) => section.id === sectionId
-    );
-
-    if (sectionIndex !== -1) {
-      const pointIndex = newData.strategySections[
-        sectionIndex
-      ].points.findIndex((point) => point.id === pointId);
-      if (pointIndex !== -1) {
-        newData.strategySections[sectionIndex].points.splice(pointIndex, 1);
-        setEditData(newData);
-      }
-    }
-  };
-
-  // Add new strategy section
-  const addStrategySection = (): void => {
-    const newData = { ...editData };
-    const newId = `section-${Date.now()}`;
-
-    newData.strategySections.push({
-      id: newId,
-      title: "New Strategy Section",
-      points: [
-        {
-          id: `point-${Date.now()}`,
-          title: "New Point:",
-          description: "Description for the new point.",
-        },
-      ],
-    });
-
-    setEditData(newData);
-  };
-
-  // Remove strategy section
-  const removeStrategySection = (sectionId: string): void => {
-    const newData = { ...editData };
-    const sectionIndex = newData.strategySections.findIndex(
-      (section) => section.id === sectionId
-    );
-
-    if (sectionIndex !== -1) {
-      newData.strategySections.splice(sectionIndex, 1);
-      setEditData(newData);
-    }
-  };
+  }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 bg-white">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-gray-700 text-5xl font-normal">Strategy</h1>
-        {!isEditing ? (
-          <button
-            onClick={startEditing}
-            className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-2"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-            </svg>
-            Edit
-          </button>
-        ) : (
-          <div className="flex gap-2">
-            <button
-              onClick={saveChanges}
-              className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-2"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                <polyline points="7 3 7 8 15 8"></polyline>
-              </svg>
-              Save
-            </button>
-            <button
-              onClick={cancelEditing}
-              className="border border-gray-300 text-gray-700 px-4 py-2 rounded flex items-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-2"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-              Cancel
-            </button>
-          </div>
-        )}
-      </div>
+    <div className="w-full max-w-7xl mx-auto p-6">
+      <h1 className="text-4xl font-semibold text-[#445963] mb-4">Strategy</h1>
+      <div className="h-px bg-[#ced7db] w-full mb-8"></div>
 
-      <div className="border-t border-gray-300 mb-8"></div>
-
-      {/* Strategy Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-8">
-          {/* Latest Strategy */}
-          <div className="bg-gray-50 p-6 rounded-lg">
-            {isEditing ? (
-              <>
-                <input
-                  type="text"
-                  className="w-full p-2 mb-4 border border-gray-300 rounded text-xl font-medium"
-                  value={editData.latestStrategy?.title || ""}
-                  onChange={(e) =>
-                    updateComment("latestStrategy", "title", e.target.value)
-                  }
-                />
-                <textarea
-                  className="w-full h-32 p-4 border border-gray-300 rounded bg-gray-200"
-                  value={editData.latestStrategy?.content || ""}
-                  onChange={(e) =>
-                    updateComment("latestStrategy", "content", e.target.value)
-                  }
-                />
-              </>
-            ) : (
-              <>
-                <h2 className="text-xl font-medium text-gray-700 mb-4">
-                  {data.latestStrategy?.title || "N/A"}
-                </h2>
-                <div className="p-8 rounded bg-gray-200 flex items-center justify-center">
-                  <p className="text-gray-700">
-                    {data.latestStrategy?.content || "N/A"}
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
+          <Card className="bg-[#eff2f3] p-6 border-none shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-medium text-[#445963]">
+                Mission & Vision
+              </h2>
+              {editSection !== "mission" && editSection !== "vision" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-[#57727e] hover:text-[#156082] hover:bg-[#ced7db]/50"
+                  onClick={() => handleEdit("mission", strategy.mission)}
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+              )}
+            </div>
 
-          {/* Strategic Focus going forward */}
-          <div className="bg-gray-50 p-6 rounded-lg">
-            {isEditing ? (
-              <>
-                <input
-                  type="text"
-                  className="w-full p-2 mb-4 border border-gray-300 rounded text-xl font-medium"
-                  value={editData.strategicFocus?.title || ""}
-                  onChange={(e) =>
-                    updateComment("strategicFocus", "title", e.target.value)
-                  }
-                />
-                <textarea
-                  className="w-full h-32 p-4 border border-gray-300 rounded bg-gray-200"
-                  value={editData.strategicFocus?.content || ""}
-                  onChange={(e) =>
-                    updateComment("strategicFocus", "content", e.target.value)
-                  }
-                />
-              </>
-            ) : (
-              <>
-                <h2 className="text-xl font-medium text-gray-700 mb-4">
-                  {data.strategicFocus?.title || "N/A"}
-                </h2>
-                <div className="p-8 rounded bg-gray-200 flex items-center justify-center">
-                  <p className="text-gray-700">
-                    {data.strategicFocus?.content || "N/A"}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-medium text-[#57727e] mb-1">
+                  Mission
+                </h3>
+                {editSection === "mission" ? (
+                  <div className="space-y-2">
+                    <Textarea
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      className="min-h-[100px] border-[#ced7db]"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={handleSave}
+                        className="bg-[#156082] hover:bg-[#092a38]"
+                      >
+                        <Check className="h-4 w-4 mr-1" />
+                        Save
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancel}
+                        className="text-[#445963] border-[#ced7db]"
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-[#35454c]">
+                    {strategy.mission || "Not available"}
                   </p>
+                )}
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium text-[#57727e] mb-1">
+                  Vision
+                </h3>
+                {editSection === "vision" ? (
+                  <div className="space-y-2">
+                    <Textarea
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      className="min-h-[100px] border-[#ced7db]"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={handleSave}
+                        className="bg-[#156082] hover:bg-[#092a38]"
+                      >
+                        <Check className="h-4 w-4 mr-1" />
+                        Save
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancel}
+                        className="text-[#445963] border-[#ced7db]"
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-[#35454c]">
+                    {strategy.vision || "Not available"}
+                  </p>
+                )}
+              </div>
+            </div>
+          </Card>
+
+          <Card className="bg-[#eff2f3] p-6 border-none shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-medium text-[#445963]">
+                Core Values
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-[#57727e] hover:text-[#156082] hover:bg-[#ced7db]/50"
+                onClick={handleAddCoreValue}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              {strategy.coreValues && strategy.coreValues.length > 0 ? (
+                <ul className="space-y-2">
+                  {strategy.coreValues.map((value, index) => (
+                    <li
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      {editCoreValueIndex === index ? (
+                        <div className="flex-1 flex gap-2">
+                          <Input
+                            value={editCoreValue}
+                            onChange={(e) => setEditCoreValue(e.target.value)}
+                            className="border-[#ced7db]"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={handleSaveCoreValue}
+                            className="bg-[#156082] hover:bg-[#092a38]"
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancel}
+                            className="text-[#445963] border-[#ced7db]"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-[#35454c]">• {value}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-[#57727e] hover:text-[#156082] hover:bg-[#ced7db]/50"
+                            onClick={() => handleEditCoreValue(value, index)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-[#35454c]">Not available</p>
+              )}
+            </div>
+          </Card>
+
+          <Card className="bg-[#eff2f3] p-6 border-none shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-medium text-[#445963]">
+                Business Model
+              </h2>
+              {editSection !== "businessModel" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-[#57727e] hover:text-[#156082] hover:bg-[#ced7db]/50"
+                  onClick={() =>
+                    handleEdit("businessModel", strategy.businessModel)
+                  }
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+              )}
+            </div>
+
+            {editSection === "businessModel" ? (
+              <div className="space-y-2">
+                <Textarea
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  className="min-h-[100px] border-[#ced7db]"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleSave}
+                    className="bg-[#156082] hover:bg-[#092a38]"
+                  >
+                    <Check className="h-4 w-4 mr-1" />
+                    Save
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCancel}
+                    className="text-[#445963] border-[#ced7db]"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Cancel
+                  </Button>
                 </div>
-              </>
+              </div>
+            ) : (
+              <p className="text-[#35454c]">
+                {strategy.businessModel || "Not available"}
+              </p>
             )}
-          </div>
+          </Card>
         </div>
 
         <div className="space-y-8">
-          {/* Strategy Sections */}
-          {isEditing ? (
-            <>
-              {editData.strategySections.map((section) => (
-                <div key={section.id} className="relative">
-                  <div className="mb-4 flex justify-between items-center">
-                    <input
-                      type="text"
-                      className="flex-1 p-2 border border-gray-300 rounded text-xl font-medium"
-                      value={section.title}
-                      onChange={(e) =>
-                        updateSectionTitle(section.id, e.target.value)
-                      }
-                    />
-                    <button
-                      onClick={() => removeStrategySection(section.id)}
-                      className="ml-2 text-gray-500 hover:text-red-500"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                      </svg>
-                    </button>
-                  </div>
+          <Card className="bg-[#eff2f3] p-6 border-none shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-medium text-[#445963]">
+                Growth Strategy
+              </h2>
+              {editSection !== "growthStrategy" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-[#57727e] hover:text-[#156082] hover:bg-[#ced7db]/50"
+                  onClick={() =>
+                    handleEdit("growthStrategy", strategy.growthStrategy)
+                  }
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+              )}
+            </div>
 
-                  <ul className="space-y-4">
-                    {section.points.map((point) => (
-                      <li key={point.id} className="flex items-start">
-                        <div className="mr-2 mt-2">•</div>
-                        <div className="flex-1">
-                          <div className="flex items-start mb-1">
-                            <input
-                              type="text"
-                              className="flex-1 p-1 border border-gray-300 rounded text-sm font-medium"
-                              value={point.title || ""}
-                              onChange={(e) =>
-                                updateStrategyPoint(
-                                  section.id,
-                                  point.id,
-                                  "title",
-                                  e.target.value
-                                )
-                              }
-                            />
-                            <button
-                              onClick={() =>
-                                removeStrategyPoint(section.id, point.id)
-                              }
-                              className="ml-2 text-gray-500 hover:text-red-500"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                              >
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                              </svg>
-                            </button>
-                          </div>
-                          <textarea
-                            className="w-full p-1 border border-gray-300 rounded text-sm"
-                            rows={2}
-                            value={point.description || ""}
+            {editSection === "growthStrategy" ? (
+              <div className="space-y-2">
+                <Textarea
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  className="min-h-[100px] border-[#ced7db]"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleSave}
+                    className="bg-[#156082] hover:bg-[#092a38]"
+                  >
+                    <Check className="h-4 w-4 mr-1" />
+                    Save
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCancel}
+                    className="text-[#445963] border-[#ced7db]"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-[#35454c]">
+                {strategy.growthStrategy || "Not available"}
+              </p>
+            )}
+          </Card>
+
+          <Card className="bg-[#eff2f3] p-6 border-none shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-medium text-[#445963]">
+                Competitive Advantage
+              </h2>
+              {editSection !== "competitiveAdvantage" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-[#57727e] hover:text-[#156082] hover:bg-[#ced7db]/50"
+                  onClick={() =>
+                    handleEdit(
+                      "competitiveAdvantage",
+                      strategy.competitiveAdvantage
+                    )
+                  }
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+              )}
+            </div>
+
+            {editSection === "competitiveAdvantage" ? (
+              <div className="space-y-2">
+                <Textarea
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  className="min-h-[100px] border-[#ced7db]"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleSave}
+                    className="bg-[#156082] hover:bg-[#092a38]"
+                  >
+                    <Check className="h-4 w-4 mr-1" />
+                    Save
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCancel}
+                    className="text-[#445963] border-[#ced7db]"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-[#35454c]">
+                {strategy.competitiveAdvantage || "Not available"}
+              </p>
+            )}
+          </Card>
+
+          <Card className="bg-[#eff2f3] p-6 border-none shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-medium text-[#445963]">
+                Key Initiatives
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-[#57727e] hover:text-[#156082] hover:bg-[#ced7db]/50"
+                onClick={handleAddInitiative}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {strategy.keyInitiatives && strategy.keyInitiatives.length > 0 ? (
+                strategy.keyInitiatives.map((initiative, index) => (
+                  <div
+                    key={index}
+                    className="border border-[#ced7db] rounded-md p-4 bg-white"
+                  >
+                    {editInitiativeIndex === index && editInitiative ? (
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-sm font-medium text-[#57727e] mb-1 block">
+                            Name
+                          </label>
+                          <Input
+                            value={editInitiative.name || ""}
                             onChange={(e) =>
-                              updateStrategyPoint(
-                                section.id,
-                                point.id,
-                                "description",
-                                e.target.value
-                              )
+                              setEditInitiative({
+                                ...editInitiative,
+                                name: e.target.value,
+                              })
                             }
+                            className="border-[#ced7db]"
                           />
                         </div>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={() => addStrategyPoint(section.id)}
-                    className="mt-4 text-blue-700 text-sm flex items-center"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    Add Point
-                  </button>
-                </div>
-              ))}
-
-              <button
-                onClick={addStrategySection}
-                className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:bg-gray-50 flex items-center justify-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                Add Strategy Section
-              </button>
-            </>
-          ) : (
-            <>
-              {data.strategySections.map((section) => (
-                <div key={section.id}>
-                  <h2 className="text-xl font-medium text-gray-700 mb-4">
-                    {section.title}
-                  </h2>
-                  <ul className="space-y-4">
-                    {section.points.map((point) => (
-                      <li key={point.id} className="flex items-start">
-                        <div className="mr-2">•</div>
                         <div>
-                          <span className="font-medium">
-                            {point.title || "N/A"}{" "}
-                          </span>
-                          <span>{point.description || "N/A"}</span>
+                          <label className="text-sm font-medium text-[#57727e] mb-1 block">
+                            Description
+                          </label>
+                          <Textarea
+                            value={editInitiative.description || ""}
+                            onChange={(e) =>
+                              setEditInitiative({
+                                ...editInitiative,
+                                description: e.target.value,
+                              })
+                            }
+                            className="min-h-[80px] border-[#ced7db]"
+                          />
                         </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </>
-          )}
+                        <div>
+                          <label className="text-sm font-medium text-[#57727e] mb-1 block">
+                            Expected Outcome
+                          </label>
+                          <Textarea
+                            value={editInitiative.expectedOutcome || ""}
+                            onChange={(e) =>
+                              setEditInitiative({
+                                ...editInitiative,
+                                expectedOutcome: e.target.value,
+                              })
+                            }
+                            className="min-h-[80px] border-[#ced7db]"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={handleSaveInitiative}
+                            className="bg-[#156082] hover:bg-[#092a38]"
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Save
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancel}
+                            className="text-[#445963] border-[#ced7db]"
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium text-[#445963]">
+                            {initiative.name || "Untitled Initiative"}
+                          </h3>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-[#57727e] hover:text-[#156082] hover:bg-[#ced7db]/50"
+                            onClick={() =>
+                              handleEditInitiative(initiative, index)
+                            }
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="mt-2 space-y-2">
+                          <div>
+                            <h4 className="text-xs font-medium text-[#57727e]">
+                              Description
+                            </h4>
+                            <p className="text-sm text-[#35454c]">
+                              {initiative.description || "Not available"}
+                            </p>
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-medium text-[#57727e]">
+                              Expected Outcome
+                            </h4>
+                            <p className="text-sm text-[#35454c]">
+                              {initiative.expectedOutcome || "Not available"}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-[#35454c]">No key initiatives available</p>
+              )}
+            </div>
+          </Card>
         </div>
       </div>
 
-      <div className="mt-8 text-gray-500 text-sm">
-        Source: 1.PromenadeAI, 2.Crunchbase
+      <div className="mt-8 text-sm text-[#57727e] italic">
+        Source: Company Strategy Documentation
       </div>
     </div>
   );

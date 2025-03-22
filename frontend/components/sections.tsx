@@ -154,9 +154,9 @@ export function Sections({ searchResults }: SectionsProps) {
         <KeyTechnologyPage initialData={searchResults?.key_technology} />{" "}
       </section>
       <section id="strategy-component" className="p-6">
-        <StrategyPage />
+        <StrategyPage initialData={searchResults?.strategy} />
       </section>
-      <section id="customer-success-component" className="p-6">
+      <section id="customer-success-component" className="hidden p-6">
         <CustomerSuccessPage />
       </section>
       {/* <section id="ma-map-component" className="p-6">
