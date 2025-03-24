@@ -1,8 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React from "react";
-import { CalendarDays, Eye, Clock, FileText, FileSpreadsheet, Share2, Mail } from "lucide-react";
+import {
+  CalendarDays,
+  Eye,
+  Clock,
+  FileText,
+  FileSpreadsheet,
+  Share2,
+  Mail,
+} from "lucide-react";
 import { format } from "date-fns";
+import { CompanyData } from "@/types/apiResponse";
 
 interface ReportHeaderProps {
   title: string;
@@ -10,6 +20,7 @@ interface ReportHeaderProps {
   searchCriteria?: string;
   pagesViewed?: number;
   manHoursSaved?: number;
+  initialData: CompanyData | null | undefined;
 }
 
 const ReportHeader = ({
@@ -18,6 +29,7 @@ const ReportHeader = ({
   searchCriteria = "",
   pagesViewed = 10000,
   manHoursSaved = 20,
+  initialData,
 }: ReportHeaderProps) => {
   return (
     <div className="pt-4 pb-4 px-6 border-b border-gray-200">
@@ -55,7 +67,9 @@ const ReportHeader = ({
           {searchCriteria && (
             <div className="flex items-center gap-2 text-sm">
               <span className="text-gray-500">Search Criteria:</span>
-              <span className="bg-gray-100 px-3 py-0.5 rounded-full font-medium text-gray-700">{searchCriteria}</span>
+              <span className="bg-gray-100 px-3 py-0.5 rounded-full font-medium text-gray-700">
+                {searchCriteria}
+              </span>
             </div>
           )}
         </div>
@@ -67,7 +81,9 @@ const ReportHeader = ({
             {/* Pages Viewed */}
             <div className="flex items-center gap-1.5">
               <Eye className="h-4 w-4 text-green-600" />
-              <span className="text-sm">{pagesViewed.toLocaleString()} pages viewed</span>
+              <span className="text-sm">
+                {pagesViewed.toLocaleString()} pages viewed
+              </span>
             </div>
 
             {/* Separator */}
@@ -83,13 +99,13 @@ const ReportHeader = ({
           {/* Export PDF Button */}
           <button className="flex items-center gap-2 text-sm bg-white border border-[#D0D5DD] px-3 py-1.5 rounded-md hover:bg-gray-100 transition">
             <FileText className="h-4 w-4 text-red-500" />
-            <span className='text-[#344054]'>Export</span>
+            <span className="text-[#344054]">Export</span>
           </button>
 
           {/* Export Excel Button */}
           <button className="flex items-center gap-2 text-sm bg-white border border-[#D0D5DD] px-3 py-1.5 rounded-md hover:bg-gray-100 transition">
             <FileSpreadsheet className="h-4 w-4 text-green-600" />
-            <span className='text-[#344054]'>Export</span>
+            <span className="text-[#344054]">Export</span>
           </button>
 
           {/* Share Button */}

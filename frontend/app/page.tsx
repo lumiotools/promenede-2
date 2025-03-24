@@ -192,15 +192,26 @@ export default function Home() {
 
   const handleSearchResults = (data: CompanyData) => {
     console.log("page.tsx search results", data);
-
     setSearchResults(data);
+  };
+
+  // Handle updates from child components
+  const handleDataUpdate = (updatedData: Partial<CompanyData>) => {
+    console.log("Updating main state with:", updatedData);
+    setSearchResults(prevData => ({
+      ...prevData,
+      ...updatedData
+    }));
   };
 
   return (
     <div className="flex h-screen bg-[#f7f9f9]">
       <Sidebar onSearchResults={handleSearchResults} />
       <main className="flex-1 overflow-y-auto w-full">
-        <Sections searchResults={searchResults} />{" "}
+        <Sections 
+          searchResults={searchResults} 
+          onUpdateData={handleDataUpdate}
+        />
       </main>
     </div>
   );

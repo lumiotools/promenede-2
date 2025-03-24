@@ -64,7 +64,7 @@ async def get_company_data(request: CompanyRequest):
             "industry": coresignal_data.get("industry",""),
             "topic_tags":coresignal_data.get("categories_and_keywords",""),
             "valuation":crunchbase_data.get("cards", {}).get("fields", {}).get("valuation", ""),
-            "equity_funnding_total": crunchbase_data.get("cards", {}).get("fields", {}).get("equity_funding_total", ""),
+            "equity_funding_total": crunchbase_data.get("cards", {}).get("fields", {}).get("equity_funding_total", ""),
             "funding_total":crunchbase_data.get("cards", {}).get("fields", {}).get("funding_total", ""),
             "description":crunchbase_data.get("cards", {}).get("fields", {}).get("short_description", ""),
             "financial_highlights":{

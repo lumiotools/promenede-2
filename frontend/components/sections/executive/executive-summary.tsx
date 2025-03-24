@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ExecutiveSummary } from "@/types/executive";
+import type { ExecutiveSummary } from "@/types/executive";
 
 type FinancialDataEntry = {
   value?: number | null;
@@ -25,9 +25,15 @@ type FinancialDataEntry = {
 
 type ExecutiveSummaryProps = {
   initialData?: ExecutiveSummary;
+  onDataUpdate?: (data: ExecutiveSummary) => void; // Add callback prop
 };
 
-export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
+export function ExecutiveSummaryPage({
+  initialData,
+  onDataUpdate,
+}: ExecutiveSummaryProps) {
+  // Add a master edit state at the top of the component
+  const [masterEditMode, setMasterEditMode] = useState(false);
   const [data, setData] = useState<ExecutiveSummary | undefined>(initialData);
   const [editMode, setEditMode] = useState<string | null>(null);
   const [newTag, setNewTag] = useState("");
@@ -45,6 +51,11 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
     data?.equity_funding_total?.value || 0
   );
 
+  // Add state for financial highlights editing with the correct type
+  const [editFinancialHighlights, setEditFinancialHighlights] = useState<{
+    [key: string]: { value: number | null; date: string | null };
+  }>({});
+
   useEffect(() => {
     setData(initialData);
     setEditDescription(initialData?.description || "");
@@ -53,6 +64,13 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
     setEditFundingTotal(initialData?.funding_total?.value || 0);
     setEditEquityFunding(initialData?.equity_funding_total?.value || 0);
   }, [initialData]);
+
+  // Add useEffect to update parent data when data changes
+  useEffect(() => {
+    if (onDataUpdate && data) {
+      onDataUpdate(data);
+    }
+  }, [data]);
 
   const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) return "N/A";
@@ -166,15 +184,123 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
     })[0];
   };
 
+  // Add function to handle financial data changes
+  const handleFinancialDataChange = (
+    metric: string,
+    value: number | null,
+    date: string | null
+  ) => {
+    setEditFinancialHighlights((prev) => ({
+      ...prev,
+      [metric]: { value, date },
+    }));
+  };
+
+  // Updated handleSaveFinancialHighlights function to work with the new ExecutiveSummary interface
+  const handleSaveFinancialHighlights = () => {
+    if (data && data.financial_highlights) {
+      const updatedData = { ...data };
+
+      // Ensure financial_highlights exists
+      if (!updatedData.financial_highlights) {
+        updatedData.financial_highlights = {};
+      }
+
+      // Update each financial metric with edited values
+      Object.keys(editFinancialHighlights).forEach((metricKey) => {
+        // Handle each metric type specifically based on the updated interface
+        switch (metricKey) {
+          case "operating_revenue":
+          case "operating_profit":
+          case "ebitda":
+          case "net_income":
+            // These are array types in the interface
+            const metricArray =
+              updatedData.financial_highlights?.[metricKey] || [];
+
+            if (metricArray && metricArray.length > 0) {
+              // Update the first (latest) entry
+              metricArray[0] = {
+                ...metricArray[0],
+                value: editFinancialHighlights[metricKey].value,
+                date: editFinancialHighlights[metricKey].date,
+              };
+            } else {
+              if (!updatedData.financial_highlights) {
+                updatedData.financial_highlights = {};
+              }
+              // Create a new array with one entry if it doesn't exist
+              updatedData.financial_highlights[metricKey] = [
+                {
+                  value: editFinancialHighlights[metricKey].value,
+                  date: editFinancialHighlights[metricKey].date,
+                  currency: "USD", // Default currency
+                },
+              ];
+            }
+            break;
+
+          case "per":
+            // Handle the per object which has a different structure
+            if (!updatedData.financial_highlights) {
+              updatedData.financial_highlights = {};
+            }
+
+            if (!updatedData.financial_highlights.per) {
+              updatedData.financial_highlights.per = {};
+            }
+
+            updatedData.financial_highlights.per = {
+              ...updatedData.financial_highlights.per,
+              value: editFinancialHighlights[metricKey].value,
+              date: editFinancialHighlights[metricKey].date,
+            };
+            break;
+
+          default:
+            // For any other metrics that might be added in the future
+            break;
+        }
+      });
+
+      setData(updatedData);
+    }
+    setEditMode(null);
+  };
+
+  // Add a function to handle financial data editing
+  const handleSaveFinancialData = () => {
+    if (data) {
+      // Save the updated data
+      setData({
+        ...data,
+        // No changes needed as the individual fields already have their own save handlers
+      });
+    }
+    setEditMode(null);
+  };
+
+  // Add a useEffect to reset edit mode when master edit mode is turned off
+  useEffect(() => {
+    if (!masterEditMode) {
+      setEditMode(null);
+    }
+  }, [masterEditMode]);
+
   return (
     <div className="w-full max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6 border-b border-[#ced7db] pb-4">
         <h1 className="text-4xl font-semibold text-[#445963]">
           Executive Summary
         </h1>
-        <Button variant="outline" className="border-[#ced7db]">
+        {/* Modify the top edit button to toggle master edit mode */}
+        <Button
+          variant="outline"
+          className="border-[#ced7db]"
+          onClick={() => setMasterEditMode(!masterEditMode)}
+        >
           <PencilIcon className="h-4 w-4 mr-2" />
-          Edit
+          {masterEditMode ? "Save All" : "Edit"}
         </Button>
       </div>
 
@@ -208,11 +334,14 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
                       ) : (
                         <div className="flex justify-between items-center">
                           <span>{data?.industry || "N/A"}</span>
+                          {/* Modify the edit buttons to only show when in master edit mode */}
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setEditMode("industry")}
-                            className="h-8 w-8 p-0"
+                            className={`h-8 w-8 p-0 ${
+                              !masterEditMode && "hidden"
+                            }`}
                           >
                             <PencilIcon className="h-4 w-4" />
                           </Button>
@@ -283,11 +412,14 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
                       ) : (
                         <div className="flex justify-between items-center">
                           <span>{formatCurrency(data?.valuation?.value)}</span>
+                          {/* Modify the edit buttons for valuation */}
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setEditMode("valuation")}
-                            className="h-8 w-8 p-0"
+                            className={`h-8 w-8 p-0 ${
+                              !masterEditMode && "hidden"
+                            }`}
                           >
                             <PencilIcon className="h-4 w-4" />
                           </Button>
@@ -319,11 +451,14 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
                           <span>
                             {formatCurrency(data?.equity_funding_total?.value)}
                           </span>
+                          {/* Modify the edit buttons for equity funding */}
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setEditMode("equity_funding")}
-                            className="h-8 w-8 p-0"
+                            className={`h-8 w-8 p-0 ${
+                              !masterEditMode && "hidden"
+                            }`}
                           >
                             <PencilIcon className="h-4 w-4" />
                           </Button>
@@ -355,11 +490,14 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
                           <span>
                             {formatCurrency(data?.funding_total?.value)}
                           </span>
+                          {/* Modify the edit buttons for funding total */}
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setEditMode("funding_total")}
-                            className="h-8 w-8 p-0"
+                            className={`h-8 w-8 p-0 ${
+                              !masterEditMode && "hidden"
+                            }`}
                           >
                             <PencilIcon className="h-4 w-4" />
                           </Button>
@@ -373,11 +511,24 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
           </Card>
 
           <Card className="border-[#ced7db] shadow-sm mt-6">
+            {/* Modify the Financial Highlights card header to include an edit button */}
             <CardHeader className="bg-[#f7f9f9] border-b border-[#ced7db]">
-              <CardTitle className="text-[#445963] text-xl">
-                Financial Highlights{" "}
-                <span className="text-sm font-normal">$ in millions</span>
-              </CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-[#445963] text-xl">
+                  Financial Highlights{" "}
+                  <span className="text-sm font-normal">$ in millions</span>
+                </CardTitle>
+                {masterEditMode && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditMode("financial_highlights")}
+                    className="h-8 w-8 p-0"
+                  >
+                    <PencilIcon className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -398,11 +549,36 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
                       <TableCell className="font-medium">
                         Operating Revenue
                       </TableCell>
+                      {/* Modify the TableCell for Operating Revenue to be editable when in edit mode */}
                       <TableCell className="text-right">
-                        {formatCurrency(
-                          getLatestFinancialData(
-                            data?.financial_highlights?.operating_revenue
-                          )?.value
+                        {editMode === "financial_highlights" ? (
+                          <Input
+                            type="number"
+                            value={
+                              editFinancialHighlights.operating_revenue
+                                ?.value ||
+                              getLatestFinancialData(
+                                data?.financial_highlights?.operating_revenue
+                              )?.value ||
+                              0
+                            }
+                            onChange={(e) =>
+                              handleFinancialDataChange(
+                                "operating_revenue",
+                                Number(e.target.value),
+                                getLatestFinancialData(
+                                  data?.financial_highlights?.operating_revenue
+                                )?.date || null
+                              )
+                            }
+                            className="w-full"
+                          />
+                        ) : (
+                          formatCurrency(
+                            getLatestFinancialData(
+                              data?.financial_highlights?.operating_revenue
+                            )?.value
+                          )
                         )}
                       </TableCell>
                       <TableCell className="text-right">
@@ -418,10 +594,33 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
                         Operating Profit
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatCurrency(
-                          getLatestFinancialData(
-                            data?.financial_highlights?.operating_profit
-                          )?.value
+                        {editMode === "financial_highlights" ? (
+                          <Input
+                            type="number"
+                            value={
+                              editFinancialHighlights.operating_profit?.value ||
+                              getLatestFinancialData(
+                                data?.financial_highlights?.operating_profit
+                              )?.value ||
+                              0
+                            }
+                            onChange={(e) =>
+                              handleFinancialDataChange(
+                                "operating_profit",
+                                Number(e.target.value),
+                                getLatestFinancialData(
+                                  data?.financial_highlights?.operating_profit
+                                )?.date || null
+                              )
+                            }
+                            className="w-full"
+                          />
+                        ) : (
+                          formatCurrency(
+                            getLatestFinancialData(
+                              data?.financial_highlights?.operating_profit
+                            )?.value
+                          )
                         )}
                       </TableCell>
                       <TableCell className="text-right">
@@ -435,10 +634,33 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
                     <TableRow>
                       <TableCell className="font-medium">EBITDA</TableCell>
                       <TableCell className="text-right">
-                        {formatCurrency(
-                          getLatestFinancialData(
-                            data?.financial_highlights?.ebitda
-                          )?.value
+                        {editMode === "financial_highlights" ? (
+                          <Input
+                            type="number"
+                            value={
+                              editFinancialHighlights.ebitda?.value ||
+                              getLatestFinancialData(
+                                data?.financial_highlights?.ebitda
+                              )?.value ||
+                              0
+                            }
+                            onChange={(e) =>
+                              handleFinancialDataChange(
+                                "ebitda",
+                                Number(e.target.value),
+                                getLatestFinancialData(
+                                  data?.financial_highlights?.ebitda
+                                )?.date || null
+                              )
+                            }
+                            className="w-full"
+                          />
+                        ) : (
+                          formatCurrency(
+                            getLatestFinancialData(
+                              data?.financial_highlights?.ebitda
+                            )?.value
+                          )
                         )}
                       </TableCell>
                       <TableCell className="text-right">
@@ -452,10 +674,33 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
                     <TableRow>
                       <TableCell className="font-medium">Net Income</TableCell>
                       <TableCell className="text-right">
-                        {formatCurrency(
-                          getLatestFinancialData(
-                            data?.financial_highlights?.net_income
-                          )?.value
+                        {editMode === "financial_highlights" ? (
+                          <Input
+                            type="number"
+                            value={
+                              editFinancialHighlights.net_income?.value ||
+                              getLatestFinancialData(
+                                data?.financial_highlights?.net_income
+                              )?.value ||
+                              0
+                            }
+                            onChange={(e) =>
+                              handleFinancialDataChange(
+                                "net_income",
+                                Number(e.target.value),
+                                getLatestFinancialData(
+                                  data?.financial_highlights?.net_income
+                                )?.date || null
+                              )
+                            }
+                            className="w-full"
+                          />
+                        ) : (
+                          formatCurrency(
+                            getLatestFinancialData(
+                              data?.financial_highlights?.net_income
+                            )?.value
+                          )
                         )}
                       </TableCell>
                       <TableCell className="text-right">
@@ -469,8 +714,27 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
                     <TableRow>
                       <TableCell className="font-medium">P/E Ratio</TableCell>
                       <TableCell className="text-right">
-                        {data?.financial_highlights?.per?.value?.toFixed(2) ||
-                          "N/A"}
+                        {editMode === "financial_highlights" ? (
+                          <Input
+                            type="number"
+                            value={
+                              editFinancialHighlights.per?.value ||
+                              data?.financial_highlights?.per?.value ||
+                              0
+                            }
+                            onChange={(e) =>
+                              handleFinancialDataChange(
+                                "per",
+                                Number(e.target.value),
+                                data?.financial_highlights?.per?.date || null
+                              )
+                            }
+                            className="w-full"
+                          />
+                        ) : (
+                          data?.financial_highlights?.per?.value?.toFixed(2) ||
+                          "N/A"
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         {formatDate(data?.financial_highlights?.per?.date)}
@@ -504,6 +768,14 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
               </div>
             </CardContent>
           </Card>
+          {/* Add a save button at the bottom of the Financial Highlights table when in edit mode */}
+          {editMode === "financial_highlights" && (
+            <div className="mt-4 flex justify-end">
+              <Button onClick={handleSaveFinancialHighlights}>
+                Save Changes
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="md:col-span-1">
@@ -514,11 +786,12 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
                   <CardTitle className="text-[#445963] text-xl">
                     Business Description
                   </CardTitle>
+                  {/* Modify the edit button for description */}
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setEditMode("description")}
-                    className="h-8 w-8 p-0"
+                    className={`h-8 w-8 p-0 ${!masterEditMode && "hidden"}`}
                   >
                     <PencilIcon className="h-4 w-4" />
                   </Button>
@@ -543,10 +816,23 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
             </Card>
 
             <Card className="border-[#ced7db] shadow-sm">
+              {/* Modify the Financial Data card header to include an edit button */}
               <CardHeader className="bg-[#f7f9f9] border-b border-[#ced7db] pb-3">
-                <CardTitle className="text-[#445963] text-xl">
-                  Financial Data ($M)
-                </CardTitle>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-[#445963] text-xl">
+                    Financial Data ($M)
+                  </CardTitle>
+                  {masterEditMode && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditMode("financial_data")}
+                      className="h-8 w-8 p-0"
+                    >
+                      <PencilIcon className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="p-4">
                 <div className="h-[200px] flex items-end justify-between gap-2">
@@ -610,6 +896,58 @@ export function ExecutiveSummaryPage({ initialData }: ExecutiveSummaryProps) {
       <div className="mt-6 text-sm text-[#8097a2]">
         Source: Company filings, financial reports
       </div>
+      {/* Add edit mode for financial data */}
+      {editMode === "financial_data" && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
+            <h2 className="text-xl font-bold mb-4">Edit Financial Data</h2>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Valuation ($M)
+                  </label>
+                  <Input
+                    type="number"
+                    value={editValuation || 0}
+                    onChange={(e) => setEditValuation(Number(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Equity Funding ($M)
+                  </label>
+                  <Input
+                    type="number"
+                    value={editEquityFunding || 0}
+                    onChange={(e) =>
+                      setEditEquityFunding(Number(e.target.value))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Total Funding ($M)
+                  </label>
+                  <Input
+                    type="number"
+                    value={editFundingTotal || 0}
+                    onChange={(e) =>
+                      setEditFundingTotal(Number(e.target.value))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={() => setEditMode(null)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveFinancialData}>Save</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

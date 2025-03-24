@@ -42,13 +42,32 @@ import CompanyProfile from "./sections/company/company-profile";
 import { FinancialSummaryDetail } from "./sections/financial/financial-details";
 import { LeadershipExecutivesPage } from "./sections/employee/employee-leadership";
 import { StrategicAlliancePage } from "./sections/strategic-partnership/strategicPartnership";
+import { KeyTechnology } from "@/types/technology";
+import { ExecutiveSummary } from "@/types/executive";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
 type SectionsProps = {
-  searchResults?: CompanyData;
+  searchResults?: CompanyData | null;
+  onUpdateData?: (updatedData: Partial<CompanyData>) => void;
 };
-export function Sections({ searchResults }: SectionsProps) {
+export function Sections({ searchResults, onUpdateData }: SectionsProps) {
+  const handleExecutiveSummaryUpdate = (updatedData: ExecutiveSummary) => {
+    if (onUpdateData) {
+      // Create a partial update for the parent component
+      onUpdateData({
+        executive_summary: updatedData,
+      });
+    }
+  };
+  const handleKeyTechnologyUpdate = (updatedTechData: KeyTechnology) => {
+    if (onUpdateData) {
+      // Create a partial update for the parent component
+      onUpdateData({
+        key_technology: updatedTechData,
+      });
+    }
+  };
   return (
     <div className="flex flex-col w-full">
       <ReportHeader
@@ -57,10 +76,14 @@ export function Sections({ searchResults }: SectionsProps) {
         searchCriteria="www.paypal.com"
         pagesViewed={10000}
         manHoursSaved={20}
+        initialData={searchResults}
       />
 
       <section id="executive-summary" className="p-6">
-        <ExecutiveSummaryPage initialData={searchResults?.executive_summary} />
+        <ExecutiveSummaryPage
+          initialData={searchResults?.executive_summary}
+          onDataUpdate={handleExecutiveSummaryUpdate}
+        />
       </section>
 
       <section id="company-profile" className="p-6">
@@ -151,7 +174,10 @@ export function Sections({ searchResults }: SectionsProps) {
         <MarketLeadershipPage initialData={searchResults?.market_leadership} />{" "}
       </section>
       <section id="technology-component" className="p-6">
-        <KeyTechnologyPage initialData={searchResults?.key_technology} />{" "}
+        <KeyTechnologyPage
+          initialData={searchResults?.key_technology}
+          onDataUpdate={handleKeyTechnologyUpdate}
+        />{" "}
       </section>
       <section id="strategy-component" className="p-6">
         <StrategyPage initialData={searchResults?.strategy} />

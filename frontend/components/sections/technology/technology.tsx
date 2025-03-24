@@ -28,10 +28,12 @@ const formatDate = (dateStr: string | null): string => {
 
 type KeyTechnologyProps = {
   initialData?: KeyTechnology;
+  onDataUpdate?: (data: KeyTechnology) => void; // Add callback prop
 };
 
 const KeyTechnologyPage: React.FC<KeyTechnologyProps> = ({
   initialData = defaultState,
+  onDataUpdate,
 }: KeyTechnologyProps) => {
   // Ensure technologies_used exists and is an array
   const safeTechnologies = initialData?.technologies_used || [];
@@ -83,7 +85,7 @@ const KeyTechnologyPage: React.FC<KeyTechnologyProps> = ({
     const dataToUse = isEditing ? editData : data;
     const technologiesLength = dataToUse.technologies_used?.length || 0;
     setTotalPages(Math.max(1, Math.ceil(technologiesLength / itemsPerPage)));
-  }, [data, editData, isEditing, itemsPerPage]);
+  }, [editData]);
 
   // Reset to first page when switching between edit and view modes
   useEffect(() => {
@@ -105,6 +107,11 @@ const KeyTechnologyPage: React.FC<KeyTechnologyProps> = ({
   const saveChanges = (): void => {
     setData(editData);
     setIsEditing(false);
+
+    // Call the callback to update parent component state
+    if (onDataUpdate) {
+      onDataUpdate(editData);
+    }
   };
 
   // Update technology - since we don't have IDs, we use index for identification
