@@ -283,23 +283,23 @@ async def get_company_data(request: CompanyRequest):
     }
     
     
-    # employeeReviewsSummary = get_employee_reviews_summary(response_data["organization"]["employee_reviews2"])
-    # response_data["organization"]["employee_reviews2"]["summary"] = employeeReviewsSummary
+    employeeReviewsSummary = get_employee_reviews_summary(response_data["organization"]["employee_reviews2"])
+    response_data["organization"]["employee_reviews2"]["summary"] = employeeReviewsSummary
     
-    # competitiveAnalysis = get_competitive_analysis(company_name, response_data["competitive_analysis"])
-    # response_data["competitive_analysis"] = competitiveAnalysis
+    competitiveAnalysis = get_competitive_analysis(company_name, response_data["competitive_analysis"])
+    response_data["competitive_analysis"] = competitiveAnalysis
     
-    # opportunityAreas = get_opportunity_areas(company_name, response_data["executive_summary"]["topic_tags"])
-    # response_data["opportunities_risks"]["opportunities"] = opportunityAreas
+    opportunityAreas = get_opportunity_areas(company_name, response_data["executive_summary"]["topic_tags"])
+    response_data["opportunities_risks"]["opportunities"] = opportunityAreas
     
-    # productServices = get_product_services(company_name, response_data["products_services"]["services"])
-    # response_data["products_services"]["services"] = productServices
+    productServices = get_product_services(company_name, response_data["products_services"]["services"])
+    response_data["products_services"]["services"] = productServices
     
-    # employeeTrendDepartmentSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["breakdown_by_department"], response_data["organization"]["employees_trend"]["breakdown_by_department_by_month"])
-    # response_data["organization"]["employees_trend"]["department_summary"] = employeeTrendDepartmentSummary
+    employeeTrendDepartmentSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["breakdown_by_department"], response_data["organization"]["employees_trend"]["breakdown_by_department_by_month"])
+    response_data["organization"]["employees_trend"]["department_summary"] = employeeTrendDepartmentSummary
     
-    # employeeTrendCountSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["count_by_month"], response_data["organization"]["employees_trend"]["count_change"])
-    # response_data["organization"]["employees_trend"]["count_summary"] = employeeTrendCountSummary
+    employeeTrendCountSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["count_by_month"], response_data["organization"]["employees_trend"]["count_change"])
+    response_data["organization"]["employees_trend"]["count_summary"] = employeeTrendCountSummary
     
     
     employeeRatingsSummary = get_employee_ratings_summary(company_name, response_data["organization"]["employee_reviews2"])
