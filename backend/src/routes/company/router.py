@@ -15,6 +15,7 @@ from src.utils.llm_summary.employeeReviews import get_employee_reviews_summary
 from src.utils.llmInfo.competitive_analysis import get_competitive_analysis
 from src.utils.llmInfo.opportunity_areas import get_opportunity_areas
 from src.utils.llmInfo.product_services import get_product_services
+from src.utils.llm_summary.employee_trend import get_employee_trend_summary
 # Load environment variables from .env file
 load_dotenv()
 
@@ -293,5 +294,11 @@ async def get_company_data(request: CompanyRequest):
     
     productServices = get_product_services(company_name, response_data["products_services"]["services"])
     response_data["products_services"]["services"] = productServices
+    
+    employeeTrendDepartmentSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["breakdown_by_department"], response_data["organization"]["employees_trend"]["breakdown_by_department_by_month"])
+    response_data["organization"]["employees_trend"]["department_summary"] = employeeTrendDepartmentSummary
+    
+    employeeTrendCountSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["count_by_month"], response_data["organization"]["employees_trend"]["count_change"])
+    response_data["organization"]["employees_trend"]["count_summary"] = employeeTrendCountSummary
     
     return {"success":True,"company_name": company_name, "data": response_data}
