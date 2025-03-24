@@ -283,8 +283,8 @@ async def get_company_data(request: CompanyRequest):
     }
     
     
-    employeeReviewsSummary = get_employee_reviews_summary(response_data["organization"]["employee_reviews2"])
-    response_data["organization"]["employee_reviews2"]["summary"] = employeeReviewsSummary
+    employeeReviewsSummary = get_employee_reviews_summary(company_name, response_data["organization"]["employee_reviews2"])
+    response_data["organization"]["employee_reviews2"]["reviews_summary"] = employeeReviewsSummary
     
     competitiveAnalysis = get_competitive_analysis(company_name, response_data["competitive_analysis"])
     response_data["competitive_analysis"] = competitiveAnalysis
