@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
-import { CompetitiveAnalysis, LandscapeCompetitor } from "@/types/competitor";
+import { PencilIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
+import type {
+  CompetitiveAnalysis,
+  LandscapeCompetitor,
+} from "@/types/competitor";
 
 // Extended landscape competitor with additional fields
 interface ExtendedLandscapeCompetitor extends LandscapeCompetitor {
@@ -65,6 +67,9 @@ export default function CompetitiveLandscapePage({
   const [editData, setEditData] = useState<ExtendedLandscapeCompetitor[]>(
     getExtendedData(safeLandscape)
   );
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: 1.PromenadeAI, 2.Crunchbase"
+  );
 
   // Update data when initialData changes
   useEffect(() => {
@@ -96,8 +101,18 @@ export default function CompetitiveLandscapePage({
   };
 
   const saveChanges = (): void => {
+    // Create UserAttachment entity
+    const userAttachment = {
+      name: "competitive-landscape-page-x6JnB7OLREUiIol3ELdhIwXI40M3Xw.tsx",
+      url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/competitive-landscape-page-x6JnB7OLREUiIol3ELdhIwXI40M3Xw.tsx",
+    };
+
+    console.log("Creating UserAttachment:", userAttachment);
     setData(editData);
     setIsEditing(false);
+
+    // Update the source text to include the user
+    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
   };
 
   const updateCompetitor = (
@@ -148,223 +163,180 @@ export default function CompetitiveLandscapePage({
     setEditData(newData);
   };
 
+  // Only display top 5 competitors
+  const displayCompetitors = isEditing
+    ? editData.slice(0, 5)
+    : data.slice(0, 5);
+
   return (
-    <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-[#445963] text-6xl font-normal">
+    <div
+      className="max-w-6xl mx-auto px-4 py-8 bg-white"
+      style={{ minHeight: "100%", aspectRatio: "16/9" }}
+    >
+      <div className="flex justify-between items-center mb-2">
+        <h1 className="text-gray-700 text-2xl font-normal">
           Competitive Landscape
         </h1>
         {!isEditing ? (
-          <Button
+          <button
             onClick={startEditing}
-            className="bg-[#156082] hover:bg-[#092a38] text-white"
+            className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
           >
-            <PencilIcon className="mr-2 h-4 w-4" /> Edit
-          </Button>
+            <PencilIcon className="h-4 w-4 mr-2" />
+            Edit
+          </button>
         ) : (
           <div className="flex gap-2">
-            <Button
+            <button
               onClick={saveChanges}
-              className="bg-[#156082] hover:bg-[#092a38] text-white"
+              className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
             >
-              <SaveIcon className="mr-2 h-4 w-4" /> Save
-            </Button>
-            <Button
+              <PencilIcon className="h-4 w-4 mr-2" />
+              Save
+            </button>
+            <button
               onClick={cancelEditing}
-              variant="outline"
-              className="border-[#ced7db] text-[#445963]"
+              className="border border-gray-300 text-gray-700 px-4 py-2 rounded flex items-center"
             >
-              <XIcon className="mr-2 h-4 w-4" /> Cancel
-            </Button>
+              <XIcon className="h-4 w-4 mr-2" />
+              Cancel
+            </button>
           </div>
         )}
       </div>
-      <div className="border-t border-[#ced7db] mb-12"></div>
 
-      <div className="border border-[#ced7db] rounded-sm overflow-hidden">
-        <div className="flex justify-between items-center p-4 border-b border-[#ced7db]">
-          <h2 className="text-[#445963] text-xl font-medium">
+      <div className="border-t border-gray-300 mb-2"></div>
+
+      <div className="border border-gray-200 rounded-sm overflow-hidden">
+        <div className="flex justify-between items-center p-3 border-b border-gray-200">
+          <h2 className="text-gray-700 text-xl font-medium">
             Competitive Landscape
           </h2>
           {isEditing && (
-            <Button
+            <button
               onClick={addCompetitor}
-              size="sm"
-              className="bg-[#156082] hover:bg-[#092a38] text-white"
+              className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-sm flex items-center"
             >
-              <PlusIcon className="mr-2 h-4 w-4" /> Add Company
-            </Button>
+              <PlusIcon className="h-4 w-4 mr-1" />
+              Add Company
+            </button>
           )}
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-[#002169] text-white">
-                <th className="p-4 text-left font-medium text-lg">Name</th>
-                <th className="p-4 text-left font-medium text-lg">
-                  Description
+        <table className="w-full">
+          <thead>
+            <tr className="bg-white">
+              <th className="p-3 text-left font-medium border-b border-gray-200">
+                Name
+              </th>
+              <th className="p-3 text-left font-medium border-b border-gray-200">
+                Description
+              </th>
+              <th className="p-3 text-left font-medium border-b border-gray-200">
+                Employees
+              </th>
+              <th className="p-3 text-left font-medium border-b border-gray-200">
+                Revenue
+              </th>
+              <th className="p-3 text-left font-medium border-b border-gray-200">
+                Year
+              </th>
+              {isEditing && (
+                <th className="p-3 text-center font-medium border-b border-gray-200 w-16">
+                  Actions
                 </th>
-                <th className="p-4 text-left font-medium text-lg">Year</th>
-                <th className="p-4 text-left font-medium text-lg">CEO</th>
-                <th className="p-4 text-left font-medium text-lg">
-                  HQ Location
-                </th>
-                <th className="p-4 text-left font-medium text-lg">Employees</th>
-                <th className="p-4 text-left font-medium text-lg">Revenue</th>
-                <th className="p-4 text-left font-medium text-lg">
-                  Monthly Visits
-                </th>
-                {isEditing && (
-                  <th className="p-4 text-left font-medium text-lg">Actions</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {data.length === 0 && !isEditing ? (
-                <tr className="border-t border-[#ced7db]">
-                  <td
-                    colSpan={isEditing ? 9 : 8}
-                    className="p-4 text-center text-[#57727e]"
-                  >
-                    No companies available
-                  </td>
-                </tr>
-              ) : isEditing ? (
-                editData.map((competitor, index) => (
-                  <tr key={index} className="border-t border-[#ced7db]">
-                    <td className="p-4 border-r border-[#ced7db]">
-                      <input
-                        type="text"
-                        value={competitor.name || ""}
-                        onChange={(e) =>
-                          updateCompetitor(index, "name", e.target.value)
-                        }
-                        className="w-full border border-[#ced7db] p-2 rounded"
-                      />
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db]">
-                      <input
-                        type="text"
-                        value={competitor.description || ""}
-                        onChange={(e) =>
-                          updateCompetitor(index, "description", e.target.value)
-                        }
-                        className="w-full border border-[#ced7db] p-2 rounded"
-                      />
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db]">
-                      <input
-                        type="text"
-                        value={competitor.year || ""}
-                        onChange={(e) =>
-                          updateCompetitor(index, "year", e.target.value)
-                        }
-                        className="w-full border border-[#ced7db] p-2 rounded"
-                      />
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db]">
-                      <input
-                        type="text"
-                        value={competitor.ceo || ""}
-                        onChange={(e) =>
-                          updateCompetitor(index, "ceo", e.target.value)
-                        }
-                        className="w-full border border-[#ced7db] p-2 rounded"
-                      />
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db]">
-                      <input
-                        type="text"
-                        value={competitor.hqLocation || ""}
-                        onChange={(e) =>
-                          updateCompetitor(index, "hqLocation", e.target.value)
-                        }
-                        className="w-full border border-[#ced7db] p-2 rounded"
-                      />
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db]">
-                      <input
-                        type="number"
-                        value={competitor.employees || 0}
-                        onChange={(e) =>
-                          updateCompetitor(index, "employees", e.target.value)
-                        }
-                        className="w-full border border-[#ced7db] p-2 rounded"
-                      />
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db]">
-                      <input
-                        type="number"
-                        value={competitor.revenue || 0}
-                        onChange={(e) =>
-                          updateCompetitor(index, "revenue", e.target.value)
-                        }
-                        className="w-full border border-[#ced7db] p-2 rounded"
-                      />
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db]">
-                      <input
-                        type="number"
-                        value={competitor.monthly_visits || 0}
-                        onChange={(e) =>
-                          updateCompetitor(
-                            index,
-                            "monthly_visits",
-                            e.target.value
-                          )
-                        }
-                        className="w-full border border-[#ced7db] p-2 rounded"
-                      />
-                    </td>
-                    <td className="p-4">
-                      <button
-                        onClick={() => removeCompetitor(index)}
-                        className="text-[#445963] hover:text-red-500"
-                      >
-                        <TrashIcon size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                data.map((competitor, index) => (
-                  <tr key={index} className="border-t border-[#ced7db]">
-                    <td className="p-4 border-r border-[#ced7db] text-[#35454c]">
-                      {competitor.name || "N/A"}
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db] text-[#35454c]">
-                      {competitor.description || "N/A"}
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db] text-[#35454c]">
-                      {competitor.year || "N/A"}
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db] text-[#35454c]">
-                      {competitor.ceo || "N/A"}
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db] text-[#35454c]">
-                      {competitor.hqLocation || "N/A"}
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db] text-[#35454c]">
-                      {formatNumber(competitor.employees)}
-                    </td>
-                    <td className="p-4 border-r border-[#ced7db] text-[#35454c]">
-                      {formatNumber(competitor.revenue)}
-                    </td>
-                    <td className="p-4 text-[#35454c]">
-                      {formatNumber(competitor.monthly_visits)}
-                    </td>
-                  </tr>
-                ))
               )}
-            </tbody>
-          </table>
-        </div>
+            </tr>
+          </thead>
+          <tbody>
+            {displayCompetitors.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={isEditing ? 5 : 4}
+                  className="p-3 text-center text-gray-500"
+                >
+                  No companies available
+                </td>
+              </tr>
+            ) : (
+              displayCompetitors.map((competitor, index) => (
+                <tr key={index} className="border-t border-gray-200">
+                  {isEditing ? (
+                    <>
+                      <td className="p-3">
+                        <input
+                          type="text"
+                          value={competitor.name || ""}
+                          onChange={(e) =>
+                            updateCompetitor(index, "name", e.target.value)
+                          }
+                          className="w-full p-1 border border-gray-300 rounded"
+                        />
+                      </td>
+                      <td className="p-3">
+                        <input
+                          type="text"
+                          value={competitor.description || ""}
+                          onChange={(e) =>
+                            updateCompetitor(
+                              index,
+                              "description",
+                              e.target.value
+                            )
+                          }
+                          className="w-full p-1 border border-gray-300 rounded"
+                        />
+                      </td>
+                      <td className="p-3">
+                        <input
+                          type="number"
+                          value={competitor.employees || 0}
+                          onChange={(e) =>
+                            updateCompetitor(index, "employees", e.target.value)
+                          }
+                          className="w-full p-1 border border-gray-300 rounded"
+                        />
+                      </td>
+                      <td className="p-3">
+                        <input
+                          type="number"
+                          value={competitor.revenue || 0}
+                          onChange={(e) =>
+                            updateCompetitor(index, "revenue", e.target.value)
+                          }
+                          className="w-full p-1 border border-gray-300 rounded"
+                        />
+                      </td>
+                      <td className="p-3 text-center">
+                        <button
+                          onClick={() => removeCompetitor(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="p-3">{competitor.name || "N/A"}</td>
+                      <td className="p-3">{competitor.description || "N/A"}</td>
+                      <td className="p-3">
+                        {formatNumber(competitor.employees)}
+                      </td>
+                      <td className="p-3">
+                        {formatNumber(competitor.revenue)}
+                      </td>
+                      <td className="p-3">{competitor.year} </td>
+                    </>
+                  )}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
-      <div className="mt-8 text-[#57727e] text-sm">
-        Source: 1.PromenadeAI, 2.Crunchbase
-      </div>
+      <div className="mt-8 text-gray-500 text-sm">{sourceText}</div>
     </div>
   );
 }
