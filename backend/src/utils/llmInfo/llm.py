@@ -93,13 +93,23 @@ def fetch_company_data_parallel(company_name, max_tokens=10000, model="gpt-4o-mi
     )
     
     value_chain_content = (
-        f"Company Name: {company_name}\nCurrent Date: {current_date}\n"
-        "Please provide the company's value chain information as JSON. "
-        "Return an object with the following structure: "
-        "{\"summary\": string, \"primaryActivities\": [{\"name\": string, \"description\": string}], "
-        "\"supportActivities\": [{\"name\": string, \"description\": string}], "
-        "\"keyStrengths\": [string], \"keyChallenges\": [string]}"
-    )
+    f"Company Name: {company_name}\nCurrent Date: {current_date}\n"
+    "Please provide the company's value chain information as JSON. "
+    "Return an object with the following structure: "
+    "{\"industryName\": string, "
+    "\"stages\": [{"
+    "\"stage\": string, "
+    "\"activities\": [string], // List containing minimum 4 activities and maximum 6 activities for each stage. "
+    "\"companyLogos\": [string] // Store the URLs of logos of companies/tools involved in each stage, not the company's logo itself. "
+    "For example, if a stage involves tools store the logos of these tools here, not the company logo of {company_name} or the main company. "
+    "Each logo should correspond to the tools or other companies used in that stage."
+    "To store a logo of tool or company use the toolurl/favicon.ico or companyurl/favicon.ico format. "
+    "For example, if the tool is Slack, store the logo as https://slack.com/favicon.ico. "
+    "Minimum 3 logos required, maximum 5. "
+    "}]}"
+)
+
+
     
     leadership_executives_content = (
         f"Company Name: {company_name}\nCurrent Date: {current_date}\n"
