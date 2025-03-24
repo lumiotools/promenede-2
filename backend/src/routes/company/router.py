@@ -17,6 +17,7 @@ from src.utils.llmInfo.opportunity_areas import get_opportunity_areas
 from src.utils.llmInfo.product_services import get_product_services
 from src.utils.llm_summary.employee_trend import get_employee_trend_summary
 from src.utils.llmInfo.market_map import get_market_map
+from src.utils.contactout.people import get_people_experience_and_education
 # Load environment variables from .env file
 load_dotenv()
 
@@ -61,10 +62,13 @@ async def get_company_data(request: CompanyRequest):
     key_members = []
     
     for i, member in enumerate(llmData["leadership_executives"]):
+        experience, education = get_people_experience_and_education(member["name"], member["position"], company_name)
         key_members.append({
             "member_id": i,
             "member_full_name": member["name"],
-            "member_position_title": member["position"]
+            "member_position_title": member["position"],
+            "member_experience": experience,
+            "member_education": education
         })
 
     
