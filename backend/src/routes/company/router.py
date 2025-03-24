@@ -16,6 +16,7 @@ from src.utils.llmInfo.competitive_analysis import get_competitive_analysis
 from src.utils.llmInfo.opportunity_areas import get_opportunity_areas
 from src.utils.llmInfo.product_services import get_product_services
 from src.utils.llm_summary.employee_trend import get_employee_trend_summary
+from src.utils.llmInfo.market_map import get_market_map
 # Load environment variables from .env file
 load_dotenv()
 
@@ -307,5 +308,8 @@ async def get_company_data(request: CompanyRequest):
     
     employeeRatingsAreasOfImprovement = get_areas_of_improvement(company_name, response_data["organization"]["employee_reviews2"])
     response_data["organization"]["employee_reviews2"]["areas_of_improvements"] = employeeRatingsAreasOfImprovement
+    
+    market_map = get_market_map(company_name, response_data["market_info"]["market_map"])
+    response_data["market_info"]["market_map"] = market_map 
     
     return {"success":True,"company_name": company_name, "data": response_data}
