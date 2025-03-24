@@ -38,6 +38,9 @@ export function ProductTimelineTable({
   );
   const [isNewItem, setIsNewItem] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: Apple Product Launches"
+  );
 
   useEffect(() => {
     // Simulate loading data
@@ -70,6 +73,14 @@ export function ProductTimelineTable({
   };
 
   const handleSave = () => {
+    // Create UserAttachment entity
+    const userAttachment = {
+      name: "product-timeline-update.tsx",
+      url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/product-timeline-update.tsx",
+    };
+
+    console.log("Creating UserAttachment:", userAttachment);
+
     if (currentItem) {
       if (isNewItem) {
         setTimelineData([...timelineData, currentItem]);
@@ -80,6 +91,9 @@ export function ProductTimelineTable({
       }
     }
     setIsEditDialogOpen(false);
+
+    // Update the source text to include the user
+    setSourceText("Source: Apple Product Launches, User Update");
   };
 
   const getYear = (dateString: string | null): string => {
@@ -107,99 +121,115 @@ export function ProductTimelineTable({
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-[#002169]" />
-        <p className="mt-2 text-[#35454c]">Loading product timeline...</p>
+      <div
+        className="flex flex-col bg-white p-6"
+        style={{ minHeight: "100%", aspectRatio: "16/9" }}
+      >
+        <div className="flex-grow flex flex-col items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-[#002169]" />
+          <p className="mt-2 text-[#35454c]">Loading product timeline...</p>
+        </div>
+
+        {/* Footer with source text, always at the bottom */}
+        <div className="mt-auto pt-8 pb-6 text-sm text-[#475467]">
+          {sourceText}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-4xl font-medium text-[#35454c]">
-          Product Timeline
-        </h2>
-        <Button
-          onClick={handleAddClick}
-          className="bg-[#002169] hover:bg-[#156082]"
-        >
-          <Plus className="h-4 w-4 mr-2" /> Add Product
-        </Button>
-      </div>
-
-      <div className="border rounded-md">
-        <div className="flex justify-between items-center p-4 border-b">
-          <h3 className="text-lg font-medium text-[#35454c]">
+    <div
+      className="flex flex-col bg-white p-6"
+      style={{ minHeight: "100%", aspectRatio: "16/9" }}
+    >
+      <div className="flex-grow">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-4xl font-medium text-[#35454c]">
             Product Timeline
-          </h3>
-          <Button variant="ghost" size="icon">
-            <Pencil className="h-5 w-5 text-[#57727e]" />
+          </h2>
+          <Button
+            onClick={handleAddClick}
+            className="bg-[#002169] hover:bg-[#156082]"
+          >
+            <Plus className="h-4 w-4 mr-2" /> Add Product
           </Button>
         </div>
 
-        {timelineData.length === 0 ? (
-          <div className="p-8 text-center text-[#57727e]">
-            No product timeline data available
+        <div className="border rounded-md">
+          <div className="flex justify-between items-center p-4 border-b">
+            <h3 className="text-lg font-medium text-[#35454c]">
+              Product Timeline
+            </h3>
+            <Button variant="ghost" size="icon">
+              <Pencil className="h-5 w-5 text-[#57727e]" />
+            </Button>
           </div>
-        ) : (
-          <Table>
-            <TableHeader className="bg-[#002169]">
-              <TableRow>
-                <TableHead className="text-white font-medium w-16 text-center">
-                  #
-                </TableHead>
-                <TableHead className="text-white font-medium">Year</TableHead>
-                <TableHead className="text-white font-medium">
-                  Product Launches
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {timelineData.map((item, index) => (
-                <TableRow
-                  key={index}
-                  className="hover:bg-[#ced7db]/20 cursor-pointer"
-                  onClick={() => handleEditClick(item, index)}
-                >
-                  <TableCell className="text-center font-medium">
-                    {index + 1}
-                  </TableCell>
-                  <TableCell>{getYear(item.date)}</TableCell>
-                  <TableCell>
-                    <div>
-                      <span className="font-medium">
-                        {item.productName || "Not available"}
-                      </span>
-                      {item.description && (
-                        <p className="text-[#57727e] mt-1">
-                          {item.description}
-                        </p>
-                      )}
-                      {item.referenceLink && (
-                        <a
-                          href={item.referenceLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#156082] hover:underline flex items-center mt-1"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          <span>link</span>
-                        </a>
-                      )}
-                    </div>
-                  </TableCell>
+
+          {timelineData.length === 0 ? (
+            <div className="p-8 text-center text-[#57727e]">
+              No product timeline data available
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-[#002169]">
+                <TableRow>
+                  <TableHead className="text-white font-medium w-16 text-center">
+                    #
+                  </TableHead>
+                  <TableHead className="text-white font-medium">Year</TableHead>
+                  <TableHead className="text-white font-medium">
+                    Product Launches
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+              </TableHeader>
+              <TableBody>
+                {timelineData.slice(0, 3).map((item, index) => (
+                  <TableRow
+                    key={index}
+                    className="hover:bg-[#ced7db]/20 cursor-pointer"
+                    onClick={() => handleEditClick(item, index)}
+                  >
+                    <TableCell className="text-center font-medium">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell>{getYear(item.date)}</TableCell>
+                    <TableCell>
+                      <div>
+                        <span className="font-medium">
+                          {item.productName || "Not available"}
+                        </span>
+                        {item.description && (
+                          <p className="text-[#57727e] mt-1">
+                            {item.description}
+                          </p>
+                        )}
+                        {item.referenceLink && (
+                          <a
+                            href={item.referenceLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#156082] hover:underline flex items-center mt-1"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            <span>link</span>
+                          </a>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
       </div>
 
-      <p className="text-[#57727e] text-sm mt-4">
-        Source: Apple Product Launches
-      </p>
+      {/* Footer with source text, always at the bottom */}
+      <div className="mt-auto pt-8 pb-6 text-sm text-[#475467]">
+        {sourceText}
+      </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">

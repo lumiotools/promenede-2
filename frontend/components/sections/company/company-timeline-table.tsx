@@ -30,6 +30,9 @@ export function CompanyTimelineTable({
   const [data, setData] = useState<TimelineEvent[]>(getInitialDataArray());
   const [editData, setEditData] = useState<TimelineEvent[] | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: 1.PromenadeAI, 2.Crunchbase"
+  );
 
   // Update data when initialData changes
   useEffect(() => {
@@ -77,7 +80,18 @@ export function CompanyTimelineTable({
   // Save changes
   const saveChanges = () => {
     if (editData) {
+      // Create UserAttachment entity
+      const userAttachment = {
+        name: "company-timeline-table-update.tsx",
+        url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/company-timeline-table-update.tsx",
+      };
+
+      console.log("Creating UserAttachment:", userAttachment);
+
       setData(editData);
+
+      // Update the source text to include the user
+      setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
     }
     setIsEditing(false);
   };
@@ -121,174 +135,183 @@ export function CompanyTimelineTable({
     setEditData(newEditData);
   };
 
-  // Ensure data is available
-
   // Use editData when in editing mode, otherwise use data
-  const displayData = isEditing ? editData : data;
+  // Limit to top 5 entries when not in editing mode
+  const displayData = isEditing ? editData : data.slice(0, 5);
 
   return (
-    <div className="space-y-6 bg-white">
-      <h1 className="text-4xl font-medium text-[#475467] mb-6">
-        Company Timeline (table)
-      </h1>
+    <div
+      className="space-y-6 bg-white p-4 flex flex-col"
+      style={{ minHeight: "100%", aspectRatio: "16/9" }}
+    >
+      <div className="flex-grow">
+        <h1 className="text-2xl font-medium text-[#475467] mb-2">
+          Company Timeline (table)
+        </h1>
 
-      <div className="border-t border-[#e5e7eb] mb-6"></div>
+        <div className="border-t border-[#e5e7eb] mb-6"></div>
 
-      {/* Timeline Table */}
-      <div className="border border-[#e5e7eb] rounded-md overflow-hidden mx-10">
-        <div className="flex items-center justify-between p-4 border-b border-[#e5e7eb]">
-          <h2 className="text-base font-medium text-[#475467]">
-            Company Timeline
-          </h2>
-          {isEditing ? (
-            <div className="flex gap-2">
-              <button
-                onClick={saveChanges}
-                className="text-green-600 hover:text-green-800 flex items-center gap-1"
-              >
-                <Save className="h-4 w-4" />
-                <span className="text-xs">Save</span>
-              </button>
-              <button
-                onClick={cancelEditing}
-                className="text-red-600 hover:text-red-800 flex items-center gap-1"
-              >
-                <X className="h-4 w-4" />
-                <span className="text-xs">Cancel</span>
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={startEditing}
-              className="text-[#8097a2] hover:text-[#475467]"
-            >
-              <Edit className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-[#002169] text-white">
-                <th className="py-3 px-4 text-left font-medium border-r border-[#1a3573] w-16">
-                  #
-                </th>
-                <th className="py-3 px-4 text-left font-medium border-r border-[#1a3573] w-32">
-                  MM/YY
-                </th>
-                <th className="py-3 px-4 text-left font-medium border-r border-[#1a3573]">
-                  Partner
-                </th>
-                <th className="py-3 px-4 text-left font-medium">Detail</th>
-                {isEditing && (
-                  <th className="py-3 px-4 text-center font-medium w-16">
-                    Action
-                  </th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {displayData?.map((event, index) => (
-                <tr
-                  key={index}
-                  className={index % 2 === 0 ? "bg-white" : "bg-[#f9fafb]"}
+        {/* Timeline Table */}
+        <div className="border border-[#e5e7eb] rounded-md overflow-hidden mx-10">
+          <div className="flex items-center justify-between p-4 border-b border-[#e5e7eb]">
+            <h2 className="text-base font-medium text-[#475467]">
+              Company Timeline
+            </h2>
+            {isEditing ? (
+              <div className="flex gap-2">
+                <button
+                  onClick={saveChanges}
+                  className="text-green-600 hover:text-green-800 flex items-center gap-1"
                 >
-                  <td className="py-3 px-4 border-r border-[#e5e7eb] text-[#475467]">
-                    {index + 1}
-                  </td>
-                  <td className="py-3 px-4 border-r border-[#e5e7eb] text-[#475467]">
-                    {isEditing ? (
-                      <input
-                        type="date"
-                        className="w-full p-1 border border-gray-300 rounded"
-                        value={event.date || "Not Available"}
-                        onChange={(e) =>
-                          updateField(index, "date", e.target.value)
-                        }
-                      />
-                    ) : (
-                      formatDate(event.date || "Not available")
-                    )}
-                  </td>
-                  <td className="py-3 px-4 border-r border-[#e5e7eb] text-[#475467]">
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        className="w-full p-1 border border-gray-300 rounded"
-                        value={event.event || ""}
-                        onChange={(e) =>
-                          updateField(index, "event", e.target.value)
-                        }
-                      />
-                    ) : (
-                      event.event || "NA"
-                    )}
-                  </td>
-                  <td className="py-3 px-4 text-[#475467]">
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        className="w-full p-1 border border-gray-300 rounded"
-                        value={event.description || "Not Available"}
-                        onChange={(e) =>
-                          updateField(index, "description", e.target.value)
-                        }
-                      />
-                    ) : (
-                      event.description || "NA"
-                    )}
-                  </td>
+                  <Save className="h-4 w-4" />
+                  <span className="text-xs">Save</span>
+                </button>
+                <button
+                  onClick={cancelEditing}
+                  className="text-red-600 hover:text-red-800 flex items-center gap-1"
+                >
+                  <X className="h-4 w-4" />
+                  <span className="text-xs">Cancel</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={startEditing}
+                className="text-[#8097a2] hover:text-[#475467]"
+              >
+                <Edit className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-[#002169] text-white">
+                  <th className="py-3 px-4 text-left font-medium border-r border-[#1a3573] w-16">
+                    #
+                  </th>
+                  <th className="py-3 px-4 text-left font-medium border-r border-[#1a3573] w-32">
+                    MM/YY
+                  </th>
+                  <th className="py-3 px-4 text-left font-medium border-r border-[#1a3573]">
+                    Partner
+                  </th>
+                  <th className="py-3 px-4 text-left font-medium">Detail</th>
                   {isEditing && (
-                    <td className="py-3 px-4 text-center">
-                      <button
-                        onClick={() => removeTimelineEvent(index)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </td>
+                    <th className="py-3 px-4 text-center font-medium w-16">
+                      Action
+                    </th>
                   )}
                 </tr>
-              ))}
+              </thead>
+              <tbody>
+                {displayData?.map((event, index) => (
+                  <tr
+                    key={index}
+                    className={index % 2 === 0 ? "bg-white" : "bg-[#f9fafb]"}
+                  >
+                    <td className="py-3 px-4 border-r border-[#e5e7eb] text-[#475467]">
+                      {index + 1}
+                    </td>
+                    <td className="py-3 px-4 border-r border-[#e5e7eb] text-[#475467]">
+                      {isEditing ? (
+                        <input
+                          type="date"
+                          className="w-full p-1 border border-gray-300 rounded"
+                          value={event.date || "Not Available"}
+                          onChange={(e) =>
+                            updateField(index, "date", e.target.value)
+                          }
+                        />
+                      ) : (
+                        formatDate(event.date || "Not available")
+                      )}
+                    </td>
+                    <td className="py-3 px-4 border-r border-[#e5e7eb] text-[#475467]">
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          className="w-full p-1 border border-gray-300 rounded"
+                          value={event.event || ""}
+                          onChange={(e) =>
+                            updateField(index, "event", e.target.value)
+                          }
+                        />
+                      ) : (
+                        event.event || "NA"
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-[#475467]">
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          className="w-full p-1 border border-gray-300 rounded"
+                          value={event.description || "Not Available"}
+                          onChange={(e) =>
+                            updateField(index, "description", e.target.value)
+                          }
+                        />
+                      ) : (
+                        event.description || "NA"
+                      )}
+                    </td>
+                    {isEditing && (
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          onClick={() => removeTimelineEvent(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
 
-              {/* Add empty rows to match the design if needed */}
-              {!isEditing &&
-                displayData &&
-                displayData.length < 5 &&
-                Array.from({ length: 5 - displayData.length }).map(
-                  (_, index) => (
-                    <tr
-                      key={`empty-${index}`}
-                      className={index % 2 === 0 ? "bg-white" : "bg-[#f9fafb]"}
-                    >
-                      <td className="py-3 px-4 border-r border-[#e5e7eb]"></td>
-                      <td className="py-3 px-4 border-r border-[#e5e7eb]"></td>
-                      <td className="py-3 px-4 border-r border-[#e5e7eb]"></td>
-                      <td className="py-3 px-4"></td>
-                    </tr>
-                  )
-                )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Add new event button when in edit mode */}
-        {isEditing && (
-          <div className="p-4 border-t border-[#e5e7eb] flex justify-center">
-            <button
-              onClick={addTimelineEvent}
-              className="flex items-center gap-1 text-[#002169] hover:text-[#1a3573] font-medium"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Add Timeline Event</span>
-            </button>
+                {/* Add empty rows to match the design if needed */}
+                {!isEditing &&
+                  displayData &&
+                  displayData.length < 5 &&
+                  Array.from({ length: 5 - displayData.length }).map(
+                    (_, index) => (
+                      <tr
+                        key={`empty-${index}`}
+                        className={
+                          (displayData.length + index) % 2 === 0
+                            ? "bg-white"
+                            : "bg-[#f9fafb]"
+                        }
+                      >
+                        <td className="py-3 px-4 border-r border-[#e5e7eb]"></td>
+                        <td className="py-3 px-4 border-r border-[#e5e7eb]"></td>
+                        <td className="py-3 px-4 border-r border-[#e5e7eb]"></td>
+                        <td className="py-3 px-4"></td>
+                      </tr>
+                    )
+                  )}
+              </tbody>
+            </table>
           </div>
-        )}
+
+          {/* Add new event button when in edit mode */}
+          {isEditing && (
+            <div className="p-4 border-t border-[#e5e7eb] flex justify-center">
+              <button
+                onClick={addTimelineEvent}
+                className="flex items-center gap-1 text-[#002169] hover:text-[#1a3573] font-medium"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add Timeline Event</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="text-xs text-[#8097a2] italic">
-        Source: 1.PromenadeAI, 2.Crunchbase
+      {/* Footer with source text, always at the bottom */}
+      <div className="mt-auto pt-8 pb-6 text-sm text-[#475467]">
+        {sourceText}
       </div>
     </div>
   );

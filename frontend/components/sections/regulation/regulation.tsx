@@ -21,6 +21,9 @@ export default function RegulationPage({
   const [editData, setEditData] = useState<RegulationItem[]>(
     initialData || defaultState
   );
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: 1.PromenadeAI, 2.Crunchbase"
+  );
 
   useEffect(() => {
     // Ensure we have valid data with the correct structure
@@ -38,8 +41,19 @@ export default function RegulationPage({
   };
 
   const saveChanges = (): void => {
+    // Create UserAttachment entity
+    const userAttachment = {
+      name: "regulation-component-update.tsx",
+      url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/regulation-component-update.tsx",
+    };
+
+    console.log("Creating UserAttachment:", userAttachment);
+
     setData(editData);
     setIsEditing(false);
+
+    // Update the source text to include the user
+    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
   };
 
   const updateRegulation = (
@@ -73,7 +87,10 @@ export default function RegulationPage({
   const isDataEmpty = !data || data.length === 0;
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 py-8 bg-white">
+    <div
+      className="max-w-[1200px] mx-auto px-4 py-8 bg-white flex flex-col"
+      style={{ minHeight: "100%", aspectRatio: "16/9" }}
+    >
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-[#445963] text-6xl font-normal">Regulation</h1>
         {!isEditing ? (
@@ -103,93 +120,95 @@ export default function RegulationPage({
       </div>
       <div className="border-t border-[#ced7db] mb-12"></div>
 
-      {isDataEmpty && !isEditing ? (
-        <div className="text-center py-12 text-[#57727e] text-lg">
-          No regulation data present
-        </div>
-      ) : (
-        <div className="border border-[#ced7db] rounded-sm overflow-hidden">
-          <div className="flex justify-between items-center p-4 border-b border-[#ced7db]">
-            <h2 className="text-[#445963] text-xl font-medium">Regulation</h2>
-            {isEditing && (
-              <Button
-                onClick={addRegulation}
-                size="sm"
-                className="bg-[#156082] hover:bg-[#092a38] text-white"
-              >
-                <PlusIcon className="mr-2 h-4 w-4" /> Add
-              </Button>
+      {/* Content area that will grow/shrink as needed */}
+      <div className="flex-grow">
+        {isDataEmpty && !isEditing ? (
+          <div className="text-center py-12 text-[#57727e] text-lg">
+            No regulation data present
+          </div>
+        ) : (
+          <div className="border border-[#ced7db] rounded-sm overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-[#ced7db]">
+              <h2 className="text-[#445963] text-xl font-medium">Regulation</h2>
+              {isEditing && (
+                <Button
+                  onClick={addRegulation}
+                  size="sm"
+                  className="bg-[#156082] hover:bg-[#092a38] text-white"
+                >
+                  <PlusIcon className="mr-2 h-4 w-4" /> Add
+                </Button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 bg-[#002169] text-white font-medium text-lg">
+              <div className="p-4 border-r border-[#35454c]">
+                Key Regulatory Trend
+              </div>
+              <div className="p-4">Description</div>
+            </div>
+
+            {isEditing ? (
+              <>
+                {editData.map((item, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-2 border-t border-[#ced7db]"
+                  >
+                    <div className="p-4 border-r border-[#ced7db] flex items-start">
+                      <textarea
+                        value={item.trend || ""}
+                        onChange={(e) =>
+                          updateRegulation(index, "trend", e.target.value)
+                        }
+                        className="w-full border border-[#ced7db] p-2 rounded"
+                        rows={3}
+                      />
+                      <button
+                        onClick={() => removeRegulation(index)}
+                        className="ml-2 text-[#445963] hover:text-red-500"
+                      >
+                        <TrashIcon size={16} />
+                      </button>
+                    </div>
+
+                    <div className="p-4">
+                      <textarea
+                        value={item.description || ""}
+                        onChange={(e) =>
+                          updateRegulation(index, "description", e.target.value)
+                        }
+                        className="w-full border border-[#ced7db] p-2 rounded"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <>
+                {data.map((item, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-2 border-t border-[#ced7db]"
+                  >
+                    <div className="p-4 border-r border-[#ced7db]">
+                      <p className="text-[#35454c]">{item.trend || ""}</p>
+                    </div>
+
+                    <div className="p-4">
+                      <p className="text-[#35454c]">{item.description || ""}</p>
+                    </div>
+                  </div>
+                ))}
+              </>
             )}
           </div>
-
-          <div className="grid grid-cols-2 bg-[#002169] text-white font-medium text-lg">
-            <div className="p-4 border-r border-[#35454c]">
-              Key Regulatory Trend
-            </div>
-            <div className="p-4">Description</div>
-          </div>
-
-          {isEditing ? (
-            <>
-              {editData.map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-2 border-t border-[#ced7db]"
-                >
-                  <div className="p-4 border-r border-[#ced7db] flex items-start">
-                    <textarea
-                      value={item.trend || ""}
-                      onChange={(e) =>
-                        updateRegulation(index, "trend", e.target.value)
-                      }
-                      className="w-full border border-[#ced7db] p-2 rounded"
-                      rows={3}
-                    />
-                    <button
-                      onClick={() => removeRegulation(index)}
-                      className="ml-2 text-[#445963] hover:text-red-500"
-                    >
-                      <TrashIcon size={16} />
-                    </button>
-                  </div>
-
-                  <div className="p-4">
-                    <textarea
-                      value={item.description || ""}
-                      onChange={(e) =>
-                        updateRegulation(index, "description", e.target.value)
-                      }
-                      className="w-full border border-[#ced7db] p-2 rounded"
-                      rows={3}
-                    />
-                  </div>
-                </div>
-              ))}
-            </>
-          ) : (
-            <>
-              {data.map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-2 border-t border-[#ced7db]"
-                >
-                  <div className="p-4 border-r border-[#ced7db]">
-                    <p className="text-[#35454c]">{item.trend || ""}</p>
-                  </div>
-
-                  <div className="p-4">
-                    <p className="text-[#35454c]">{item.description || ""}</p>
-                  </div>
-                </div>
-              ))}
-            </>
-          )}
-        </div>
-      )}
-
-      <div className="mt-8 text-[#57727e] text-sm">
-        Source: 1.PromenadeAI, 2.Crunchbase
+        )}
       </div>
+
+      {/* Footer with source text, always at the bottom */}
+      <div className="mt-auto pt-8 text-[#57727e] text-sm">{sourceText}</div>
     </div>
   );
 }

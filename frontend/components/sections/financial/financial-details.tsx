@@ -38,6 +38,9 @@ export function FinancialSummaryDetail({
   const [editingRow, setEditingRow] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<Record<string, string>>({});
   const [periods, setPeriods] = useState<string[]>([]);
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: 1.PromenadeAI, 2.Crunchbase"
+  );
 
   useEffect(() => {
     // Simulate API fetch - in real app, replace with actual API call
@@ -114,6 +117,14 @@ export function FinancialSummaryDetail({
     // Here you would typically send the updated data to your API
     console.log("Saving changes:", editValues);
 
+    // Create UserAttachment entity for tracking changes
+    const userAttachment = {
+      name: "financial-summary-detail-update.tsx",
+      url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/financial-summary-detail-update.tsx",
+    };
+
+    console.log("Creating UserAttachment:", userAttachment);
+
     // Update local state (in a real app, this would happen after API success)
     if (editingRow === "Revenue" && financialData) {
       const updatedRevenue = [...(financialData.operating_revenue || [])];
@@ -137,6 +148,9 @@ export function FinancialSummaryDetail({
     setEditMode(false);
     setEditingRow(null);
     setEditValues({});
+
+    // Update the source text to include the user
+    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
   };
 
   const handleCancel = () => {
@@ -156,14 +170,45 @@ export function FinancialSummaryDetail({
     // Implementation for adding a new row would go here
     console.log("Adding new row");
     // This would typically open a modal or form to add a new financial metric
+
+    // Update the source text to include the user
+    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
   };
 
   if (loading) {
-    return <div className="p-4 text-center">Loading financial data...</div>;
+    return (
+      <div
+        className="w-full flex flex-col bg-white p-6"
+        style={{ minHeight: "100%", aspectRatio: "16/9" }}
+      >
+        <div className="flex-grow">
+          <div className="p-4 text-center">Loading financial data...</div>
+        </div>
+
+        {/* Footer with source text, always at the bottom */}
+        <div className="mt-auto pt-8 pb-6 text-sm text-[#475467]">
+          {sourceText}
+        </div>
+      </div>
+    );
   }
 
   if (!financialData) {
-    return <div className="p-4 text-center">No financial data available.</div>;
+    return (
+      <div
+        className="w-full flex flex-col bg-white p-6"
+        style={{ minHeight: "100%", aspectRatio: "16/9" }}
+      >
+        <div className="flex-grow">
+          <div className="p-4 text-center">No financial data available.</div>
+        </div>
+
+        {/* Footer with source text, always at the bottom */}
+        <div className="mt-auto pt-8 pb-6 text-sm text-[#475467]">
+          {sourceText}
+        </div>
+      </div>
+    );
   }
 
   // Extract the financial metrics we want to display
@@ -188,126 +233,138 @@ export function FinancialSummaryDetail({
   ];
 
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-[#35454c]">
-          Financial Summary
-        </h2>
-        <Button
-          onClick={handleAddRow}
-          variant="outline"
-          className="flex items-center gap-1 border-[#002169] text-[#002169]"
-        >
-          <Plus size={16} />
-          Add Row
-        </Button>
-      </div>
+    <div
+      className="w-full flex flex-col bg-white p-6"
+      style={{ minHeight: "100%", aspectRatio: "16/9" }}
+    >
+      <div className="flex-grow">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-[#35454c]">
+            Financial Summary
+          </h2>
+          <Button
+            onClick={handleAddRow}
+            variant="outline"
+            className="flex items-center gap-1 border-[#002169] text-[#002169]"
+          >
+            <Plus size={16} />
+            Add Row
+          </Button>
+        </div>
 
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-[#002169] text-white">
-            <th className="p-3 text-left font-semibold">Category</th>
-            {periods.map((period) => (
-              <th key={period} className="p-3 text-right font-semibold">
-                {period}
-              </th>
-            ))}
-            <th className="p-3 text-center w-20">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {metrics.map((metric, rowIndex) => (
-            <tr
-              key={metric.category}
-              className={rowIndex % 2 === 0 ? "bg-[#eff2f3]" : "bg-white"}
-            >
-              <td className="p-3 font-medium text-[#35454c]">
-                {metric.category}
-              </td>
-
-              {periods.map((period, colIndex) => (
-                <td
-                  key={`${metric.category}-${period}`}
-                  className="p-3 text-right"
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-[#002169] text-white">
+                <th className="p-3 text-left font-semibold">Category</th>
+                {periods.map((period) => (
+                  <th key={period} className="p-3 text-right font-semibold">
+                    {period}
+                  </th>
+                ))}
+                <th className="p-3 text-center w-20">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {metrics.map((metric, rowIndex) => (
+                <tr
+                  key={metric.category}
+                  className={rowIndex % 2 === 0 ? "bg-[#eff2f3]" : "bg-white"}
                 >
-                  {editMode && editingRow === metric.category ? (
-                    <Input
-                      type="text"
-                      value={editValues[period] || ""}
-                      onChange={(e) =>
-                        handleInputChange(period, e.target.value)
-                      }
-                      className="w-full text-right"
-                    />
-                  ) : (
-                    formatCurrency(metric.getValue(colIndex) || 0)
-                  )}
-                </td>
+                  <td className="p-3 font-medium text-[#35454c]">
+                    {metric.category}
+                  </td>
+
+                  {periods.map((period, colIndex) => (
+                    <td
+                      key={`${metric.category}-${period}`}
+                      className="p-3 text-right"
+                    >
+                      {editMode && editingRow === metric.category ? (
+                        <Input
+                          type="text"
+                          value={editValues[period] || ""}
+                          onChange={(e) =>
+                            handleInputChange(period, e.target.value)
+                          }
+                          className="w-full text-right"
+                        />
+                      ) : (
+                        formatCurrency(metric.getValue(colIndex) || 0)
+                      )}
+                    </td>
+                  ))}
+
+                  <td className="p-3 text-center">
+                    {editMode && editingRow === metric.category ? (
+                      <div className="flex justify-center gap-1">
+                        <Button
+                          onClick={handleSave}
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                        >
+                          <Save size={16} className="text-green-600" />
+                        </Button>
+                        <Button
+                          onClick={handleCancel}
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                        >
+                          <X size={16} className="text-red-600" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={() => handleEdit(metric.category)}
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0"
+                      >
+                        <Edit size={16} className="text-[#002169]" />
+                      </Button>
+                    )}
+                  </td>
+                </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
 
-              <td className="p-3 text-center">
-                {editMode && editingRow === metric.category ? (
-                  <div className="flex justify-center gap-1">
-                    <Button
-                      onClick={handleSave}
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 w-8 p-0"
-                    >
-                      <Save size={16} className="text-green-600" />
-                    </Button>
-                    <Button
-                      onClick={handleCancel}
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 w-8 p-0"
-                    >
-                      <X size={16} className="text-red-600" />
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={() => handleEdit(metric.category)}
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 p-0"
-                  >
-                    <Edit size={16} className="text-[#002169]" />
-                  </Button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {financialData.per && (
-        <div className="mt-6 p-4 bg-[#eff2f3] rounded-md">
-          <h3 className="font-medium text-[#35454c] mb-2">
-            Price-to-Earnings Ratio
-          </h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm text-[#445963]">P/E Ratio</p>
-              <p className="font-semibold text-[#002169]">
-                {financialData.per.value?.toFixed(2) || "N/A"}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-[#445963]">Closing Price</p>
-              <p className="font-semibold text-[#002169]">
-                ${financialData.per.closing_price?.toFixed(2) || "N/A"}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-[#445963]">EPS</p>
-              <p className="font-semibold text-[#002169]">
-                ${financialData.per.eps?.toFixed(2) || "N/A"}
-              </p>
+        {financialData.per && (
+          <div className="mt-6 p-4 bg-[#eff2f3] rounded-md">
+            <h3 className="font-medium text-[#35454c] mb-2">
+              Price-to-Earnings Ratio
+            </h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-[#445963]">P/E Ratio</p>
+                <p className="font-semibold text-[#002169]">
+                  {financialData.per.value?.toFixed(2) || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-[#445963]">Closing Price</p>
+                <p className="font-semibold text-[#002169]">
+                  ${financialData.per.closing_price?.toFixed(2) || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-[#445963]">EPS</p>
+                <p className="font-semibold text-[#002169]">
+                  ${financialData.per.eps?.toFixed(2) || "N/A"}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* Footer with source text, always at the bottom */}
+      <div className="mt-auto pt-8 pb-6 text-sm text-[#475467]">
+        {sourceText}
+      </div>
     </div>
   );
 }
