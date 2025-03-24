@@ -290,7 +290,7 @@ export function EmployeeKeyMembers({
       </div>
 
       {/* Pagination Controls */}
-      {safeMembers.length > 0 && (
+      {/* {safeMembers.length > 0 && (
         <div className="flex justify-center items-center space-x-2 mt-6">
           <Button
             variant="outline"
@@ -302,7 +302,6 @@ export function EmployeeKeyMembers({
             <ChevronLeft size={18} />
           </Button>
 
-          {/* Page numbers */}
           <div className="flex space-x-2">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNum;
@@ -344,7 +343,7 @@ export function EmployeeKeyMembers({
             <ChevronRight size={18} />
           </Button>
         </div>
-      )}
+      )} */}
 
       {/* Footer Source */}
       <div className="text-xs text-[#8097a2] italic mt-4">
