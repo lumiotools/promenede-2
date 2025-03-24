@@ -35,6 +35,9 @@ export default function ProductsServices({
     entity_def_id: "category",
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: 1.PromenadeAI, 2.Crunchbase"
+  );
 
   // Simulate API fetch
   useEffect(() => {
@@ -59,6 +62,7 @@ export default function ProductsServices({
     if (selectedServiceIndex >= 0) {
       setEditedService({ ...services[selectedServiceIndex] });
       setIsEditing(true);
+      setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, User Update");
     }
   };
 
@@ -85,6 +89,7 @@ export default function ProductsServices({
 
   const handleAddNew = () => {
     setIsAddingNew(true);
+    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, User Update");
   };
 
   const handleNewServiceChange = (field: keyof Service, value: string) => {
@@ -133,6 +138,7 @@ export default function ProductsServices({
       const updatedServices = [...services];
       updatedServices.splice(index, 1);
       setServices(updatedServices);
+      setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, User Update");
 
       if (selectedServiceIndex === index) {
         setSelectedServiceIndex(updatedServices.length > 0 ? 0 : -1);
@@ -144,27 +150,35 @@ export default function ProductsServices({
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+      <div
+        className="w-full max-w-6xl mx-auto bg-white p-6 relative"
+        style={{ minHeight: "100%", aspectRatio: "16/9" }}
+      >
+        <div className="flex justify-between items-center">
           <h1 className="text-3xl font-semibold text-slate-800">
             Products & Services
           </h1>
         </div>
-        <Card className="w-full">
-          <CardContent className="p-8 flex items-center justify-center">
+        <Card className="w-full mb-16">
+          <CardContent className="flex items-center justify-center">
             <div className="flex flex-col items-center">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
               <p className="text-slate-500">Loading services...</p>
             </div>
           </CardContent>
         </Card>
+
+        <div className="mt-auto pt-8 text-sm text-[#475467]">{sourceText}</div>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+    <div
+      className="w-full max-w-6xl mx-auto bg-white p-6 relative"
+      style={{ minHeight: "100%", aspectRatio: "16/9" }}
+    >
+      <div className="flex justify-between items-center">
         <h1 className="text-3xl font-semibold text-slate-800">
           Products & Services
         </h1>
@@ -178,8 +192,8 @@ export default function ProductsServices({
         </Button>
       </div>
 
-      <Card className="w-full">
-        <CardHeader className="border-b bg-slate-50 px-6">
+      <Card className="w-full mt-4 mb-16">
+        <CardHeader className="border-b bg-slate-50 px-4">
           <div className="flex justify-between items-center">
             <CardTitle className="text-xl font-medium text-slate-700">
               {isEditing
@@ -214,7 +228,7 @@ export default function ProductsServices({
         </CardHeader>
         <CardContent className="p-0">
           {isEditing && editedService ? (
-            <div className="p-6">
+            <div className="p-4">
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2 text-slate-700">
                   Service Name
@@ -226,7 +240,7 @@ export default function ProductsServices({
                   placeholder="Enter service name"
                 />
               </div>
-              <div className="flex gap-2 mt-6">
+              <div className="flex gap-2 mt-4">
                 <Button
                   onClick={handleSaveEdit}
                   disabled={!editedService.value}
@@ -245,7 +259,7 @@ export default function ProductsServices({
               </div>
             </div>
           ) : isAddingNew ? (
-            <div className="p-6">
+            <div className="p-4">
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2 text-slate-700">
                   Service Name
@@ -260,7 +274,7 @@ export default function ProductsServices({
                   autoFocus
                 />
               </div>
-              <div className="flex gap-2 mt-6">
+              <div className="flex gap-2 mt-4">
                 <Button
                   onClick={handleSaveNew}
                   disabled={!newService.value}
@@ -279,7 +293,7 @@ export default function ProductsServices({
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
               {services.length > 0 ? (
                 services.map((service, index) => (
                   <div
@@ -305,7 +319,7 @@ export default function ProductsServices({
                   </div>
                 ))
               ) : (
-                <div className="col-span-3 text-center py-12 text-slate-500">
+                <div className="col-span-3 text-center py-8 text-slate-500">
                   <p>
                     No services found. Click &quot;Add Service&quot; to create
                     one.
@@ -317,8 +331,9 @@ export default function ProductsServices({
         </CardContent>
       </Card>
 
-      <div className="mt-6 text-sm text-slate-500">
-        Source: 1.PromenadeAI, 2.Crunchbase
+      {/* Footer with source text, always at the bottom */}
+      <div className="mt-auto pt-6 pb-6 text-sm text-[#475467] absolute bottom-0 left-0 w-full px-6">
+        {sourceText}
       </div>
     </div>
   );
