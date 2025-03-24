@@ -3,6 +3,7 @@
 import type React from "react";
 import { useState, useEffect } from "react";
 import type { MarketLeadership } from "@/types/market_leadership";
+import { PencilIcon, PlusIcon, XIcon } from "lucide-react";
 
 // Default state for the component
 const defaultState: MarketLeadership = {
@@ -45,8 +46,6 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
   return (
     <div className="bg-gray-50 p-6 rounded-lg">
       {/* <h3 className="text-lg font-semibold text-center mb-4">G2 Award</h3> */}
-
-      <div className="bg-gray-200 rounded-lg h-36 mb-4"></div>
 
       {isEditing ? (
         <div className="space-y-3">
@@ -130,6 +129,9 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
   const [editData, setEditData] = useState<MarketLeadership[]>(
     getInitialDataArray(initialData)
   );
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: 1.PromenadeAI, 2.Crunchbase"
+  );
 
   // Update data when initialData changes
   useEffect(() => {
@@ -162,8 +164,18 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
 
   // Save changes
   const saveChanges = (): void => {
+    // Create UserAttachment entity
+    const userAttachment = {
+      name: "market-leadership-page-rfIK0zPoqztIbqDKai2QIJFCnsyyM7.tsx",
+      url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/market-leadership-page-rfIK0zPoqztIbqDKai2QIJFCnsyyM7.tsx",
+    };
+
+    console.log("Creating UserAttachment:", userAttachment);
     setData(editData);
     setIsEditing(false);
+
+    // Update the source text to include the user
+    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
   };
 
   // Update a specific award
@@ -195,7 +207,10 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
   const displayData = isEditing ? editData : data;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 bg-white">
+    <div
+      className="max-w-6xl mx-auto px-4 py-8 bg-white"
+      style={{ minHeight: "100%", aspectRatio: "16/9" }}
+    >
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-gray-700 text-5xl font-normal">
           Market Leadership and Industry Recognition
@@ -206,16 +221,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
             onClick={startEditing}
             className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-2"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-            </svg>
+            <PencilIcon className="h-4 w-4 mr-2" />
             Edit
           </button>
         ) : (
@@ -224,35 +230,14 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
               onClick={saveChanges}
               className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-2"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                <polyline points="7 3 7 8 15 8"></polyline>
-              </svg>
+              <PencilIcon className="h-4 w-4 mr-2" />
               Save
             </button>
             <button
               onClick={cancelEditing}
               className="border border-gray-300 text-gray-700 px-4 py-2 rounded flex items-center"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-2"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
+              <XIcon className="h-4 w-4 mr-2" />
               Cancel
             </button>
           </div>
@@ -261,7 +246,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
 
       <div className="border-t border-gray-300 mb-8"></div>
 
-      <div className="mb-8">
+      <div className="hidden mb-8">
         <p className="text-lg">
           Company A has presence in the market with leading recognition in
           various industries.
@@ -277,17 +262,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
                 onClick={addAward}
                 className="text-blue-700 hover:text-blue-900 flex items-center mx-auto"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
+                <PlusIcon className="h-6 w-6 mr-2" />
                 Add Award
               </button>
             </div>
@@ -309,17 +284,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
                   className="absolute top-2 right-2 text-red-500 hover:text-red-700 bg-white rounded-full p-1"
                   title="Remove award"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
+                  <XIcon className="h-5 w-5" />
                 </button>
               )}
             </div>
@@ -331,17 +296,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
                 onClick={addAward}
                 className="text-blue-700 hover:text-blue-900 flex items-center"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
+                <PlusIcon className="h-6 w-6 mr-2" />
                 Add Award
               </button>
             </div>
@@ -349,9 +304,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
         </div>
       )}
 
-      <div className="mt-8 text-gray-500 text-sm">
-        Source: 1.PromenadeAI, 2.Crunchbase
-      </div>
+      <div className="mt-8 text-gray-500 text-sm">{sourceText}</div>
     </div>
   );
 };
