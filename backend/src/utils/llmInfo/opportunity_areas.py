@@ -25,7 +25,7 @@ For **{company_name}**, use the given **topic tags** to guide your identificatio
    "opportunity_areas": [
        {
            "area": "string", // The opportunity area or growth area
-           "details": "string", // Explanation of the opportunity
+           "detail": "string", // Explanation of the opportunity
            "rationale": "string" // Justification for why this is a key opportunity
        }
    ]
