@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
-import { QAItem } from "@/types/qa";
+import { PencilIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
+import type { QAItem } from "@/types/qa";
 
 // Initial QA data
 type QAProps = {
@@ -14,10 +13,18 @@ export default function QAComponent({ initialData = [] }: QAProps) {
   const [qaData, setQaData] = useState<QAItem[]>(initialData);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editData, setEditData] = useState<QAItem[]>(initialData || []);
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: 1.PromenadeAI, 2.Crunchbase"
+  );
+
   useEffect(() => {
-    // console.log("QAComponent received new data:", initialData);
+    // console.log("QAComponent received new data:", initialData)
     setQaData(initialData);
-  }, [initialData]);
+    if (!isEditing) {
+      setEditData(initialData || []);
+    }
+  }, [initialData, isEditing]);
+
   const startEditing = (): void => {
     setIsEditing(true);
     setEditData(JSON.parse(JSON.stringify(qaData)));
@@ -28,8 +35,19 @@ export default function QAComponent({ initialData = [] }: QAProps) {
   };
 
   const saveChanges = (): void => {
+    // Create UserAttachment entity
+    const userAttachment = {
+      name: "qa-component-mxW7m4ypuvj5UDPAYcM1jKFEpJnmwe.tsx",
+      url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/peer-developments-page-mxW7m4ypuvj5UDPAYcM1jKFEpJnmwe.tsx",
+    };
+
+    console.log("Creating UserAttachment:", userAttachment);
+
     setQaData(editData);
     setIsEditing(false);
+
+    // Update the source text to include the user
+    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
   };
 
   const updateQA = (
@@ -60,121 +78,137 @@ export default function QAComponent({ initialData = [] }: QAProps) {
   // Check if QA data is empty
   const isQADataEmpty = !qaData || qaData.length === 0;
 
+  // Get only top 5 items for display
+  const displayQAData = qaData.slice(0, 6);
+  const displayEditData = editData.slice(0, 6);
+
   return (
-    <div className="max-w-[1200px] mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-[#445963] text-6xl font-normal">Q&A</h2>
+    <div
+      className="max-w-6xl mx-auto px-4 py-2 bg-white flex flex-col"
+      style={{ minHeight: "100%", aspectRatio: "16/9" }}
+    >
+      <div className="flex justify-between items-center mb-2">
+        <h1 className="text-gray-700 text-2xl font-normal">Q&A</h1>
         {!isEditing ? (
-          <Button
+          <button
             onClick={startEditing}
-            className="bg-[#156082] hover:bg-[#092a38] text-white"
+            className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
           >
-            <PencilIcon className="mr-2 h-4 w-4" /> Edit
-          </Button>
+            <PencilIcon className="h-4 w-4 mr-2" />
+            Edit
+          </button>
         ) : (
           <div className="flex gap-2">
-            <Button
+            <button
               onClick={saveChanges}
-              className="bg-[#156082] hover:bg-[#092a38] text-white"
+              className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
             >
-              <SaveIcon className="mr-2 h-4 w-4" /> Save
-            </Button>
-            <Button
+              <PencilIcon className="h-4 w-4 mr-2" />
+              Save
+            </button>
+            <button
               onClick={cancelEditing}
-              variant="outline"
-              className="border-[#ced7db] text-[#445963]"
+              className="border border-gray-300 text-gray-700 px-4 py-2 rounded flex items-center"
             >
-              <XIcon className="mr-2 h-4 w-4" /> Cancel
-            </Button>
+              <XIcon className="h-4 w-4 mr-2" />
+              Cancel
+            </button>
           </div>
         )}
       </div>
-      <div className="border-t border-[#ced7db] mb-12"></div>
+      <div className="border-t border-gray-300 mb-1"></div>
 
-      {isQADataEmpty && !isEditing ? (
-        <div className="text-center py-12 text-[#57727e] text-lg">
-          No Q&A data present
-        </div>
-      ) : isEditing ? (
-        <div className="space-y-8">
-          {editData.map((item, index) => (
-            <div key={index} className="border border-[#ced7db] rounded-md p-4">
-              <div className="flex justify-between mb-3">
-                <h3 className="text-[#35454c] text-lg font-medium">
-                  Q&A Item #{index + 1}
-                </h3>
+      {/* Content area that will grow/shrink as needed */}
+      <div className="flex-grow">
+        {isQADataEmpty && !isEditing ? (
+          <div className="text-center py-12 text-gray-500 text-lg">
+            No Q&A data present
+          </div>
+        ) : isEditing ? (
+          <div className="space-y-6">
+            {displayEditData.map((item, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-md p-1"
+              >
+                <div className="flex justify-between ">
+                  <h3 className="text-gray-700 text-lg font-medium">
+                    Q&A Item #{index + 1}
+                  </h3>
+                  <button
+                    onClick={() => removeQA(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <TrashIcon size={18} />
+                  </button>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Question:
+                  </label>
+                  <textarea
+                    value={item.question || ""}
+                    onChange={(e) =>
+                      updateQA(index, "question", e.target.value)
+                    }
+                    className="w-full border border-gray-300 p-2 rounded"
+                    rows={2}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Answer:
+                  </label>
+                  <textarea
+                    value={item.answer || ""}
+                    onChange={(e) => updateQA(index, "answer", e.target.value)}
+                    className="w-full border border-gray-300 p-2 rounded"
+                    rows={3}
+                  />
+                </div>
+              </div>
+            ))}
+
+            {editData.length < 5 && (
+              <div className="flex justify-center mt-6">
                 <button
-                  onClick={() => removeQA(index)}
-                  className="text-[#445963] hover:text-red-500"
+                  onClick={addQA}
+                  className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
                 >
-                  <TrashIcon size={18} />
+                  <PlusIcon className="h-4 w-4 mr-2" />
+                  Add Q&A Item
                 </button>
               </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-[#445963] mb-1">
-                  Question:
-                </label>
-                <textarea
-                  value={item.question || ""}
-                  onChange={(e) => updateQA(index, "question", e.target.value)}
-                  className="w-full border border-[#ced7db] p-2 rounded"
-                  rows={2}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#445963] mb-1">
-                  Answer:
-                </label>
-                <textarea
-                  value={item.answer || ""}
-                  onChange={(e) => updateQA(index, "answer", e.target.value)}
-                  className="w-full border border-[#ced7db] p-2 rounded"
-                  rows={3}
-                />
-              </div>
-            </div>
-          ))}
-
-          <div className="flex justify-center mt-6">
-            <Button
-              onClick={addQA}
-              className="bg-[#156082] hover:bg-[#092a38] text-white"
-            >
-              <PlusIcon className="mr-2 h-4 w-4" /> Add Q&A Item
-            </Button>
+            )}
           </div>
-        </div>
-      ) : (
-        <div>
-          {qaData.map((item, index) => (
-            <div key={index} className="mb-12">
-              <h3 className="text-[#35454c] text-2xl font-normal mb-8">
-                {item.question || ""}
-              </h3>
+        ) : (
+          <div>
+            {displayQAData.map((item, index) => (
+              <div key={index} className="mb-3">
+                <h3 className="text-gray-700 text-xl font-normal mb-1">
+                  {item.question || ""}
+                </h3>
 
-              <ul className="space-y-6">
-                <li className="flex gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <span className="inline-block w-1.5 h-1.5 bg-[#35454c] rounded-full"></span>
-                  </div>
-                  <div>
-                    <span className="text-[#35454c] font-semibold">
-                      End-to-End Automation:{" "}
-                    </span>
-                    <span className="text-[#445963]">{item.answer || ""}</span>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div className="mt-16 text-[#57727e] text-sm">
-        Source: 1.PromenadeAI, 2.Crunchbase
+                <ul className="space-y-6">
+                  <li className="flex gap-3">
+                    <div className="flex-shrink-0 ">
+                      <span className="inline-block w-1.5 h-1.5 bg-gray-700 rounded-full"></span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">{item.answer || ""}</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* Footer with source text, always at the bottom */}
+      <div className="mt-auto pt-4 text-gray-500 text-sm">{sourceText}</div>
     </div>
   );
 }
