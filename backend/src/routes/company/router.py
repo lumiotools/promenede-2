@@ -12,6 +12,7 @@ from src.utils.yahoo.shareholder import get_shareholder_info
 from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer,convert_null_to_none
 
 from src.utils.llm_summary.employeeReviews import get_employee_reviews_summary
+from src.utils.llmInfo.competitive_analysis import get_competitive_analysis
 # Load environment variables from .env file
 load_dotenv()
 
@@ -280,10 +281,10 @@ async def get_company_data(request: CompanyRequest):
     
     
     employeeReviewsSummary = get_employee_reviews_summary(response_data["organization"]["employee_reviews2"])
-    
     response_data["organization"]["employee_reviews2"]["summary"] = employeeReviewsSummary
     
-    print(employeeReviewsSummary)
+    competitiveAnalysis = get_competitive_analysis(company_name, response_data["competitive_analysis"])
+    response_data["competitive_analysis"] = competitiveAnalysis
     
     return {"success":True,"company_name": company_name, "data": response_data}
 

@@ -36,7 +36,7 @@ Refer below for an example and give strictly in this format only:
         messages=[
             {
                 "role": "system",
-                "content": "Summarize the reviews of the employee"
+                "content": prompt
             },
             {
                 "role": "user",
