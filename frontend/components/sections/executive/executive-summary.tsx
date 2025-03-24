@@ -184,7 +184,6 @@ export function ExecutiveSummaryPage({
     })[0];
   };
 
-  // Add function to handle financial data changes
   const handleFinancialDataChange = (
     metric: string,
     value: number | null,
@@ -196,9 +195,8 @@ export function ExecutiveSummaryPage({
     }));
   };
 
-  // Updated handleSaveFinancialHighlights function to work with the new ExecutiveSummary interface
   const handleSaveFinancialHighlights = () => {
-    if (data && data.financial_highlights) {
+    if (data) {
       const updatedData = { ...data };
 
       // Ensure financial_highlights exists
@@ -263,7 +261,13 @@ export function ExecutiveSummaryPage({
         }
       });
 
-      setData(updatedData);
+      // Force a re-render of the chart by creating a new object
+      setData({ ...updatedData });
+
+      // If there's a callback, call it with the updated data
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
     }
     setEditMode(null);
   };
@@ -271,11 +275,32 @@ export function ExecutiveSummaryPage({
   // Add a function to handle financial data editing
   const handleSaveFinancialData = () => {
     if (data) {
-      // Save the updated data
-      setData({
+      // Create a new object to force re-render
+      const updatedData = {
         ...data,
-        // No changes needed as the individual fields already have their own save handlers
-      });
+        valuation: {
+          ...data.valuation,
+          value: editValuation,
+          value_usd: editValuation,
+        },
+        equity_funding_total: {
+          ...data.equity_funding_total,
+          value: editEquityFunding,
+          value_usd: editEquityFunding,
+        },
+        funding_total: {
+          ...data.funding_total,
+          value: editFundingTotal,
+          value_usd: editFundingTotal,
+        },
+      };
+
+      setData(updatedData);
+
+      // If there's a callback, call it with the updated data
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
     }
     setEditMode(null);
   };
@@ -361,12 +386,14 @@ export function ExecutiveSummaryPage({
                             className="bg-[#eaecf0] text-[#475467] hover:bg-[#ced7db] flex items-center gap-1"
                           >
                             {tag}
-                            <button
-                              onClick={() => handleRemoveTag(tag)}
-                              className="ml-1 rounded-full hover:bg-[#ced7db] p-0.5"
-                            >
-                              <XIcon className="h-3 w-3" />
-                            </button>
+                            {masterEditMode && (
+                              <button
+                                onClick={() => handleRemoveTag(tag)}
+                                className="ml-1 rounded-full hover:bg-[#ced7db] p-0.5"
+                              >
+                                <XIcon className="h-3 w-3" />
+                              </button>
+                            )}
                           </Badge>
                         ))}
                       </div>
@@ -566,9 +593,13 @@ export function ExecutiveSummaryPage({
                               handleFinancialDataChange(
                                 "operating_revenue",
                                 Number(e.target.value),
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.operating_revenue
-                                )?.date || null
+                                editFinancialHighlights.operating_revenue
+                                  ?.date ||
+                                  getLatestFinancialData(
+                                    data?.financial_highlights
+                                      ?.operating_revenue
+                                  )?.date ||
+                                  null
                               )
                             }
                             className="w-full"
@@ -582,10 +613,37 @@ export function ExecutiveSummaryPage({
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatDate(
-                          getLatestFinancialData(
-                            data?.financial_highlights?.operating_revenue
-                          )?.date
+                        {editMode === "financial_highlights" ? (
+                          <Input
+                            type="date"
+                            value={
+                              editFinancialHighlights.operating_revenue?.date ||
+                              getLatestFinancialData(
+                                data?.financial_highlights?.operating_revenue
+                              )?.date ||
+                              ""
+                            }
+                            onChange={(e) =>
+                              handleFinancialDataChange(
+                                "operating_revenue",
+                                editFinancialHighlights.operating_revenue
+                                  ?.value ||
+                                  getLatestFinancialData(
+                                    data?.financial_highlights
+                                      ?.operating_revenue
+                                  )?.value ||
+                                  0,
+                                e.target.value
+                              )
+                            }
+                            className="w-full"
+                          />
+                        ) : (
+                          formatDate(
+                            getLatestFinancialData(
+                              data?.financial_highlights?.operating_revenue
+                            )?.date
+                          )
                         )}
                       </TableCell>
                     </TableRow>
@@ -608,9 +666,12 @@ export function ExecutiveSummaryPage({
                               handleFinancialDataChange(
                                 "operating_profit",
                                 Number(e.target.value),
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.operating_profit
-                                )?.date || null
+                                editFinancialHighlights.operating_profit
+                                  ?.date ||
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.operating_profit
+                                  )?.date ||
+                                  null
                               )
                             }
                             className="w-full"
@@ -624,10 +685,36 @@ export function ExecutiveSummaryPage({
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatDate(
-                          getLatestFinancialData(
-                            data?.financial_highlights?.operating_profit
-                          )?.date
+                        {editMode === "financial_highlights" ? (
+                          <Input
+                            type="date"
+                            value={
+                              editFinancialHighlights.operating_profit?.date ||
+                              getLatestFinancialData(
+                                data?.financial_highlights?.operating_profit
+                              )?.date ||
+                              ""
+                            }
+                            onChange={(e) =>
+                              handleFinancialDataChange(
+                                "operating_profit",
+                                editFinancialHighlights.operating_profit
+                                  ?.value ||
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.operating_profit
+                                  )?.value ||
+                                  0,
+                                e.target.value
+                              )
+                            }
+                            className="w-full"
+                          />
+                        ) : (
+                          formatDate(
+                            getLatestFinancialData(
+                              data?.financial_highlights?.operating_profit
+                            )?.date
+                          )
                         )}
                       </TableCell>
                     </TableRow>
@@ -648,9 +735,11 @@ export function ExecutiveSummaryPage({
                               handleFinancialDataChange(
                                 "ebitda",
                                 Number(e.target.value),
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.ebitda
-                                )?.date || null
+                                editFinancialHighlights.ebitda?.date ||
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.ebitda
+                                  )?.date ||
+                                  null
                               )
                             }
                             className="w-full"
@@ -664,10 +753,35 @@ export function ExecutiveSummaryPage({
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatDate(
-                          getLatestFinancialData(
-                            data?.financial_highlights?.ebitda
-                          )?.date
+                        {editMode === "financial_highlights" ? (
+                          <Input
+                            type="date"
+                            value={
+                              editFinancialHighlights.ebitda?.date ||
+                              getLatestFinancialData(
+                                data?.financial_highlights?.ebitda
+                              )?.date ||
+                              ""
+                            }
+                            onChange={(e) =>
+                              handleFinancialDataChange(
+                                "ebitda",
+                                editFinancialHighlights.ebitda?.value ||
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.ebitda
+                                  )?.value ||
+                                  0,
+                                e.target.value
+                              )
+                            }
+                            className="w-full"
+                          />
+                        ) : (
+                          formatDate(
+                            getLatestFinancialData(
+                              data?.financial_highlights?.ebitda
+                            )?.date
+                          )
                         )}
                       </TableCell>
                     </TableRow>
@@ -688,9 +802,11 @@ export function ExecutiveSummaryPage({
                               handleFinancialDataChange(
                                 "net_income",
                                 Number(e.target.value),
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.net_income
-                                )?.date || null
+                                editFinancialHighlights.net_income?.date ||
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.net_income
+                                  )?.date ||
+                                  null
                               )
                             }
                             className="w-full"
@@ -704,10 +820,35 @@ export function ExecutiveSummaryPage({
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatDate(
-                          getLatestFinancialData(
-                            data?.financial_highlights?.net_income
-                          )?.date
+                        {editMode === "financial_highlights" ? (
+                          <Input
+                            type="date"
+                            value={
+                              editFinancialHighlights.net_income?.date ||
+                              getLatestFinancialData(
+                                data?.financial_highlights?.net_income
+                              )?.date ||
+                              ""
+                            }
+                            onChange={(e) =>
+                              handleFinancialDataChange(
+                                "net_income",
+                                editFinancialHighlights.net_income?.value ||
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.net_income
+                                  )?.value ||
+                                  0,
+                                e.target.value
+                              )
+                            }
+                            className="w-full"
+                          />
+                        ) : (
+                          formatDate(
+                            getLatestFinancialData(
+                              data?.financial_highlights?.net_income
+                            )?.date
+                          )
                         )}
                       </TableCell>
                     </TableRow>
@@ -737,7 +878,28 @@ export function ExecutiveSummaryPage({
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatDate(data?.financial_highlights?.per?.date)}
+                        {editMode === "financial_highlights" ? (
+                          <Input
+                            type="date"
+                            value={
+                              editFinancialHighlights.per?.date ||
+                              data?.financial_highlights?.per?.date ||
+                              ""
+                            }
+                            onChange={(e) =>
+                              handleFinancialDataChange(
+                                "per",
+                                editFinancialHighlights.per?.value ||
+                                  data?.financial_highlights?.per?.value ||
+                                  0,
+                                e.target.value
+                              )
+                            }
+                            className="w-full"
+                          />
+                        ) : (
+                          formatDate(data?.financial_highlights?.per?.date)
+                        )}
                       </TableCell>
                     </TableRow>
                     <TableRow>
