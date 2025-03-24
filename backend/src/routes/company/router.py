@@ -14,6 +14,7 @@ from src.routes.company.helpers import extract_financial_data, calculate_per, ca
 from src.utils.llm_summary.employeeReviews import get_employee_reviews_summary
 from src.utils.llmInfo.competitive_analysis import get_competitive_analysis
 from src.utils.llmInfo.opportunity_areas import get_opportunity_areas
+from src.utils.llmInfo.product_services import get_product_services
 # Load environment variables from .env file
 load_dotenv()
 
@@ -289,5 +290,8 @@ async def get_company_data(request: CompanyRequest):
     
     opportunityAreas = get_opportunity_areas(company_name, response_data["executive_summary"]["topic_tags"])
     response_data["opportunities_risks"]["opportunities"] = opportunityAreas
+    
+    productServices = get_product_services(company_name, response_data["products_services"]["services"])
+    response_data["products_services"]["services"] = productServices
     
     return {"success":True,"company_name": company_name, "data": response_data}

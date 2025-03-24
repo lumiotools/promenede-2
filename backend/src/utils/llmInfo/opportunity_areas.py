@@ -6,10 +6,6 @@ client = OpenAI()
 
 def get_opportunity_areas(company_name, topic_tags):
     prompt = """
-Here's a prompt to generate the opportunity areas in the specified format, incorporating company name and topic tags:
-
----
-
 Generate a report on the opportunity areas for Company: {company_name} based on the given data and the company's focus on the following topic tags: {topic_tags}. The report should include potential growth opportunities with specific details and rationale.
 
 Each opportunity area should include:
