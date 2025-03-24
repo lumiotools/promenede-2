@@ -6,7 +6,7 @@ client = OpenAI()
 def get_employee_trend_summary(company_name, data_1, data_2):
     prompt = """
     Understand the Given 2 datasets.
-    And Summarize them in 100 words, with respect to the employee trends in the company {company_name}.```
+    And Summarize them in 100 words, with respect to the employee trends in the company {company_name}.
     """.replace("{company_name}", company_name)
     
     response = client.chat.completions.create(

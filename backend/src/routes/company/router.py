@@ -11,7 +11,7 @@ from src.utils.coresignal.company import get_company_details,get_company_id
 from src.utils.yahoo.shareholder import get_shareholder_info
 from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer,convert_null_to_none
 
-from src.utils.llm_summary.employeeReviews import get_employee_reviews_summary
+from src.utils.llm_summary.employeer_reviews import get_employee_reviews_summary, get_employee_ratings_summary, get_areas_of_improvement
 from src.utils.llmInfo.competitive_analysis import get_competitive_analysis
 from src.utils.llmInfo.opportunity_areas import get_opportunity_areas
 from src.utils.llmInfo.product_services import get_product_services
@@ -283,22 +283,29 @@ async def get_company_data(request: CompanyRequest):
     }
     
     
-    employeeReviewsSummary = get_employee_reviews_summary(response_data["organization"]["employee_reviews2"])
-    response_data["organization"]["employee_reviews2"]["summary"] = employeeReviewsSummary
+    # employeeReviewsSummary = get_employee_reviews_summary(response_data["organization"]["employee_reviews2"])
+    # response_data["organization"]["employee_reviews2"]["summary"] = employeeReviewsSummary
     
-    competitiveAnalysis = get_competitive_analysis(company_name, response_data["competitive_analysis"])
-    response_data["competitive_analysis"] = competitiveAnalysis
+    # competitiveAnalysis = get_competitive_analysis(company_name, response_data["competitive_analysis"])
+    # response_data["competitive_analysis"] = competitiveAnalysis
     
-    opportunityAreas = get_opportunity_areas(company_name, response_data["executive_summary"]["topic_tags"])
-    response_data["opportunities_risks"]["opportunities"] = opportunityAreas
+    # opportunityAreas = get_opportunity_areas(company_name, response_data["executive_summary"]["topic_tags"])
+    # response_data["opportunities_risks"]["opportunities"] = opportunityAreas
     
-    productServices = get_product_services(company_name, response_data["products_services"]["services"])
-    response_data["products_services"]["services"] = productServices
+    # productServices = get_product_services(company_name, response_data["products_services"]["services"])
+    # response_data["products_services"]["services"] = productServices
     
-    employeeTrendDepartmentSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["breakdown_by_department"], response_data["organization"]["employees_trend"]["breakdown_by_department_by_month"])
-    response_data["organization"]["employees_trend"]["department_summary"] = employeeTrendDepartmentSummary
+    # employeeTrendDepartmentSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["breakdown_by_department"], response_data["organization"]["employees_trend"]["breakdown_by_department_by_month"])
+    # response_data["organization"]["employees_trend"]["department_summary"] = employeeTrendDepartmentSummary
     
-    employeeTrendCountSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["count_by_month"], response_data["organization"]["employees_trend"]["count_change"])
-    response_data["organization"]["employees_trend"]["count_summary"] = employeeTrendCountSummary
+    # employeeTrendCountSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["count_by_month"], response_data["organization"]["employees_trend"]["count_change"])
+    # response_data["organization"]["employees_trend"]["count_summary"] = employeeTrendCountSummary
+    
+    
+    employeeRatingsSummary = get_employee_ratings_summary(company_name, response_data["organization"]["employee_reviews2"])
+    response_data["organization"]["employee_reviews2"]["ratings_summary"] = employeeRatingsSummary
+    
+    employeeRatingsAreasOfImprovement = get_areas_of_improvement(company_name, response_data["organization"]["employee_reviews2"])
+    response_data["organization"]["employee_reviews2"]["areas_of_improvements"] = employeeRatingsAreasOfImprovement
     
     return {"success":True,"company_name": company_name, "data": response_data}
