@@ -4,9 +4,6 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { PencilIcon, PlusIcon, XIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -15,24 +12,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { ExecutiveSummary } from "@/types/executive";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { PencilIcon, PlusIcon, XIcon } from "lucide-react";
+import { ExecutiveSummary } from "@/types/executive";
 
-type FinancialDataEntry = {
+interface ExecutiveSummaryProps {
+  initialData: ExecutiveSummary | undefined;
+  onDataUpdate?: (data: ExecutiveSummary) => void;
+}
+
+interface FinancialDataEntry {
   value?: number | null;
-  currency?: string | null;
   date?: string | null;
-};
-
-type ExecutiveSummaryProps = {
-  initialData?: ExecutiveSummary;
-  onDataUpdate?: (data: ExecutiveSummary) => void; // Add callback prop
-};
+  currency?: string | null;
+}
 
 export function ExecutiveSummaryPage({
   initialData,
   onDataUpdate,
 }: ExecutiveSummaryProps) {
-  // Add a master edit state at the top of the component
   const [masterEditMode, setMasterEditMode] = useState(false);
   const [data, setData] = useState<ExecutiveSummary | undefined>(initialData);
   const [editMode, setEditMode] = useState<string | null>(null);
@@ -51,7 +50,6 @@ export function ExecutiveSummaryPage({
     data?.equity_funding_total?.value || 0
   );
 
-  // Add state for financial highlights editing with the correct type
   const [editFinancialHighlights, setEditFinancialHighlights] = useState<{
     [key: string]: { value: number | null; date: string | null };
   }>({});
@@ -65,7 +63,6 @@ export function ExecutiveSummaryPage({
     setEditEquityFunding(initialData?.equity_funding_total?.value || 0);
   }, [initialData]);
 
-  // Add useEffect to update parent data when data changes
   useEffect(() => {
     if (onDataUpdate && data) {
       onDataUpdate(data);
@@ -199,25 +196,20 @@ export function ExecutiveSummaryPage({
     if (data) {
       const updatedData = { ...data };
 
-      // Ensure financial_highlights exists
       if (!updatedData.financial_highlights) {
         updatedData.financial_highlights = {};
       }
 
-      // Update each financial metric with edited values
       Object.keys(editFinancialHighlights).forEach((metricKey) => {
-        // Handle each metric type specifically based on the updated interface
         switch (metricKey) {
           case "operating_revenue":
           case "operating_profit":
           case "ebitda":
           case "net_income":
-            // These are array types in the interface
             const metricArray =
               updatedData.financial_highlights?.[metricKey] || [];
 
             if (metricArray && metricArray.length > 0) {
-              // Update the first (latest) entry
               metricArray[0] = {
                 ...metricArray[0],
                 value: editFinancialHighlights[metricKey].value,
@@ -227,19 +219,17 @@ export function ExecutiveSummaryPage({
               if (!updatedData.financial_highlights) {
                 updatedData.financial_highlights = {};
               }
-              // Create a new array with one entry if it doesn't exist
               updatedData.financial_highlights[metricKey] = [
                 {
                   value: editFinancialHighlights[metricKey].value,
                   date: editFinancialHighlights[metricKey].date,
-                  currency: "USD", // Default currency
+                  currency: "USD",
                 },
               ];
             }
             break;
 
           case "per":
-            // Handle the per object which has a different structure
             if (!updatedData.financial_highlights) {
               updatedData.financial_highlights = {};
             }
@@ -256,15 +246,12 @@ export function ExecutiveSummaryPage({
             break;
 
           default:
-            // For any other metrics that might be added in the future
             break;
         }
       });
 
-      // Force a re-render of the chart by creating a new object
       setData({ ...updatedData });
 
-      // If there's a callback, call it with the updated data
       if (onDataUpdate) {
         onDataUpdate(updatedData);
       }
@@ -272,10 +259,8 @@ export function ExecutiveSummaryPage({
     setEditMode(null);
   };
 
-  // Add a function to handle financial data editing
   const handleSaveFinancialData = () => {
     if (data) {
-      // Create a new object to force re-render
       const updatedData = {
         ...data,
         valuation: {
@@ -297,7 +282,6 @@ export function ExecutiveSummaryPage({
 
       setData(updatedData);
 
-      // If there's a callback, call it with the updated data
       if (onDataUpdate) {
         onDataUpdate(updatedData);
       }
@@ -305,7 +289,6 @@ export function ExecutiveSummaryPage({
     setEditMode(null);
   };
 
-  // Add a useEffect to reset edit mode when master edit mode is turned off
   useEffect(() => {
     if (!masterEditMode) {
       setEditMode(null);
@@ -313,96 +296,113 @@ export function ExecutiveSummaryPage({
   }, [masterEditMode]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-6 border-b border-[#ced7db] pb-4">
-        <h1 className="text-4xl font-semibold text-[#445963]">
+    <div
+      className="w-full bg-white p-2"
+      style={{ minHeight: "100%", aspectRatio: "16/9" }}
+    >
+      <div className="flex justify-between items-center mb-2 border-b border-gray-200 pb-1">
+        <h1 className="text-2xl font-semibold text-gray-700">
           Executive Summary
         </h1>
-        {/* Modify the top edit button to toggle master edit mode */}
         <Button
           variant="outline"
-          className="border-[#ced7db]"
+          size="sm"
+          className="border-gray-200"
           onClick={() => setMasterEditMode(!masterEditMode)}
         >
-          <PencilIcon className="h-4 w-4 mr-2" />
+          <PencilIcon className="h-3 w-3 mr-1" />
           {masterEditMode ? "Save All" : "Edit"}
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <Card className="border-[#ced7db] shadow-sm">
-            <CardHeader className="bg-[#f7f9f9] border-b border-[#ced7db]">
-              <CardTitle className="text-[#445963] text-xl">
+      <div
+        className="grid grid-cols-12 gap-3"
+        style={{ minHeight: "calc(100% - 3rem)" }}
+      >
+        <div className="col-span-8">
+          <Card className="border-gray-200 shadow-sm ">
+            <CardHeader className="bg-gray-50 border-b border-gray-200">
+              <CardTitle className="text-gray-700 text-lg">
                 Company Overview
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <Table>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium w-1/4 bg-[#f2f4f7] border-r border-[#ced7db]">
-                      Industry
-                    </TableCell>
-                    <TableCell>
-                      {editMode === "industry" ? (
-                        <div className="flex gap-2">
-                          <Input
-                            value={editIndustry || ""}
-                            onChange={(e) => setEditIndustry(e.target.value)}
-                            className="flex-1"
-                          />
-                          <Button size="sm" onClick={handleSaveIndustry}>
-                            Save
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex justify-between items-center">
-                          <span>{data?.industry || "N/A"}</span>
-                          {/* Modify the edit buttons to only show when in master edit mode */}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setEditMode("industry")}
-                            className={`h-8 w-8 p-0 ${
-                              !masterEditMode && "hidden"
-                            }`}
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium bg-[#f2f4f7] border-r border-[#ced7db]">
-                      Topic Tags
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {data?.topic_tags?.map((tag, index) => (
-                          <Badge
-                            key={index}
-                            className="bg-[#eaecf0] text-[#475467] hover:bg-[#ced7db] flex items-center gap-1"
-                          >
-                            {tag}
-                            {masterEditMode && (
-                              <button
-                                onClick={() => handleRemoveTag(tag)}
-                                className="ml-1 rounded-full hover:bg-[#ced7db] p-0.5"
-                              >
-                                <XIcon className="h-3 w-3" />
-                              </button>
-                            )}
-                          </Badge>
-                        ))}
-                      </div>
+              <div className="divide-y divide-gray-200">
+                <div className="flex">
+                  <div className="w-1/4 bg-gray-50 border-r border-gray-200 p-2 text-sm font-medium">
+                    Industry
+                  </div>
+                  <div className="flex-1 p-2">
+                    {editMode === "industry" ? (
                       <div className="flex gap-2">
+                        <Input
+                          value={editIndustry || ""}
+                          onChange={(e) => setEditIndustry(e.target.value)}
+                          className="flex-1 h-7 text-sm"
+                        />
+                        <Button
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={handleSaveIndustry}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">
+                          {data?.industry || "N/A"}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditMode("industry")}
+                          className={`h-5 w-5 p-0 ${
+                            !masterEditMode && "hidden"
+                          }`}
+                        >
+                          <PencilIcon className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex">
+                  <div className="w-1/4 bg-gray-50 border-r border-gray-200 p-2 text-sm font-medium">
+                    Topic Tags
+                  </div>
+                  <div className="flex-1 p-2">
+                    <div className="flex flex-wrap gap-1">
+                      {data?.topic_tags?.slice(0, 5).map((tag, index) => (
+                        <Badge
+                          key={index}
+                          className="bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs py-0.5"
+                        >
+                          {tag}
+                          {masterEditMode && (
+                            <button
+                              onClick={() => handleRemoveTag(tag)}
+                              className="ml-1 rounded-full hover:bg-gray-300 p-0.5"
+                            >
+                              <XIcon className="h-2 w-2" />
+                            </button>
+                          )}
+                        </Badge>
+                      ))}
+                      {data?.topic_tags && data.topic_tags.length > 5 && (
+                        <Badge className="bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs py-0.5">
+                          +{data.topic_tags.length - 5} more
+                        </Badge>
+                      )}
+                    </div>
+                    {masterEditMode && (
+                      <div className="flex gap-1 mt-1">
                         <Input
                           value={newTag}
                           onChange={(e) => setNewTag(e.target.value)}
                           placeholder="Add new tag"
-                          className="flex-1"
+                          className="flex-1 h-6 text-xs"
                           onKeyPress={(e) => {
                             if (e.key === "Enter") {
                               handleAddTag();
@@ -410,149 +410,166 @@ export function ExecutiveSummaryPage({
                             }
                           }}
                         />
-                        <Button size="sm" onClick={handleAddTag}>
-                          <PlusIcon className="h-4 w-4 mr-1" />
+                        <Button
+                          size="sm"
+                          className="h-6 text-xs px-2"
+                          onClick={handleAddTag}
+                        >
+                          <PlusIcon className="h-3 w-3 mr-1" />
                           Add
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium bg-[#f2f4f7] border-r border-[#ced7db]">
-                      Valuation
-                    </TableCell>
-                    <TableCell>
-                      {editMode === "valuation" ? (
-                        <div className="flex gap-2">
-                          <Input
-                            type="number"
-                            value={editValuation || 0}
-                            onChange={(e) =>
-                              setEditValuation(Number(e.target.value))
-                            }
-                            className="flex-1"
-                          />
-                          <Button size="sm" onClick={handleSaveValuation}>
-                            Save
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex justify-between items-center">
-                          <span>{formatCurrency(data?.valuation?.value)}</span>
-                          {/* Modify the edit buttons for valuation */}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setEditMode("valuation")}
-                            className={`h-8 w-8 p-0 ${
-                              !masterEditMode && "hidden"
-                            }`}
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium bg-[#f2f4f7] border-r border-[#ced7db]">
-                      Equity Funding Total
-                    </TableCell>
-                    <TableCell>
-                      {editMode === "equity_funding" ? (
-                        <div className="flex gap-2">
-                          <Input
-                            type="number"
-                            value={editEquityFunding || 0}
-                            onChange={(e) =>
-                              setEditEquityFunding(Number(e.target.value))
-                            }
-                            className="flex-1"
-                          />
-                          <Button size="sm" onClick={handleSaveEquityFunding}>
-                            Save
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex justify-between items-center">
-                          <span>
-                            {formatCurrency(data?.equity_funding_total?.value)}
-                          </span>
-                          {/* Modify the edit buttons for equity funding */}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setEditMode("equity_funding")}
-                            className={`h-8 w-8 p-0 ${
-                              !masterEditMode && "hidden"
-                            }`}
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium bg-[#f2f4f7] border-r border-[#ced7db]">
-                      Funding Total
-                    </TableCell>
-                    <TableCell>
-                      {editMode === "funding_total" ? (
-                        <div className="flex gap-2">
-                          <Input
-                            type="number"
-                            value={editFundingTotal || 0}
-                            onChange={(e) =>
-                              setEditFundingTotal(Number(e.target.value))
-                            }
-                            className="flex-1"
-                          />
-                          <Button size="sm" onClick={handleSaveFundingTotal}>
-                            Save
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex justify-between items-center">
-                          <span>
-                            {formatCurrency(data?.funding_total?.value)}
-                          </span>
-                          {/* Modify the edit buttons for funding total */}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setEditMode("funding_total")}
-                            className={`h-8 w-8 p-0 ${
-                              !masterEditMode && "hidden"
-                            }`}
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex">
+                  <div className="w-1/4 bg-gray-50 border-r border-gray-200 p-2 text-sm font-medium">
+                    Valuation
+                  </div>
+                  <div className="flex-1 p-2">
+                    {editMode === "valuation" ? (
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          value={editValuation || 0}
+                          onChange={(e) =>
+                            setEditValuation(Number(e.target.value))
+                          }
+                          className="flex-1 h-7 text-sm"
+                        />
+                        <Button
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={handleSaveValuation}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">
+                          {formatCurrency(data?.valuation?.value)}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditMode("valuation")}
+                          className={`h-5 w-5 p-0 ${
+                            !masterEditMode && "hidden"
+                          }`}
+                        >
+                          <PencilIcon className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex">
+                  <div className="w-1/4 bg-gray-50 border-r border-gray-200 p-2 text-sm font-medium">
+                    Equity Funding Total
+                  </div>
+                  <div className="flex-1 p-2">
+                    {editMode === "equity_funding" ? (
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          value={editEquityFunding || 0}
+                          onChange={(e) =>
+                            setEditEquityFunding(Number(e.target.value))
+                          }
+                          className="flex-1 h-7 text-sm"
+                        />
+                        <Button
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={handleSaveEquityFunding}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">
+                          {formatCurrency(data?.equity_funding_total?.value)}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditMode("equity_funding")}
+                          className={`h-5 w-5 p-0 ${
+                            !masterEditMode && "hidden"
+                          }`}
+                        >
+                          <PencilIcon className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex">
+                  <div className="w-1/4 bg-gray-50 border-r border-gray-200 p-2 text-sm font-medium">
+                    Funding Total
+                  </div>
+                  <div className="flex-1 p-2">
+                    {editMode === "funding_total" ? (
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          value={editFundingTotal || 0}
+                          onChange={(e) =>
+                            setEditFundingTotal(Number(e.target.value))
+                          }
+                          className="flex-1 h-7 text-sm"
+                        />
+                        <Button
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={handleSaveFundingTotal}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">
+                          {formatCurrency(data?.funding_total?.value)}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditMode("funding_total")}
+                          className={`h-5 w-5 p-0 ${
+                            !masterEditMode && "hidden"
+                          }`}
+                        >
+                          <PencilIcon className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border-[#ced7db] shadow-sm mt-6">
-            {/* Modify the Financial Highlights card header to include an edit button */}
-            <CardHeader className="bg-[#f7f9f9] border-b border-[#ced7db]">
+          <Card className="border-gray-200 shadow-sm">
+            <CardHeader className="bg-gray-50 border-b border-gray-200 py-1 px-3">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-[#445963] text-xl">
+                <CardTitle className="text-gray-700 text-lg">
                   Financial Highlights{" "}
-                  <span className="text-sm font-normal">$ in millions</span>
+                  <span className="text-xs font-normal">$ in millions</span>
                 </CardTitle>
                 {masterEditMode && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setEditMode("financial_highlights")}
-                    className="h-8 w-8 p-0"
+                    className="h-5 w-5 p-0"
                   >
-                    <PencilIcon className="h-4 w-4" />
+                    <PencilIcon className="h-3 w-3" />
                   </Button>
                 )}
               </div>
@@ -562,22 +579,23 @@ export function ExecutiveSummaryPage({
                 <Table>
                   <TableHeader className="bg-[#002169] text-white">
                     <TableRow>
-                      <TableHead className="text-white">Metric</TableHead>
-                      <TableHead className="text-white text-right">
+                      <TableHead className="text-white text-xs py-1 h-8">
+                        Metric
+                      </TableHead>
+                      <TableHead className="text-white text-right text-xs py-1 h-8">
                         Latest Value
                       </TableHead>
-                      <TableHead className="text-white text-right">
+                      <TableHead className="text-white text-right text-xs py-1 h-8">
                         Date
                       </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-xs py-1 h-8">
                         Operating Revenue
                       </TableCell>
-                      {/* Modify the TableCell for Operating Revenue to be editable when in edit mode */}
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {editMode === "financial_highlights" ? (
                           <Input
                             type="number"
@@ -602,7 +620,7 @@ export function ExecutiveSummaryPage({
                                   null
                               )
                             }
-                            className="w-full"
+                            className="w-full h-6 text-xs"
                           />
                         ) : (
                           formatCurrency(
@@ -612,7 +630,7 @@ export function ExecutiveSummaryPage({
                           )
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {editMode === "financial_highlights" ? (
                           <Input
                             type="date"
@@ -636,7 +654,7 @@ export function ExecutiveSummaryPage({
                                 e.target.value
                               )
                             }
-                            className="w-full"
+                            className="w-full h-6 text-xs"
                           />
                         ) : (
                           formatDate(
@@ -648,10 +666,10 @@ export function ExecutiveSummaryPage({
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-xs py-1 h-8">
                         Operating Profit
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {editMode === "financial_highlights" ? (
                           <Input
                             type="number"
@@ -674,7 +692,7 @@ export function ExecutiveSummaryPage({
                                   null
                               )
                             }
-                            className="w-full"
+                            className="w-full h-6 text-xs"
                           />
                         ) : (
                           formatCurrency(
@@ -684,7 +702,7 @@ export function ExecutiveSummaryPage({
                           )
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {editMode === "financial_highlights" ? (
                           <Input
                             type="date"
@@ -707,7 +725,7 @@ export function ExecutiveSummaryPage({
                                 e.target.value
                               )
                             }
-                            className="w-full"
+                            className="w-full h-6 text-xs"
                           />
                         ) : (
                           formatDate(
@@ -719,8 +737,10 @@ export function ExecutiveSummaryPage({
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">EBITDA</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="font-medium text-xs py-1 h-8">
+                        EBITDA
+                      </TableCell>
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {editMode === "financial_highlights" ? (
                           <Input
                             type="number"
@@ -742,7 +762,7 @@ export function ExecutiveSummaryPage({
                                   null
                               )
                             }
-                            className="w-full"
+                            className="w-full h-6 text-xs"
                           />
                         ) : (
                           formatCurrency(
@@ -752,7 +772,7 @@ export function ExecutiveSummaryPage({
                           )
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {editMode === "financial_highlights" ? (
                           <Input
                             type="date"
@@ -774,7 +794,7 @@ export function ExecutiveSummaryPage({
                                 e.target.value
                               )
                             }
-                            className="w-full"
+                            className="w-full h-6 text-xs"
                           />
                         ) : (
                           formatDate(
@@ -786,8 +806,10 @@ export function ExecutiveSummaryPage({
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">Net Income</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="font-medium text-xs py-1 h-8">
+                        Net Income
+                      </TableCell>
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {editMode === "financial_highlights" ? (
                           <Input
                             type="number"
@@ -809,7 +831,7 @@ export function ExecutiveSummaryPage({
                                   null
                               )
                             }
-                            className="w-full"
+                            className="w-full h-6 text-xs"
                           />
                         ) : (
                           formatCurrency(
@@ -819,7 +841,7 @@ export function ExecutiveSummaryPage({
                           )
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {editMode === "financial_highlights" ? (
                           <Input
                             type="date"
@@ -841,7 +863,7 @@ export function ExecutiveSummaryPage({
                                 e.target.value
                               )
                             }
-                            className="w-full"
+                            className="w-full h-6 text-xs"
                           />
                         ) : (
                           formatDate(
@@ -853,8 +875,10 @@ export function ExecutiveSummaryPage({
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">P/E Ratio</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="font-medium text-xs py-1 h-8">
+                        P/E Ratio
+                      </TableCell>
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {editMode === "financial_highlights" ? (
                           <Input
                             type="number"
@@ -870,14 +894,14 @@ export function ExecutiveSummaryPage({
                                 data?.financial_highlights?.per?.date || null
                               )
                             }
-                            className="w-full"
+                            className="w-full h-6 text-xs"
                           />
                         ) : (
                           data?.financial_highlights?.per?.value?.toFixed(2) ||
                           "N/A"
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {editMode === "financial_highlights" ? (
                           <Input
                             type="date"
@@ -895,7 +919,7 @@ export function ExecutiveSummaryPage({
                                 e.target.value
                               )
                             }
-                            className="w-full"
+                            className="w-full h-6 text-xs"
                           />
                         ) : (
                           formatDate(data?.financial_highlights?.per?.date)
@@ -903,25 +927,27 @@ export function ExecutiveSummaryPage({
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">EPS</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="font-medium text-xs py-1 h-8">
+                        EPS
+                      </TableCell>
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {data?.financial_highlights?.per?.eps?.toFixed(2) ||
                           "N/A"}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {formatDate(data?.financial_highlights?.per?.date)}
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-xs py-1 h-8">
                         Closing Price
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {formatCurrency(
                           data?.financial_highlights?.per?.closing_price
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs py-1 h-8">
                         {formatDate(data?.financial_highlights?.per?.date)}
                       </TableCell>
                     </TableRow>
@@ -930,58 +956,65 @@ export function ExecutiveSummaryPage({
               </div>
             </CardContent>
           </Card>
-          {/* Add a save button at the bottom of the Financial Highlights table when in edit mode */}
           {editMode === "financial_highlights" && (
-            <div className="mt-4 flex justify-end">
-              <Button onClick={handleSaveFinancialHighlights}>
+            <div className="mt-1 flex justify-end">
+              <Button
+                size="sm"
+                className="text-xs"
+                onClick={handleSaveFinancialHighlights}
+              >
                 Save Changes
               </Button>
             </div>
           )}
         </div>
 
-        <div className="md:col-span-1">
-          <div className="space-y-6">
-            <Card className="border-[#ced7db] shadow-sm">
-              <CardHeader className="bg-[#f7f9f9] border-b border-[#ced7db] pb-3">
+        <div className="col-span-4">
+          <div className="space-y-3 h-full">
+            <Card className="border-gray-200 shadow-sm mb-3">
+              <CardHeader className="bg-gray-50 border-b border-gray-200 py-1 px-3">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-[#445963] text-xl">
+                  <CardTitle className="text-gray-700 text-lg">
                     Business Description
                   </CardTitle>
-                  {/* Modify the edit button for description */}
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setEditMode("description")}
-                    className={`h-8 w-8 p-0 ${!masterEditMode && "hidden"}`}
+                    className={`h-5 w-5 p-0 ${!masterEditMode && "hidden"}`}
                   >
-                    <PencilIcon className="h-4 w-4" />
+                    <PencilIcon className="h-3 w-3" />
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="p-4 max-h-60 overflow-y-auto">
+              <CardContent className="p-3">
                 {editMode === "description" ? (
                   <div className="space-y-2">
                     <Textarea
                       value={editDescription || ""}
                       onChange={(e) => setEditDescription(e.target.value)}
-                      className="h-40 resize-none"
+                      className="h-28 resize-none text-sm"
                     />
-                    <Button onClick={handleSaveDescription}>Save</Button>
+                    <Button
+                      size="sm"
+                      className="text-xs"
+                      onClick={handleSaveDescription}
+                    >
+                      Save
+                    </Button>
                   </div>
                 ) : (
-                  <div className="text-[#445963] whitespace-pre-line">
+                  <div className="text-gray-700 text-sm">
                     {data?.description || "No description available."}
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            <Card className="border-[#ced7db] shadow-sm">
-              {/* Modify the Financial Data card header to include an edit button */}
-              <CardHeader className="bg-[#f7f9f9] border-b border-[#ced7db] pb-3">
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader className="bg-gray-50 border-b border-gray-200 py-1 px-3">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-[#445963] text-xl">
+                  <CardTitle className="text-gray-700 text-lg">
                     Financial Data ($M)
                   </CardTitle>
                   {masterEditMode && (
@@ -989,41 +1022,41 @@ export function ExecutiveSummaryPage({
                       variant="ghost"
                       size="sm"
                       onClick={() => setEditMode("financial_data")}
-                      className="h-8 w-8 p-0"
+                      className="h-5 w-5 p-0"
                     >
-                      <PencilIcon className="h-4 w-4" />
+                      <PencilIcon className="h-3 w-3" />
                     </Button>
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="p-4">
-                <div className="h-[200px] flex items-end justify-between gap-2">
+              <CardContent className="p-3">
+                <div className="h-[150px] flex items-end justify-between gap-2">
                   {data?.valuation?.value && (
                     <div className="flex flex-col items-center">
                       <div
-                        className="bg-[#002169] w-16"
+                        className="bg-[#002169] w-12"
                         style={{
                           height: `${Math.min(
-                            150,
-                            (data.valuation.value / 1000000000) * 150
+                            120,
+                            (data.valuation.value / 1000000000) * 120
                           )}px`,
                         }}
                       ></div>
-                      <p className="text-xs mt-2 text-center">Valuation</p>
+                      <p className="text-[10px] mt-1 text-center">Valuation</p>
                     </div>
                   )}
                   {data?.equity_funding_total?.value && (
                     <div className="flex flex-col items-center">
                       <div
-                        className="bg-[#156082] w-16"
+                        className="bg-[#156082] w-12"
                         style={{
                           height: `${Math.min(
-                            150,
-                            (data.equity_funding_total.value / 1000000000) * 150
+                            120,
+                            (data.equity_funding_total.value / 1000000000) * 120
                           )}px`,
                         }}
                       ></div>
-                      <p className="text-xs mt-2 text-center">
+                      <p className="text-[10px] mt-1 text-center">
                         Equity
                         <br />
                         Funding
@@ -1033,15 +1066,15 @@ export function ExecutiveSummaryPage({
                   {data?.funding_total?.value && (
                     <div className="flex flex-col items-center">
                       <div
-                        className="bg-[#57727e] w-16"
+                        className="bg-[#57727e] w-12"
                         style={{
                           height: `${Math.min(
-                            150,
-                            (data.funding_total.value / 1000000000) * 150
+                            120,
+                            (data.funding_total.value / 1000000000) * 120
                           )}px`,
                         }}
                       ></div>
-                      <p className="text-xs mt-2 text-center">
+                      <p className="text-[10px] mt-1 text-center">
                         Total
                         <br />
                         Funding
@@ -1055,28 +1088,29 @@ export function ExecutiveSummaryPage({
         </div>
       </div>
 
-      <div className="mt-6 text-sm text-[#8097a2]">
+      <div className="mt-1 text-xs text-gray-400">
         Source: Company filings, financial reports
       </div>
-      {/* Add edit mode for financial data */}
+
       {editMode === "financial_data" && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
-            <h2 className="text-xl font-bold mb-4">Edit Financial Data</h2>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-lg font-bold mb-3">Edit Financial Data</h2>
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <label className="block text-sm font-medium mb-1">
+                  <label className="block text-xs font-medium mb-1">
                     Valuation ($M)
                   </label>
                   <Input
                     type="number"
                     value={editValuation || 0}
                     onChange={(e) => setEditValuation(Number(e.target.value))}
+                    className="h-8 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
+                  <label className="block text-xs font-medium mb-1">
                     Equity Funding ($M)
                   </label>
                   <Input
@@ -1085,10 +1119,11 @@ export function ExecutiveSummaryPage({
                     onChange={(e) =>
                       setEditEquityFunding(Number(e.target.value))
                     }
+                    className="h-8 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
+                  <label className="block text-xs font-medium mb-1">
                     Total Funding ($M)
                   </label>
                   <Input
@@ -1097,14 +1132,26 @@ export function ExecutiveSummaryPage({
                     onChange={(e) =>
                       setEditFundingTotal(Number(e.target.value))
                     }
+                    className="h-8 text-sm"
                   />
                 </div>
               </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <Button variant="outline" onClick={() => setEditMode(null)}>
+              <div className="flex justify-end gap-2 mt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => setEditMode(null)}
+                >
                   Cancel
                 </Button>
-                <Button onClick={handleSaveFinancialData}>Save</Button>
+                <Button
+                  size="sm"
+                  className="text-xs"
+                  onClick={handleSaveFinancialData}
+                >
+                  Save
+                </Button>
               </div>
             </div>
           </div>

@@ -60,6 +60,14 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
       });
     }
   };
+  const handleComUpdate = (updatedData: ExecutiveSummary) => {
+    if (onUpdateData) {
+      // Create a partial update for the parent component
+      onUpdateData({
+        executive_summary: updatedData,
+      });
+    }
+  };
   const handleKeyTechnologyUpdate = (updatedTechData: KeyTechnology) => {
     if (onUpdateData) {
       // Create a partial update for the parent component
