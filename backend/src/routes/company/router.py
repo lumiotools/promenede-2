@@ -262,7 +262,8 @@ async def get_company_data(request: CompanyRequest):
         },
         
         # 31-35. Regulation, Opportunities/Risks, Q&A
-        "regulation": extract_regulation_info(coresignal_data, crunchbase_data),
+        # "regulation": extract_regulation_info(coresignal_data, crunchbase_data),
+        "regulations": llmData["regulations"],
         "opportunities_risks": {
             "opportunities": extract_opportunities(coresignal_data, crunchbase_data),
             "risks": extract_risks(coresignal_data, crunchbase_data)

@@ -57,6 +57,11 @@ def fetch_company_data_parallel(company_name, max_tokens=10000, model="gpt-4o-mi
         "Return detailed company strategy information for the given company as JSON."
     )
     
+    regulations_prompt = (
+        "You are an AI assistant that provides information about companies in JSON format. "
+        "Return key regulatory trends and compliance requirements for the given company as JSON."
+    )
+    
     # Create content for each request with expected output structure
     launch_timeline_content = (
         f"Company Name: {company_name}\nCurrent Date: {current_date}\n"
@@ -128,6 +133,14 @@ def fetch_company_data_parallel(company_name, max_tokens=10000, model="gpt-4o-mi
         "\"keyInitiatives\": [{\"name\": string, \"description\": string, \"expectedOutcome\": string}]}"
     )
     
+    regulations_content = (
+        f"Company Name: {company_name}\nCurrent Date: {current_date}\n"
+        "Please provide key regulatory trends and compliance requirements for the company as JSON. "
+        "Give minumum 7 regulations and compliance requirements. "
+        "Return an array of objects with the following structure: "
+        "[{\"regulation\": string, \"description\": string}]"        
+    )
+    
     # Define tasks for parallel execution
     tasks = [
         (launch_timeline_prompt, launch_timeline_content, max_tokens, model, "launch_timeline"),
@@ -136,7 +149,8 @@ def fetch_company_data_parallel(company_name, max_tokens=10000, model="gpt-4o-mi
         (market_size_prompt, market_size_content, max_tokens, model, "market_size"),
         (value_chain_prompt, value_chain_content, max_tokens, model, "value_chain"),
         (leadership_executives_prompt, leadership_executives_content, max_tokens, model, "leadership_executives"),
-        (company_strategy_prompt, company_strategy_content, max_tokens, model, "company_strategy")
+        (company_strategy_prompt, company_strategy_content, max_tokens, model, "company_strategy"),
+        (regulations_prompt, regulations_content, max_tokens, model, "regulations")
     ]
     
     # Function to be executed in parallel for each task
