@@ -7,6 +7,7 @@ interface ExportOptions {
   title?: string
   author?: string
   subject?: string
+  companyName?: string
   selectedSections?: string[]
 }
 
@@ -158,7 +159,7 @@ export async function exportToPDF(options: ExportOptions = {}) {
     }
 
     // Save the PDF
-    pdf.save(`Promenade-Report-${new Date().toISOString().split("T")[0]}.pdf`)
+    pdf.save(`Promenade-Report-${options.companyName ?? "Company"}-${new Date().toISOString().split("T")[0]}.pdf`)
 
     return true
   } catch (error) {

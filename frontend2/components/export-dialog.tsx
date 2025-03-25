@@ -18,9 +18,10 @@ interface ExportDialogProps {
   isOpen: boolean
   onClose: () => void
   sections: Section[]
+    companyName?: string
 }
 
-export function ExportDialog({ isOpen, onClose, sections }: ExportDialogProps) {
+export function ExportDialog({ isOpen, onClose, sections, companyName }: ExportDialogProps) {
   const [selectedSections, setSelectedSections] = useState<string[]>([])
   const [isExporting, setIsExporting] = useState(false)
 
@@ -55,6 +56,7 @@ export function ExportDialog({ isOpen, onClose, sections }: ExportDialogProps) {
         title: "Promenade Business Report",
         author: "Promenade",
         subject: "Business Intelligence Dashboard",
+        companyName: companyName,
         selectedSections: selectedSections,
       })
 

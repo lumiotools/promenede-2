@@ -82,7 +82,7 @@ const ReportHeader = ({
           </div>
 
           {/* Export PDF Button */}
-          <ExportPdfButton />
+          <ExportPdfButton companyName={initialData?.company_profile?.firmographic?.name ?? undefined} />
 
           {/* Export Excel Button */}
           <button className="flex items-center gap-2 text-sm bg-white border border-[#D0D5DD] px-3 py-1.5 rounded-md hover:bg-gray-100 transition">

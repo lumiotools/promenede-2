@@ -77,7 +77,7 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
   return (
     <div className="flex flex-col w-full">
       <ReportHeader
-        title="Report A"
+        title="Company Report"
         date={new Date()}
         searchCriteria=""
         pagesViewed={10000}
@@ -95,10 +95,12 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
         <CompanyProfile initialData={searchResults?.company_profile} />
       </section>
 
+      <section id="company-overview" className="p-6">
       <CompanyOverview
         initialData={searchResults?.company_overview}
         urls={searchResults?.urls}
       />
+       </section>
 
       <section id="financial-summary" className="p-6">
         <FinancialSummary

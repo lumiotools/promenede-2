@@ -28,8 +28,8 @@ const sectionMapping = [
   { id: "strategy-component", title: "Strategy" },
   { id: "ma-activity-component", title: "M&A Activity" },
   { id: "market-size-component", title: "Market Size" },
-  { id: "value-chain-component", title: "Value Chain" },
-  { id: "market-map-component", title: "Market Map" },
+  // { id: "value-chain-component", title: "Value Chain" },
+  // { id: "market-map-component", title: "Market Map" },
   { id: "competitor-landscape-component", title: "Competitive Landscape" },
   { id: "financial-comparables-component", title: "Financial Comparables" },
   { id: "peer-developments-component", title: "Peer Developments" },
@@ -40,7 +40,7 @@ const sectionMapping = [
   { id: "qa-component", title: "Q&A" },
 ]
 
-export function ExportPdfButton() {
+export function ExportPdfButton({companyName}:{companyName?:string}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   return (
@@ -53,7 +53,7 @@ export function ExportPdfButton() {
         <span className="text-[#344054]">Export</span>
       </button>
 
-      <ExportDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} sections={sectionMapping} />
+      <ExportDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} sections={sectionMapping} companyName={companyName}/>
     </>
   )
 }
