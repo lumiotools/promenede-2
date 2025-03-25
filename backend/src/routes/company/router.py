@@ -18,6 +18,7 @@ from src.utils.llmInfo.product_services import get_product_services
 from src.utils.llm_summary.employee_trend import get_employee_trend_summary
 from src.utils.llmInfo.market_map import get_market_map
 from src.utils.contactout.people import get_people_experience_and_education
+from src.utils.website_screenshot.screenshot import get_website_screenshot
 # Load environment variables from .env file
 load_dotenv()
 
@@ -138,7 +139,8 @@ async def get_company_data(request: CompanyRequest):
             "business_model": coresignal_data.get("is_b2b", 0) == 1 and "B2B" or "B2C",
             "products_brands": crunchbase_data.get("cards", {}).get("fields", {}).get("categories", ""),
             "customers": coresignal_data.get("categories_and_keywords", []) or [],
-            "description_enriched": coresignal_data.get("description_enriched", "")
+            "description_enriched": coresignal_data.get("description_enriched", ""),
+            "website_screenshot": f"data:image/png;base64,{get_website_screenshot(company_url)}"
         },
         
         # 4. Financial Summary
