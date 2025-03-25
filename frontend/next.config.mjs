@@ -1,6 +1,4 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+const nextConfig = {
   reactStrictMode: true, // Enables React Strict Mode
   swcMinify: true, // Use SWC for faster minification
 };

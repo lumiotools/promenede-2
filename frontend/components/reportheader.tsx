@@ -21,6 +21,7 @@ interface ReportHeaderProps {
   pagesViewed?: number;
   manHoursSaved?: number;
   initialData: CompanyData | null | undefined;
+  handleDownloadReportPDF: () => void;
 }
 
 const ReportHeader = ({
@@ -30,6 +31,7 @@ const ReportHeader = ({
   pagesViewed = 10000,
   manHoursSaved = 20,
   initialData,
+  handleDownloadReportPDF,
 }: ReportHeaderProps) => {
   return (
     <div className="pt-4 pb-4 px-6 border-b border-gray-200">
@@ -97,7 +99,7 @@ const ReportHeader = ({
           </div>
 
           {/* Export PDF Button */}
-          <button className="flex items-center gap-2 text-sm bg-white border border-[#D0D5DD] px-3 py-1.5 rounded-md hover:bg-gray-100 transition">
+          <button className="flex items-center gap-2 text-sm bg-white border border-[#D0D5DD] px-3 py-1.5 rounded-md hover:bg-gray-100 transition" onClick={handleDownloadReportPDF}>
             <FileText className="h-4 w-4 text-red-500" />
             <span className="text-[#344054]">Export</span>
           </button>
