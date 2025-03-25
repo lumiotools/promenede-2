@@ -189,6 +189,7 @@ export default function Home() {
       demo_available: null,
       product_reviews: null,
     },
+    urls: null,
   });
 
   const handleSearchResults = (data: CompanyData) => {

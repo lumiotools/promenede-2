@@ -4,6 +4,7 @@ import type {
   TimelineEvent,
   WebTrafficItem,
   ProductsServices,
+  CompanyUrls,
 } from "./company";
 import type { CompetitiveAnalysis } from "./competitor";
 import type { EmployeeReviews } from "./employee_reviews";
@@ -57,6 +58,7 @@ export type CompanyData = {
   strategic_development: StrategicDevelopment | null;
   strategic_alliances: StrategicAlliance[] | null;
   strategy: Strategy | null;
+  urls: CompanyUrls | null;
 };
 
 export type CompanyApiResponse = ApiResponse<CompanyData | null>;
