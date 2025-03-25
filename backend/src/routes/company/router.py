@@ -64,11 +64,12 @@ async def get_company_data(request: CompanyRequest):
     key_members = []
     
     for i, member in enumerate(llmData["leadership_executives"]):
-        experience, education = get_people_experience_and_education(member["name"], member["position"], company_name)
+        linkedin_url, experience, education = get_people_experience_and_education(member["name"], member["position"], company_name)
         key_members.append({
             "member_id": i,
             "member_full_name": member["name"],
             "member_position_title": member["position"],
+            "member_linkedin_url": linkedin_url,
             "member_experience": experience,
             "member_education": education
         })

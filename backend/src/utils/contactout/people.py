@@ -22,18 +22,19 @@ def get_people_experience_and_education(name, position, company):
     try:
         response.raise_for_status()
         data = response.json()
-        profiles = [data["profiles"][key] for key in data["profiles"]]
-        if len(profiles) == 0:
+        matching_profile = None
+        
+        for key, profile in data["profiles"].items():
+            if profile["full_name"] == name:
+                profile["linkedin_url"] = key
+                matching_profile = profile
+                
+        if not matching_profile:
             raise Exception("No profiles found")
         
-        matching_profile = next((profile for profile in profiles if profile["full_name"] == name), None)
-        
-        if not matching_profile:
-            raise Exception("No matching profile found")
-        
-        return matching_profile["experience"], matching_profile["education"]
+        return matching_profile["linkedin_url"], matching_profile["experience"], matching_profile["education"]
         
     except Exception as e:
         print(e)
-        return [], []
+        return None, [], []
         
