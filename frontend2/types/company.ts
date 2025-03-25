@@ -101,6 +101,19 @@ export interface CompanyOverviewItem {
   products_brands: ProductService[] | null;
   customers: string[] | null;
   description_enriched?: string | null;
+  website_screenshot?: string | null;
+}
+
+export interface CompanyUrls {
+  company_url: string | null;
+  image_url: string | null;
+  linkedin_url: string | null;
+  facebook_url: string[] | null;
+  twitter_url: string[] | null;
+  youtube_url: string[] | null;
+  instagram_url: string[] | null;
+  github_url: string[] | null;
+  discord_url: string[] | null;
 }
 
 export interface CompanyProfiles {
@@ -204,16 +217,4 @@ export interface Company {
   company_timeline: TimelineEvent | null;
   web_traffic: WebTrafficItem | null;
   products_services: ProductsServices | null;
-}
-
-export interface CompanyUrls {
-  company_url: string | null;
-  image_url: string | null;
-  linkedin_url: string | null;
-  facebook_url: string[] | null;
-  twitter_url: string[] | null;
-  youtube_url: string[] | null;
-  instagram_url: string[] | null;
-  github_url: string[] | null;
-  discord_url: string[] | null;
 }

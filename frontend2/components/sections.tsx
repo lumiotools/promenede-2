@@ -95,9 +95,10 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
         <CompanyProfile initialData={searchResults?.company_profile} />
       </section>
 
-      <section id="company-overview" className="p-6">
-        <CompanyOverview initialData={searchResults?.company_overview} />
-      </section>
+      <CompanyOverview
+        initialData={searchResults?.company_overview}
+        urls={searchResults?.urls}
+      />
 
       <section id="financial-summary" className="p-6">
         <FinancialSummary
