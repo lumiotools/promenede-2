@@ -1,95 +1,117 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react"
-import type { RegulationItem } from "@/types/regulation"
-import { SectionLayout } from "@/components/ui/section-layout"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
+import type { RegulationItem } from "@/types/regulation";
+import { SectionLayout } from "@/components/ui/section-layout";
 
 type RegulationProps = {
-  initialData?: RegulationItem[]
-}
+  initialData?: RegulationItem[];
+};
 
-const defaultState: RegulationItem[] = []
+const defaultState: RegulationItem[] = [];
 
-export default function RegulationPage({ initialData = defaultState }: RegulationProps) {
-  const [data, setData] = useState<RegulationItem[]>(initialData || defaultState)
-  const [isEditing, setIsEditing] = useState<boolean>(false)
-  const [editData, setEditData] = useState<RegulationItem[]>(initialData || defaultState)
-  const [sourceText, setSourceText] = useState<string>("Source: 1.PromenadeAI, 2.Crunchbase")
+export default function RegulationPage({
+  initialData = defaultState,
+}: RegulationProps) {
+  const [data, setData] = useState<RegulationItem[]>(
+    initialData || defaultState
+  );
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editData, setEditData] = useState<RegulationItem[]>(
+    initialData || defaultState
+  );
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: 1.PromenadeAI, 2.Crunchbase"
+  );
 
   useEffect(() => {
     // Ensure we have valid data with the correct structure
-    const validData = initialData || defaultState
-    setData(validData)
-  }, [initialData])
+    const validData = initialData || defaultState;
+    setData(validData);
+  }, [initialData]);
 
   const startEditing = (): void => {
-    setIsEditing(true)
-    setEditData(JSON.parse(JSON.stringify(data)))
-  }
+    setIsEditing(true);
+    setEditData(JSON.parse(JSON.stringify(data)));
+  };
 
   const cancelEditing = (): void => {
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
   const saveChanges = (): void => {
     // Create UserAttachment entity
     const userAttachment = {
       name: "regulation-component-update.tsx",
       url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/regulation-component-update.tsx",
-    }
+    };
 
-    console.log("Creating UserAttachment:", userAttachment)
+    console.log("Creating UserAttachment:", userAttachment);
 
-    setData(editData)
-    setIsEditing(false)
+    setData(editData);
+    setIsEditing(false);
 
     // Update the source text to include the user
-    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update")
-  }
+    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
+  };
 
-  const updateRegulation = (index: number, field: keyof RegulationItem, value: string): void => {
-    const newData = [...editData]
+  const updateRegulation = (
+    index: number,
+    field: keyof RegulationItem,
+    value: string
+  ): void => {
+    const newData = [...editData];
     if (newData[index]) {
-      newData[index][field] = value
-      setEditData(newData)
+      newData[index][field] = value;
+      setEditData(newData);
     }
-  }
+  };
 
   const addRegulation = (): void => {
-    const newData = [...editData]
+    const newData = [...editData];
     newData.push({
       regulation: "New Regulation",
       description: "Description of the new regulation",
-    })
-    setEditData(newData)
-  }
+    });
+    setEditData(newData);
+  };
 
   const removeRegulation = (index: number): void => {
-    const newData = [...editData]
-    newData.splice(index, 1)
-    setEditData(newData)
-  }
+    const newData = [...editData];
+    newData.splice(index, 1);
+    setEditData(newData);
+  };
 
   // Check if regulation data is empty
-  const isDataEmpty = !data || data.length === 0
+  const isDataEmpty = !data || data.length === 0;
 
   // Limit to top 5 items
-  const limitedData = isEditing ? editData.slice(0, 5) : data.slice(0, 5)
+  const limitedData = isEditing ? editData.slice(0, 5) : data.slice(0, 5);
 
   return (
-    <SectionLayout title="Regulation" source={sourceText}>
+    <SectionLayout title="Regulation" sourceText={sourceText}>
       {!isEditing ? (
-        <Button onClick={startEditing} className="bg-[#156082] hover:bg-[#092a38] text-white">
+        <Button
+          onClick={startEditing}
+          className="bg-[#156082] hover:bg-[#092a38] text-white"
+        >
           <PencilIcon className="mr-2 h-4 w-4" /> Edit
         </Button>
       ) : (
         <div className="flex gap-2">
-          <Button onClick={saveChanges} className="bg-[#156082] hover:bg-[#092a38] text-white">
+          <Button
+            onClick={saveChanges}
+            className="bg-[#156082] hover:bg-[#092a38] text-white"
+          >
             <SaveIcon className="mr-2 h-4 w-4" /> Save
           </Button>
-          <Button onClick={cancelEditing} variant="outline" className="border-[#ced7db] text-[#445963]">
+          <Button
+            onClick={cancelEditing}
+            variant="outline"
+            className="border-[#ced7db] text-[#445963]"
+          >
             <XIcon className="mr-2 h-4 w-4" /> Cancel
           </Button>
         </div>
@@ -98,13 +120,19 @@ export default function RegulationPage({ initialData = defaultState }: Regulatio
       {/* Content area that will grow/shrink as needed */}
       <div className="flex-grow">
         {isDataEmpty && !isEditing ? (
-          <div className="text-center py-12 text-[#57727e] text-lg">No regulation data present</div>
+          <div className="text-center py-12 text-[#57727e] text-lg">
+            No regulation data present
+          </div>
         ) : (
           <div className="border border-[#ced7db] rounded-sm overflow-hidden">
             <div className="flex justify-between items-center p-4 border-b border-[#ced7db]">
               <h2 className="text-[#445963] text-xl font-medium">Regulation</h2>
               {isEditing && (
-                <Button onClick={addRegulation} size="sm" className="bg-[#156082] hover:bg-[#092a38] text-white">
+                <Button
+                  onClick={addRegulation}
+                  size="sm"
+                  className="bg-[#156082] hover:bg-[#092a38] text-white"
+                >
                   <PlusIcon className="mr-2 h-4 w-4" /> Add
                 </Button>
               )}
@@ -118,11 +146,16 @@ export default function RegulationPage({ initialData = defaultState }: Regulatio
             {isEditing ? (
               <>
                 {limitedData.map((item, index) => (
-                  <div key={index} className="grid grid-cols-2 border-t border-[#ced7db]">
+                  <div
+                    key={index}
+                    className="grid grid-cols-2 border-t border-[#ced7db]"
+                  >
                     <div className="p-4 border-r border-[#ced7db] flex items-start">
                       <textarea
                         value={item.regulation || ""}
-                        onChange={(e) => updateRegulation(index, "regulation", e.target.value)}
+                        onChange={(e) =>
+                          updateRegulation(index, "regulation", e.target.value)
+                        }
                         className="w-full border border-[#ced7db] p-2 rounded"
                         rows={3}
                       />
@@ -137,7 +170,9 @@ export default function RegulationPage({ initialData = defaultState }: Regulatio
                     <div className="p-4">
                       <textarea
                         value={item.description || ""}
-                        onChange={(e) => updateRegulation(index, "description", e.target.value)}
+                        onChange={(e) =>
+                          updateRegulation(index, "description", e.target.value)
+                        }
                         className="w-full border border-[#ced7db] p-2 rounded"
                         rows={3}
                       />
@@ -148,7 +183,10 @@ export default function RegulationPage({ initialData = defaultState }: Regulatio
             ) : (
               <>
                 {limitedData.map((item, index) => (
-                  <div key={index} className="grid grid-cols-2 border-t border-[#ced7db]">
+                  <div
+                    key={index}
+                    className="grid grid-cols-2 border-t border-[#ced7db]"
+                  >
                     <div className="p-4 border-r border-[#ced7db]">
                       <p className="text-[#35454c]">{item.regulation || ""}</p>
                     </div>
@@ -164,6 +202,5 @@ export default function RegulationPage({ initialData = defaultState }: Regulatio
         )}
       </div>
     </SectionLayout>
-  )
+  );
 }
-

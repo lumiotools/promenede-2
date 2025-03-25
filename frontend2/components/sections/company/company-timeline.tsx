@@ -1,64 +1,95 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import type { TimelineEvent } from "@/types/company"
-import { SectionLayout } from "@/components/ui/section-layout"
+import { useState, useEffect } from "react";
+import type { TimelineEvent } from "@/types/company";
+import { SectionLayout } from "@/components/ui/section-layout";
 
 type CompanyTimelineProps = {
-  initialData?: TimelineEvent | TimelineEvent[] | null
-}
+  initialData?: TimelineEvent | TimelineEvent[] | null;
+};
 
 export function CompanyTimeline({ initialData }: CompanyTimelineProps) {
   // More robust conversion that handles null values
   const getInitialDataArray = () => {
-    if (!initialData) return []
-    if (Array.isArray(initialData)) return initialData
+    if (!initialData) return [];
+    if (Array.isArray(initialData)) return initialData;
     // Handle the case where initialData is an object but might be empty
     if (typeof initialData === "object") {
       // Check if the object has the required properties
-      if ("date" in initialData && "description" in initialData) {
-        return [initialData]
+      if (
+        "date" in initialData &&
+        ("description" in initialData || "event" in initialData)
+      ) {
+        return [initialData];
       }
     }
-    console.log("Couldn't convert initialData to array, using empty array")
-    return []
-  }
+    console.log("Couldn't convert initialData to array, using empty array");
+    return [];
+  };
 
-  const [data, setData] = useState<TimelineEvent[]>(getInitialDataArray())
-  const [sourceText, setSourceText] = useState<string>("Source: 1.PromenadeAI, 2.Crunchbase")
+  const [data, setData] = useState<TimelineEvent[]>(getInitialDataArray());
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: 1.PromenadeAI, 2.Crunchbase"
+  );
 
   // Update data when initialData changes
   useEffect(() => {
-    const newDataArray = getInitialDataArray()
-    console.log("useEffect updating data:", newDataArray)
-    setData(newDataArray)
-  }, [initialData])
+    const newDataArray = getInitialDataArray();
+    console.log("useEffect updating data:", newDataArray);
+    setData(newDataArray);
+  }, [initialData]);
 
   // Format date from YYYY-MM-DD to YYYY.MM.DD
   const formatDate = (dateString: string) => {
-    if (!dateString) return "N/A"
-    return dateString.replace(/-/g, ".")
-  }
+    if (!dateString) return "N/A";
+    return dateString.replace(/-/g, ".");
+  };
 
-  // Sort events by date (newest first) and limit to 5
+  // Helper function to check if a string is empty or null
+  const isValidString = (str: string | null | undefined): boolean => {
+    return str !== null && str !== undefined && str.trim() !== "";
+  };
+
+  // Helper function to determine display text from event or description
+  const getDisplayText = (event: TimelineEvent): string => {
+    return event.event || event.description || "N/A";
+  };
+
+  // Filter events where date AND (event OR description) are not null/empty
+  // Sort by date (newest first) and limit to 5
   const sortedEvents = [...data]
-    .filter((event) => event.date)
-    .sort((a, b) => {
-      if (!a.date || !b.date) return 0
-      return new Date(b.date).getTime() - new Date(a.date).getTime()
+    .filter((event) => {
+      return (
+        isValidString(event.date) &&
+        (isValidString(event.event) || isValidString(event.description))
+      );
     })
-    .slice(0, 5)
+    .sort((a, b) => {
+      if (!a.date || !b.date) return 0;
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    })
+    .slice(0, 5);
 
   if (sortedEvents.length === 0) {
     return (
-      <SectionLayout title="Company Timeline" sourceText={sourceText} initialData={initialData}>
-        <div className="p-6 text-center text-[#8097a2]">No timeline data available</div>
+      <SectionLayout
+        title="Company Timeline"
+        sourceText={sourceText}
+        initialData={initialData}
+      >
+        <div className="p-6 text-center text-[#8097a2]">
+          No timeline data available
+        </div>
       </SectionLayout>
-    )
+    );
   }
 
   return (
-    <SectionLayout title="Company Timeline" sourceText={sourceText} initialData={initialData}>
+    <SectionLayout
+      title="Company Timeline"
+      sourceText={sourceText}
+      initialData={initialData}
+    >
       {/* Timeline */}
       <div className="relative py-16 px-4 h-[220px]">
         {/* Horizontal line */}
@@ -86,13 +117,12 @@ export function CompanyTimeline({ initialData }: CompanyTimelineProps) {
 
               {/* Event */}
               <div className="absolute top-[20px] text-xs text-[#4b5563] text-center max-w-[250px]">
-                {event.event || event.description || "N/A"}
+                {getDisplayText(event)}
               </div>
             </div>
           ))}
         </div>
       </div>
     </SectionLayout>
-  )
+  );
 }
-
