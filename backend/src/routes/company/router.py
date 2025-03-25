@@ -57,6 +57,7 @@ async def get_company_data(request: CompanyRequest):
     print("enrichment id",company_enrichment_id)
     coresignal_data = get_company_details(company_enrichment_id)
     coresignal_data=convert_null_to_none(coresignal_data)
+    
     llmData =  fetch_company_data(company_name, 10000, "gpt-4o-mini")
     
     key_members = []
@@ -277,7 +278,7 @@ async def get_company_data(request: CompanyRequest):
         # URLs for the frontend
         "urls": {
             "company_url": coresignal_data.get("website", ""),
-            "image_url": crunchbase_data.get("image_url", ""),
+            "image_url": crunchbase_data.get("cards", {}).get("fields", {}).get("image_url", ""),
             "linkedin_url": coresignal_data.get("professional_network_url", ""),
             "facebook_url": coresignal_data.get("facebook_url", []),
             "twitter_url": coresignal_data.get("twitter_url", ""),
