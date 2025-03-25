@@ -210,11 +210,11 @@ const ReportHeader = ({
           </div>
 
           {/* Search Criteria */}
-          {searchCriteria && (
+          {initialData?.company_profile.firmographic?.name && (
             <div className="flex items-center gap-2 text-sm">
               <span className="text-gray-500">Search Criteria:</span>
               <span className="bg-gray-100 px-3 py-0.5 rounded-full font-medium text-gray-700">
-                {searchCriteria}
+                {initialData?.company_profile.firmographic?.name}
               </span>
             </div>
           )}

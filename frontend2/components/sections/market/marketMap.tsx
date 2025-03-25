@@ -77,8 +77,8 @@ export default function MarketMapPage({
     segments_new: [],
   };
 
-  // Get segments from the new structure
-  const segments = marketMap.segments_new || [];
+  // Get segments from the structure - CHANGED FROM segments_new TO segments
+  const segments = marketMap.segments || [];
 
   // Limit to top 4 segments for display
   const topSegments = segments.slice(0, 4);

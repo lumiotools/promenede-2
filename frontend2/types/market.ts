@@ -6,7 +6,7 @@ export interface MarketSegment {
 
 export interface MarketMap {
   industry?: string | null;
-  segments?: string[] | null;
+  segments?: MarketSegment[] | null;
   related_industries?: string[] | null;
   // New structure
   segments_new?: MarketSegment[];

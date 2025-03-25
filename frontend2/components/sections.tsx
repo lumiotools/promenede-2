@@ -76,8 +76,8 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
     <div className="flex flex-col w-full">
       <ReportHeader
         title="Report A"
-        date={new Date("2024-05-20")}
-        searchCriteria="www.paypal.com"
+        date={new Date()}
+        searchCriteria=""
         pagesViewed={10000}
         manHoursSaved={20}
         initialData={searchResults}

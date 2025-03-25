@@ -422,47 +422,68 @@ function ViewValueChain({ data }: ViewValueChainProps) {
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
-        {data.stages && data.stages.length > 0 ? (
-          <div className="flex flex-wrap gap-4 justify-center">
+      {data.stages && data.stages.length > 0 ? (
+        <div className="overflow-x-auto pb-4">
+          <div className="flex flex-nowrap gap-2 min-w-full">
             {data.stages.map((stage, index) => (
-              <div key={index} className="w-full max-w-xs">
-                <div className="bg-[#002169] text-white p-4 rounded-t-md">
-                  <h3 className="font-medium text-center">{stage.stage}</h3>
+              <div key={index} className="w-[200px] flex-shrink-0 relative">
+                <div className="bg-[#002169] text-white p-2 rounded-t-md flex items-center justify-center relative">
+                  <h3 className="font-medium text-center text-sm">
+                    {stage.stage}
+                  </h3>
+                  {index < data.stages!.length - 1 && (
+                    <div className="absolute -right-2 top-0 bottom-0 w-4 overflow-hidden">
+                      <div className="h-full w-4 bg-[#002169] transform rotate-45 origin-top-left"></div>
+                    </div>
+                  )}
                 </div>
-                <div className="bg-[#eff2f3] p-4 rounded-b-md">
-                  <ul className="space-y-2 mb-4">
-                    {stage.activities.map((activity, actIndex) => (
+                <div className="bg-[#eff2f3] p-3 rounded-b-md h-[200px] overflow-y-auto">
+                  <ul className="space-y-1 mb-3">
+                    {stage.activities.slice(0, 4).map((activity, actIndex) => (
                       <li key={actIndex} className="flex items-start">
-                        <span className="text-[#17b26a] mr-2 mt-1">•</span>
-                        <span className="text-[#35454c] text-sm">
+                        <span className="text-[#17b26a] mr-1 mt-0.5 flex-shrink-0">
+                          •
+                        </span>
+                        <span className="text-[#35454c] text-xs">
                           {activity}
                         </span>
                       </li>
                     ))}
+                    {stage.activities.length > 4 && (
+                      <li className="text-xs text-[#57727e] italic">
+                        +{stage.activities.length - 4} more activities
+                      </li>
+                    )}
                   </ul>
 
                   {stage.companyLogos && stage.companyLogos.length > 0 && (
-                    <div className="border-t pt-3 mt-3">
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        {stage.companyLogos.map((logo, logoIndex) => (
-                          <div key={logoIndex} className="w-8 h-8 relative">
-                            <Image
-                              src={
-                                logo || "/placeholder.svg?height=32&width=32"
-                              }
-                              alt="Company logo"
-                              width={32}
-                              height={32}
-                              className="object-contain"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src =
-                                  "/placeholder.svg?height=32&width=32";
-                              }}
-                            />
+                    <div className="border-t pt-2 mt-2">
+                      <div className="flex flex-wrap gap-1 justify-center">
+                        {stage.companyLogos
+                          .slice(0, 6)
+                          .map((logo, logoIndex) => (
+                            <div key={logoIndex} className="w-6 h-6 relative">
+                              <Image
+                                src={
+                                  logo || "/placeholder.svg?height=24&width=24"
+                                }
+                                alt="Company logo"
+                                width={24}
+                                height={24}
+                                className="object-contain"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src =
+                                    "/placeholder.svg?height=24&width=24";
+                                }}
+                              />
+                            </div>
+                          ))}
+                        {stage.companyLogos.length > 6 && (
+                          <div className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-[10px] text-gray-500">
+                            +{stage.companyLogos.length - 6}
                           </div>
-                        ))}
+                        )}
                       </div>
                     </div>
                   )}
@@ -470,12 +491,12 @@ function ViewValueChain({ data }: ViewValueChainProps) {
               </div>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-8 text-[#57727e]">
-            No value chain stages available
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="text-center py-8 text-[#57727e]">
+          No value chain stages available
+        </div>
+      )}
     </div>
   );
 }
