@@ -60,6 +60,7 @@ export interface KeyMember {
   member_position_title: string | null;
   member_experience?: string[] | null;
   member_education?: string[] | null;
+  member_linkedin_url?: string | null;
 }
 
 export interface EmployeeReviewsData {
