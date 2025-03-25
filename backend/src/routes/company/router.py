@@ -56,7 +56,11 @@ async def get_company_data(request: CompanyRequest):
     
     company_enrichment_id = get_company_id(company_url)
     print("enrichment id",company_enrichment_id)
+    if not company_enrichment_id:
+        return {"success":False,"message":"Company not found"}
     coresignal_data = get_company_details(company_enrichment_id)
+    if not coresignal_data:
+        return {"success":False,"message":"Company not found"}
     coresignal_data=convert_null_to_none(coresignal_data)
     
     llmData =  fetch_company_data(company_name, 10000, "gpt-4o-mini")
