@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Search, Plus, Loader2 } from "lucide-react"
-import type { CompanyData } from "@/types/apiResponse"
+import { useState } from "react";
+import { Search, Plus, Loader2 } from "lucide-react";
+import type { CompanyData } from "@/types/apiResponse";
 
 // Define the structure for our section categories
 interface SectionCategory {
-  title: string
+  title: string;
   sections: {
-    id: string
-    label: string
-  }[]
+    id: string;
+    label: string;
+  }[];
 }
 
 export function Sidebar({
   onSearchResults,
 }: {
-  onSearchResults?: (data: CompanyData) => void
+  onSearchResults?: (data: CompanyData) => void;
 }) {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({
     "Executive & Company": true,
@@ -29,10 +29,10 @@ export function Sidebar({
     "Competitive Landscape": false,
     "M&A & Partnerships": false,
     "Risks & Opportunities": false,
-  })
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isSearching, setIsSearching] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Define all sections based on your sections.tsx file
   const sectionCategories: SectionCategory[] = [
@@ -120,59 +120,71 @@ export function Sidebar({
         { id: "qa-component", label: "Q&A" },
       ],
     },
-  ]
+  ];
 
   const toggleItem = (item: string) => {
     setExpandedItems((prev) => ({
       ...prev,
       [item]: !prev[item],
-    }))
-  }
+    }));
+  };
 
   // Function to handle search
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) {
-      e.preventDefault()
+      e.preventDefault();
     }
 
-    if (!searchQuery.trim()) return
+    if (!searchQuery.trim()) return;
 
-    setIsSearching(true)
-    setError(null)
+    setIsSearching(true);
+    setError(null);
 
     try {
-      const response = await fetch("https://promenede-2.onrender.com/company/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ company_name: searchQuery }),
-      })
+      const response = await fetch(
+        "https://promenede-2.onrender.com/company/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_name: searchQuery }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`)
+        throw new Error(`Error: ${response.status}`);
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
+      if (!data.success) {
+        throw new Error(` ${data.message}`);
+      }
       // Pass the data to the parent component
       if (onSearchResults) {
-        console.log("add to search results", data.data)
-        onSearchResults(data.data)
+        console.log("add to search results", data.data);
+        onSearchResults(data.data);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      console.error("Search error:", err)
+      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Search error:", err);
     } finally {
-      setIsSearching(false)
+      setIsSearching(false);
     }
-  }
+  };
 
   return (
     <div className="w-70 bg-[#000000] text-white overflow-y-auto h-screen flex-shrink-0 sidebar">
       {/* Header */}
       <div className="p-4 flex items-center gap-2">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <path
             d="M12 2L2 7L12 12L22 7L12 2Z"
             stroke="white"
@@ -180,11 +192,25 @@ export function Sidebar({
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M2 17L12 22L22 17"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M2 12L12 17L22 12"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
         <span className="font-semibold text-lg tracking-wide">PROMENADE</span>
-        <span className="text-xs bg-[#333] px-1.5 border py-0.5 rounded text-[#aaa]">BETA</span>
+        <span className="text-xs bg-[#333] px-1.5 border py-0.5 rounded text-[#aaa]">
+          BETA
+        </span>
       </div>
 
       {/* New Button */}
@@ -254,7 +280,11 @@ export function Sidebar({
               {expandedItems[category.title] && (
                 <div className="ml-6 space-y-1 mt-1">
                   {category.sections.map((section) => (
-                    <SidebarLink key={section.id} href={`#${section.id}`} label={section.label} />
+                    <SidebarLink
+                      key={section.id}
+                      href={`#${section.id}`}
+                      label={section.label}
+                    />
                   ))}
                 </div>
               )}
@@ -274,27 +304,27 @@ export function Sidebar({
         }
       `}</style>
     </div>
-  )
+  );
 }
 
 interface SidebarLinkProps {
-  href: string
-  label: string
-  active?: boolean
+  href: string;
+  label: string;
+  active?: boolean;
 }
 
 function SidebarLink({ href, label, active = false }: SidebarLinkProps) {
   // Extract the ID from the href
-  const id = href.replace("#", "")
+  const id = href.replace("#", "");
 
   // Function to handle smooth scrolling
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault()
-    const element = document.getElementById(id)
+    e.preventDefault();
+    const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
+      element.scrollIntoView({ behavior: "smooth" });
     }
-  }
+  };
 
   return (
     <a
@@ -306,6 +336,5 @@ function SidebarLink({ href, label, active = false }: SidebarLinkProps) {
     >
       {label}
     </a>
-  )
+  );
 }
-
