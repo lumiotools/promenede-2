@@ -24,11 +24,23 @@ export function EmployeeKeyMembers({
     }
   }, [initialData]);
 
+  // Helper function to check if a string is valid and not empty
+  const isValidString = (str: string | null | undefined): boolean => {
+    return str !== null && str !== undefined && str.trim() !== "";
+  };
+
   // Ensure members is always an array
   const safeMembers = Array.isArray(members) ? members : [];
 
+  // Filter members with valid data (name and position title)
+  const validMembers = safeMembers.filter(
+    (member) =>
+      isValidString(member.member_full_name) &&
+      isValidString(member.member_position_title)
+  );
+
   // Limit to top 9 members for display
-  const displayMembers = safeMembers.slice(0, 9);
+  const displayMembers = validMembers.slice(0, 9);
 
   return (
     <SectionLayout title="Organization: Key Members">
@@ -79,10 +91,18 @@ export function EmployeeKeyMembers({
                   </p>
                 )}
 
-              {/* LinkedIn Icon */}
-              <div className="absolute top-5 right-5 border border-[#e5e7eb] rounded-md p-2 bg-white">
-                <Linkedin size={20} className="text-[#57727e]" />
-              </div>
+              {/* LinkedIn Icon - Only show if URL exists */}
+              {isValidString(member.member_linkedin_url) && (
+                <a
+                  href={member.member_linkedin_url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute top-5 right-5 border border-[#e5e7eb] rounded-md p-2 bg-white hover:bg-gray-100 transition-colors"
+                  aria-label={`LinkedIn profile for ${member.member_full_name}`}
+                >
+                  <Linkedin size={20} className="text-[#0A66C2]" />
+                </a>
+              )}
             </div>
           ))
         ) : (
@@ -108,9 +128,9 @@ export function EmployeeKeyMembers({
       </div>
 
       {/* Show total count if more than 9 members */}
-      {safeMembers.length > 9 && (
+      {validMembers.length > 9 && (
         <p className="text-sm text-[#57727e] mt-4">
-          Showing 9 of {safeMembers.length} key members
+          Showing 9 of {validMembers.length} key members
         </p>
       )}
     </SectionLayout>
