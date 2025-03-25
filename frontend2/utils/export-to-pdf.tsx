@@ -7,6 +7,7 @@ interface ExportOptions {
   title?: string
   author?: string
   subject?: string
+  selectedSections?: string[]
 }
 
 export async function exportToPDF(options: ExportOptions = {}) {
@@ -23,8 +24,13 @@ export async function exportToPDF(options: ExportOptions = {}) {
     if (options.author) pdf.setProperties({ author: options.author })
     if (options.subject) pdf.setProperties({ subject: options.subject })
 
-    // Get all sections
-    const sections = document.querySelectorAll("section[id]")
+    // Get all sections or only selected sections
+    const allSections = document.querySelectorAll("section[id]")
+    const sections = options.selectedSections
+      ? Array.from(allSections).filter((section) =>
+          options.selectedSections?.includes(section.getAttribute("id") || ""),
+        )
+      : allSections
 
     // PDF dimensions
     const pageWidth = pdf.internal.pageSize.getWidth()
@@ -60,7 +66,8 @@ export async function exportToPDF(options: ExportOptions = {}) {
 
         // Get section title for header
         const sectionId = section.getAttribute("id") || ""
-        const sectionTitle = section.querySelector("h2")?.textContent || sectionId
+        const sectionTitle =
+          section.querySelector("h2")?.textContent || section.querySelector("h1")?.textContent || sectionId
 
         // Store original section styles
         const originalWidth = (section as HTMLElement).style.width

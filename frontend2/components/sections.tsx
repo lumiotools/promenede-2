@@ -43,8 +43,6 @@ import type { ExecutiveSummary } from "@/types/executive";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
-import generatePDF, { Margin } from "react-to-pdf";
-import { useRef } from "react";
 
 type SectionsProps = {
   searchResults?: CompanyData | null;
@@ -75,18 +73,7 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
       });
     }
   };
-  const handleDownloadReportPDF = async () => {
-    reportRef.current &&
-      generatePDF(reportRef, {
-        filename: "report-a.pdf",
-        page: {
-          orientation: "landscape",
-          margin: Margin.MEDIUM,
-        },
-      });
-  };
 
-  const reportRef = useRef<HTMLDivElement>(null);
   return (
     <div className="flex flex-col w-full">
       <ReportHeader
@@ -96,178 +83,169 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
         pagesViewed={10000}
         manHoursSaved={20}
         initialData={searchResults}
-        handleDownloadReportPDF={handleDownloadReportPDF}
       />
-      <div ref={reportRef}>
-        <section id="executive-summary" className="p-6">
-          <ExecutiveSummaryPage
-            initialData={searchResults?.executive_summary}
-            onDataUpdate={handleExecutiveSummaryUpdate}
-          />
-        </section>
+      <section id="executive-summary" className="p-6">
+        <ExecutiveSummaryPage
+          initialData={searchResults?.executive_summary}
+          onDataUpdate={handleExecutiveSummaryUpdate}
+        />
+      </section>
 
-        <section id="company-profile" className="p-6">
-          <CompanyProfile initialData={searchResults?.company_profile} />
-        </section>
+      <section id="company-profile" className="p-6">
+        <CompanyProfile initialData={searchResults?.company_profile} />
+      </section>
 
-        <section id="company-overview" className="p-6">
-          <CompanyOverview initialData={searchResults?.company_overview} />
-        </section>
+      <section id="company-overview" className="p-6">
+        <CompanyOverview initialData={searchResults?.company_overview} />
+      </section>
 
-        <section id="financial-summary" className="p-6">
-          <FinancialSummary
-            initialData={searchResults?.company_profile?.key_financials}
-          />
-        </section>
-        <section id="financial-detail" className="p-6">
-          <FinancialSummaryDetail
-            initialData={searchResults?.company_profile?.key_financials}
-          />
-        </section>
+      <section id="financial-summary" className="p-6">
+        <FinancialSummary
+          initialData={searchResults?.company_profile?.key_financials}
+        />
+      </section>
+      <section id="financial-detail" className="p-6">
+        <FinancialSummaryDetail
+          initialData={searchResults?.company_profile?.key_financials}
+        />
+      </section>
 
-        <section id="web-traffic" className="p-6">
-          <WebTraffic initialData={searchResults?.web_traffic} />
-        </section>
-        <section id="group-structure" className="hidden p-6">
-          <GroupStructure />
-        </section>
-        <section id="company-timeline" className="p-6">
-          <CompanyTimeline initialData={searchResults?.company_timeline} />
-        </section>
-        <section id="company-timeline-table" className="p-6">
-          <CompanyTimelineTable initialData={searchResults?.company_timeline} />
-        </section>
-        <section id="product-services" className="p-6">
-          <ProductsServices
-            initialData={searchResults?.products_services.services}
-          />
-        </section>
-        {/* <section id="product-launch-timeline" className="p-6">
+      <section id="web-traffic" className="p-6">
+        <WebTraffic initialData={searchResults?.web_traffic} />
+      </section>
+      <section id="group-structure" className="hidden p-6">
+        <GroupStructure />
+      </section>
+      <section id="company-timeline" className="p-6">
+        <CompanyTimeline initialData={searchResults?.company_timeline} />
+      </section>
+      <section id="company-timeline-table" className="p-6">
+        <CompanyTimelineTable initialData={searchResults?.company_timeline} />
+      </section>
+      <section id="product-services" className="p-6">
+        <ProductsServices
+          initialData={searchResults?.products_services.services}
+        />
+      </section>
+      {/* <section id="product-launch-timeline" className="p-6">
         <ProductLaunchesTimeline />
       </section> */}
-        <section id="product-timeline-table" className="p-6">
-          <ProductTimelineTable
-            initialData={searchResults?.products_services.launch_timeline}
-          />
-        </section>
-        <EmployeeBreakdown
+      <section id="product-timeline-table" className="p-6">
+        <ProductTimelineTable
+          initialData={searchResults?.products_services.launch_timeline}
+        />
+      </section>
+      <EmployeeBreakdown
+        initialData={searchResults?.organization.employees_trend}
+      />
+      <section id="employee-trend-chart" className="p-6">
+        <EmployeeTrendChart
           initialData={searchResults?.organization.employees_trend}
         />
-        <section id="employee-trend-chart" className="p-6">
-          <EmployeeTrendChart
-            initialData={searchResults?.organization.employees_trend}
-          />
-        </section>
-        <section id="employee-keymembers" className="p-6">
-          <EmployeeKeyMembers
-            initialData={searchResults?.organization.key_members}
-          />
-        </section>
-        <section id="employee-leadership" className="p-6">
-          <LeadershipExecutivesPage
-            initialData={searchResults?.organization.leadership_executives}
-          />
-        </section>
-        <section id="employee-review" className="p-6">
-          <EmployeeReviewsPage
-            initialData={searchResults?.organization.employee_reviews2}
-          />
-        </section>
-        <section id="employee-review-distribution" className="p-6">
-          <EmployeeReviewDistribution
-            initialData={searchResults?.organization.employee_reviews2}
-          />
-        </section>
-        <section id="employee-improvement-areas" className="p-6">
-          <EmployeeImprovementAreas
-            initialData={searchResults?.organization.employee_reviews2}
-          />
-        </section>
-        {/* <section id="employee-review-improve" className="p-6">
+      </section>
+      <section id="employee-keymembers" className="p-6">
+        <EmployeeKeyMembers
+          initialData={searchResults?.organization.key_members}
+        />
+      </section>
+      <section id="employee-leadership" className="p-6">
+        <LeadershipExecutivesPage
+          initialData={searchResults?.organization.leadership_executives}
+        />
+      </section>
+      <section id="employee-review" className="p-6">
+        <EmployeeReviewsPage
+          initialData={searchResults?.organization.employee_reviews2}
+        />
+      </section>
+      <section id="employee-review-distribution" className="p-6">
+        <EmployeeReviewDistribution
+          initialData={searchResults?.organization.employee_reviews2}
+        />
+      </section>
+      <section id="employee-improvement-areas" className="p-6">
+        <EmployeeImprovementAreas
+          initialData={searchResults?.organization.employee_reviews2}
+        />
+      </section>
+      {/* <section id="employee-review-improve" className="p-6">
         <EmployeeReviewImprovements />
       </section>
       <section id="employee-review-table" className="p-6">
         <EmployeeReviewsTable />
       </section> */}
 
-        <section id="strategic-development-component" className="p-6">
-          <StrategicDevelopmentTimeline
-            initialData={searchResults?.strategic_development}
-          />
-        </section>
-        <section id="strategic-partnership-component" className="p-6">
-          <StrategicPartnership
-            initialData={searchResults?.strategic_alliances}
-          />
-        </section>
-        <section id="market-leadership-component" className="p-6">
-          <MarketLeadershipPage
-            initialData={searchResults?.market_leadership}
-          />{" "}
-        </section>
-        <section id="technology-component" className="p-6">
-          <KeyTechnologyPage initialData={searchResults?.key_technology} />{" "}
-        </section>
-        <section id="strategy-component" className="p-6">
-          <StrategyPage initialData={searchResults?.strategy} />
-        </section>
-        <section id="customer-success-component" className="hidden p-6">
-          <CustomerSuccessPage />
-        </section>
-        {/* <section id="ma-map-component" className="p-6">
+      <section id="strategic-development-component" className="p-6">
+        <StrategicDevelopmentTimeline
+          initialData={searchResults?.strategic_development}
+        />
+      </section>
+      <section id="strategic-partnership-component" className="p-6">
+        <StrategicPartnership
+          initialData={searchResults?.strategic_alliances}
+        />
+      </section>
+      <section id="market-leadership-component" className="p-6">
+        <MarketLeadershipPage initialData={searchResults?.market_leadership} />{" "}
+      </section>
+      <section id="technology-component" className="p-6">
+        <KeyTechnologyPage initialData={searchResults?.key_technology} />{" "}
+      </section>
+      <section id="strategy-component" className="p-6">
+        <StrategyPage initialData={searchResults?.strategy} />
+      </section>
+      <section id="customer-success-component" className="hidden p-6">
+        <CustomerSuccessPage />
+      </section>
+      {/* <section id="ma-map-component" className="p-6">
         <MAMapPage />
       </section> */}
-        <section id="ma-activity-component" className="p-6">
-          <MAStrategyPage initialData={searchResults?.ma_activity} />{" "}
-        </section>
-        <section id="market-size-component" className="p-6">
-          <MarketSizePage initialData={searchResults?.market_info.size} />
-        </section>
-        <section id="value-chain-component" className="p-6">
-          <ValueChainPage
-            initialData={searchResults?.market_info.value_chain}
-          />
-        </section>
-        <section id="market-map-component" className="p-6">
-          <MarketMapPage initialData={searchResults?.market_info} />{" "}
-        </section>
-        <section id="competitor-landscape-component" className="p-6">
-          <CompetitiveLandscapePage
-            initialData={searchResults?.competitive_analysis}
-          />
-        </section>
-        <section id="financial-comparables-component" className="p-6">
-          <FinancialComparablesPage
-            initialData={
-              searchResults?.competitive_analysis.financial_comparables
-            }
-          />
-        </section>
-        <section id="peer-developments-component" className="p-6">
-          <PeerDevelopmentsPage
-            initialData={searchResults?.competitive_analysis}
-          />
-        </section>
-        <section id="competitor-analysis-component" className="p-6">
-          <CompetitorAnalysisPage
-            initialData={
-              searchResults?.competitive_analysis.competitive_analysis
-            }
-          />
-        </section>
-        <section id="regulation-component" className="p-6">
-          <RegulationPage initialData={searchResults?.regulations} />{" "}
-        </section>
-        <section id="opportunities-component" className="p-6">
-          <OpportunitiesPage initialData={searchResults?.opportunities_risks} />{" "}
-        </section>
-        <section id="risks-component" className="p-6">
-          <RisksPage initialData={searchResults?.opportunities_risks} />{" "}
-        </section>
-        <section id="qa-component" className="p-6">
-          <QAComponent initialData={searchResults?.qa} />
-        </section>
-      </div>
+      <section id="ma-activity-component" className="p-6">
+        <MAStrategyPage initialData={searchResults?.ma_activity} />{" "}
+      </section>
+      <section id="market-size-component" className="p-6">
+        <MarketSizePage initialData={searchResults?.market_info.size} />
+      </section>
+      <section id="value-chain-component" className="p-6">
+        <ValueChainPage initialData={searchResults?.market_info.value_chain} />
+      </section>
+      <section id="market-map-component" className="p-6">
+        <MarketMapPage initialData={searchResults?.market_info} />{" "}
+      </section>
+      <section id="competitor-landscape-component" className="p-6">
+        <CompetitiveLandscapePage
+          initialData={searchResults?.competitive_analysis}
+        />
+      </section>
+      <section id="financial-comparables-component" className="p-6">
+        <FinancialComparablesPage
+          initialData={
+            searchResults?.competitive_analysis.financial_comparables
+          }
+        />
+      </section>
+      <section id="peer-developments-component" className="p-6">
+        <PeerDevelopmentsPage
+          initialData={searchResults?.competitive_analysis}
+        />
+      </section>
+      <section id="competitor-analysis-component" className="p-6">
+        <CompetitorAnalysisPage
+          initialData={searchResults?.competitive_analysis.competitive_analysis}
+        />
+      </section>
+      <section id="regulation-component" className="p-6">
+        <RegulationPage initialData={searchResults?.regulations} />{" "}
+      </section>
+      <section id="opportunities-component" className="p-6">
+        <OpportunitiesPage initialData={searchResults?.opportunities_risks} />{" "}
+      </section>
+      <section id="risks-component" className="p-6">
+        <RisksPage initialData={searchResults?.opportunities_risks} />{" "}
+      </section>
+      <section id="qa-component" className="p-6">
+        <QAComponent initialData={searchResults?.qa} />
+      </section>
     </div>
   );
 }
