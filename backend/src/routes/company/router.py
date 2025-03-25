@@ -293,7 +293,7 @@ async def get_company_data(request: CompanyRequest):
     response_data["organization"]["employee_reviews2"]["reviews_summary"] = employeeReviewsSummary
     
     competitiveAnalysis = get_competitive_analysis(company_name, response_data["competitive_analysis"])
-    response_data["competitive_analysis2"] = competitiveAnalysis
+    response_data["competitive_analysis"]["competitive_analysis"] = competitiveAnalysis
     
     opportunityAreas = get_opportunity_areas(company_name, response_data["executive_summary"]["topic_tags"])
     response_data["opportunities_risks"]["opportunities"] = opportunityAreas
