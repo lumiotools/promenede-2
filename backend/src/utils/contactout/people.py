@@ -31,15 +31,9 @@ def get_people_experience_and_education(name, position, company):
         if not matching_profile:
             raise Exception("No matching profile found")
         
-        return {
-            "experience": matching_profile["experience"],
-            "education": matching_profile["education"]
-        }
+        return matching_profile["experience"], matching_profile["education"]
         
     except Exception as e:
         print(e)
-        return {
-            "experience":[],
-            "education":[]
-        }
+        return [], []
         
