@@ -1,77 +1,77 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
-import QAComponent from "./sections/qa/qa-component"
-import OpportunitiesPage from "./sections/opportunities-risks/opportunities"
-import RisksPage from "./sections/opportunities-risks/risks"
-import RegulationPage from "./sections/regulation/regulation"
-import CompetitorAnalysisPage from "./sections/competitor/competitorAnalysis"
-import PeerDevelopmentsPage from "./sections/competitor/peerDevelopments"
-import FinancialComparablesPage from "./sections/competitor/financialComparables"
-import CompetitiveLandscapePage from "./sections/competitor/landscape"
-import MarketMapPage from "./sections/market/marketMap"
-import ValueChainPage from "./sections/market/valueChain"
-import MarketSizePage from "./sections/market/marketSize"
-import MAStrategyPage from "./sections/maActivity/maActivity"
-import CustomerSuccessPage from "./sections/customer-success/customerSuccess"
-import StrategyPage from "./sections/strategy/strategy"
-import StrategicDevelopmentTimeline from "./sections/strategy/strategicDevelopment"
-import KeyTechnologyPage from "./sections/technology/technology"
-import MarketLeadershipPage from "./sections/market-leadership/marketLeadership"
-import ReportHeader from "./reportheader"
-import { FinancialSummary } from "./sections/financial/financial-summary"
-import WebTraffic from "./sections/webtraffic/web-traffic"
-import { CompanyTimeline } from "./sections/company/company-timeline"
-import { CompanyTimelineTable } from "./sections/company/company-timeline-table"
-import ProductsServices from "./sections/product/product-services"
-import ProductTimelineTable from "./sections/product/product-timeline-table"
-import EmployeeBreakdown from "./sections/employee/employee-breakdown"
-import { ExecutiveSummaryPage } from "./sections/executive/executive-summary"
-import { EmployeeTrendChart } from "./sections/employee/employee-trend-chart"
-import { EmployeeKeyMembers } from "./sections/employee/employee-keymember"
-import EmployeeReviewsPage from "./sections/employee/employee-review"
-import EmployeeReviewDistribution from "./sections/employee/employee-review-distribution"
-import EmployeeImprovementAreas from "./sections/employee/employee-improvement-areas"
-import GroupStructure from "./sections/group/groupstructure"
-import type { CompanyData } from "@/types/apiResponse"
-import CompanyOverview from "./sections/company/company-overview"
-import CompanyProfile from "./sections/company/company-profile"
-import { FinancialSummaryDetail } from "./sections/financial/financial-details"
-import { LeadershipExecutivesPage } from "./sections/employee/employee-leadership"
-import StrategicPartnership from "./sections/strategic-partnership/strategicPartnership"
-import type { KeyTechnology } from "@/types/technology"
-import type { ExecutiveSummary } from "@/types/executive"
+"use client";
+import QAComponent from "./sections/qa/qa-component";
+import OpportunitiesPage from "./sections/opportunities-risks/opportunities";
+import RisksPage from "./sections/opportunities-risks/risks";
+import RegulationPage from "./sections/regulation/regulation";
+import CompetitorAnalysisPage from "./sections/competitor/competitorAnalysis";
+import PeerDevelopmentsPage from "./sections/competitor/peerDevelopments";
+import FinancialComparablesPage from "./sections/competitor/financialComparables";
+import CompetitiveLandscapePage from "./sections/competitor/landscape";
+import MarketMapPage from "./sections/market/marketMap";
+import ValueChainPage from "./sections/market/valueChain";
+import MarketSizePage from "./sections/market/marketSize";
+import MAStrategyPage from "./sections/maActivity/maActivity";
+import CustomerSuccessPage from "./sections/customer-success/customerSuccess";
+import StrategyPage from "./sections/strategy/strategy";
+import StrategicDevelopmentTimeline from "./sections/strategy/strategicDevelopment";
+import KeyTechnologyPage from "./sections/technology/technology";
+import MarketLeadershipPage from "./sections/market-leadership/marketLeadership";
+import ReportHeader from "./reportheader";
+import { FinancialSummary } from "./sections/financial/financial-summary";
+import WebTraffic from "./sections/webtraffic/web-traffic";
+import { CompanyTimeline } from "./sections/company/company-timeline";
+import { CompanyTimelineTable } from "./sections/company/company-timeline-table";
+import ProductsServices from "./sections/product/product-services";
+import ProductTimelineTable from "./sections/product/product-timeline-table";
+import EmployeeBreakdown from "./sections/employee/employee-breakdown";
+import { ExecutiveSummaryPage } from "./sections/executive/executive-summary";
+import { EmployeeTrendChart } from "./sections/employee/employee-trend-chart";
+import { EmployeeKeyMembers } from "./sections/employee/employee-keymember";
+import EmployeeReviewsPage from "./sections/employee/employee-review";
+import EmployeeReviewDistribution from "./sections/employee/employee-review-distribution";
+import EmployeeImprovementAreas from "./sections/employee/employee-improvement-areas";
+import GroupStructure from "./sections/group/groupstructure";
+import type { CompanyData } from "@/types/apiResponse";
+import CompanyOverview from "./sections/company/company-overview";
+import CompanyProfile from "./sections/company/company-profile";
+import { FinancialSummaryDetail } from "./sections/financial/financial-details";
+import { LeadershipExecutivesPage } from "./sections/employee/employee-leadership";
+import StrategicPartnership from "./sections/strategic-partnership/strategicPartnership";
+import type { KeyTechnology } from "@/types/technology";
+import type { ExecutiveSummary } from "@/types/executive";
 // import { CompanyProfile } from "./sections/company-profile"
 // import { CompanyOverview } from "./sections/company-overview"
 // import { FinancialSummary } from "./sections/financial-summary"
 type SectionsProps = {
-  searchResults?: CompanyData | null
-  onUpdateData?: (updatedData: Partial<CompanyData>) => void
-}
+  searchResults?: CompanyData | null;
+  onUpdateData?: (updatedData: Partial<CompanyData>) => void;
+};
 export function Sections({ searchResults, onUpdateData }: SectionsProps) {
   const handleExecutiveSummaryUpdate = (updatedData: ExecutiveSummary) => {
     if (onUpdateData) {
       // Create a partial update for the parent component
       onUpdateData({
         executive_summary: updatedData,
-      })
+      });
     }
-  }
+  };
   const handleComUpdate = (updatedData: ExecutiveSummary) => {
     if (onUpdateData) {
       // Create a partial update for the parent component
       onUpdateData({
         executive_summary: updatedData,
-      })
+      });
     }
-  }
+  };
   const handleKeyTechnologyUpdate = (updatedTechData: KeyTechnology) => {
     if (onUpdateData) {
       // Create a partial update for the parent component
       onUpdateData({
         key_technology: updatedTechData,
-      })
+      });
     }
-  }
+  };
   return (
     <div className="flex flex-col w-full">
       <ReportHeader
@@ -99,10 +99,14 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
       </section>
 
       <section id="financial-summary" className="p-6">
-        <FinancialSummary initialData={searchResults?.company_profile?.key_financials} />
+        <FinancialSummary
+          initialData={searchResults?.company_profile?.key_financials}
+        />
       </section>
       <section id="financial-detail" className="p-6">
-        <FinancialSummaryDetail initialData={searchResults?.company_profile?.key_financials} />
+        <FinancialSummaryDetail
+          initialData={searchResults?.company_profile?.key_financials}
+        />
       </section>
 
       <section id="web-traffic" className="p-6">
@@ -118,32 +122,50 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
         <CompanyTimelineTable initialData={searchResults?.company_timeline} />
       </section>
       <section id="product-services" className="p-6">
-        <ProductsServices initialData={searchResults?.products_services.services} />
+        <ProductsServices
+          initialData={searchResults?.products_services.services}
+        />
       </section>
       {/* <section id="product-launch-timeline" className="p-6">
         <ProductLaunchesTimeline />
       </section> */}
       <section id="product-timeline-table" className="p-6">
-        <ProductTimelineTable initialData={searchResults?.products_services.launch_timeline} />
+        <ProductTimelineTable
+          initialData={searchResults?.products_services.launch_timeline}
+        />
       </section>
-      <EmployeeBreakdown initialData={searchResults?.organization.employees_trend} />
+      <EmployeeBreakdown
+        initialData={searchResults?.organization.employees_trend}
+      />
       <section id="employee-trend-chart" className="p-6">
-        <EmployeeTrendChart initialData={searchResults?.organization.employees_trend} />
+        <EmployeeTrendChart
+          initialData={searchResults?.organization.employees_trend}
+        />
       </section>
       <section id="employee-keymembers" className="p-6">
-        <EmployeeKeyMembers initialData={searchResults?.organization.key_members} />
+        <EmployeeKeyMembers
+          initialData={searchResults?.organization.key_members}
+        />
       </section>
       <section id="employee-leadership" className="p-6">
-        <LeadershipExecutivesPage initialData={searchResults?.organization.leadership_executives} />
+        <LeadershipExecutivesPage
+          initialData={searchResults?.organization.leadership_executives}
+        />
       </section>
       <section id="employee-review" className="p-6">
-        <EmployeeReviewsPage initialData={searchResults?.organization.employee_reviews2} />
+        <EmployeeReviewsPage
+          initialData={searchResults?.organization.employee_reviews2}
+        />
       </section>
       <section id="employee-review-distribution" className="p-6">
-        <EmployeeReviewDistribution initialData={searchResults?.organization.employee_reviews2} />
+        <EmployeeReviewDistribution
+          initialData={searchResults?.organization.employee_reviews2}
+        />
       </section>
       <section id="employee-improvement-areas" className="p-6">
-        <EmployeeImprovementAreas initialData={searchResults?.organization.employee_reviews2} />
+        <EmployeeImprovementAreas
+          initialData={searchResults?.organization.employee_reviews2}
+        />
       </section>
       {/* <section id="employee-review-improve" className="p-6">
         <EmployeeReviewImprovements />
@@ -153,16 +175,20 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
       </section> */}
 
       <section id="strategic-development-component" className="p-6">
-        <StrategicDevelopmentTimeline initialData={searchResults?.strategic_development} />
+        <StrategicDevelopmentTimeline
+          initialData={searchResults?.strategic_development}
+        />
       </section>
       <section id="strategic-partnership-component" className="p-6">
-        <StrategicPartnership initialData={searchResults?.strategic_alliances} />
+        <StrategicPartnership
+          initialData={searchResults?.strategic_alliances}
+        />
       </section>
       <section id="market-leadership-component" className="p-6">
         <MarketLeadershipPage initialData={searchResults?.market_leadership} />{" "}
       </section>
       <section id="technology-component" className="p-6">
-        <KeyTechnologyPage initialData={searchResults?.key_technology} onDataUpdate={handleKeyTechnologyUpdate} />{" "}
+        <KeyTechnologyPage initialData={searchResults?.key_technology} />{" "}
       </section>
       <section id="strategy-component" className="p-6">
         <StrategyPage initialData={searchResults?.strategy} />
@@ -186,18 +212,26 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
         <MarketMapPage initialData={searchResults?.market_info} />{" "}
       </section>
       <section id="competitor-landscape-component" className="p-6">
-        <CompetitiveLandscapePage initialData={searchResults?.competitive_analysis} />
+        <CompetitiveLandscapePage
+          initialData={searchResults?.competitive_analysis}
+        />
       </section>
       <section id="financial-comparables-component" className="p-6">
-        <FinancialComparablesPage initialData={searchResults?.competitive_analysis.financial_comparables} />
+        <FinancialComparablesPage
+          initialData={
+            searchResults?.competitive_analysis.financial_comparables
+          }
+        />
       </section>
       <section id="peer-developments-component" className="p-6">
         <PeerDevelopmentsPage
-          initialData={searchResults?.competitive_analysis?.peer_developments}
+          initialData={searchResults?.competitive_analysis}
         />
       </section>
       <section id="competitor-analysis-component" className="p-6">
-        <CompetitorAnalysisPage initialData={searchResults?.competitive_analysis.competitive_analysis} />
+        <CompetitorAnalysisPage
+          initialData={searchResults?.competitive_analysis.competitive_analysis}
+        />
       </section>
       <section id="regulation-component" className="p-6">
         <RegulationPage initialData={searchResults?.regulations} />{" "}
@@ -212,8 +246,7 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
         <QAComponent initialData={searchResults?.qa} />
       </section>
     </div>
-  )
+  );
 }
 
-export default Sections
-
+export default Sections;

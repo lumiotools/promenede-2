@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Sections from "@/components/sections"
-import { Sidebar } from "@/components/sidebar"
-import type { CompanyData } from "@/types/apiResponse"
+import { useState } from "react";
+import Sections from "@/components/sections";
+import { Sidebar } from "@/components/sidebar";
+import type { CompanyData } from "@/types/apiResponse";
 
 export default function Home() {
   const [searchResults, setSearchResults] = useState<CompanyData>({
@@ -148,7 +148,7 @@ export default function Home() {
       },
       competitive_analysis: [],
     },
-    regulation: [],
+    regulations: [],
     opportunities_risks: {
       opportunities: [],
       risks: [],
@@ -189,29 +189,31 @@ export default function Home() {
       demo_available: null,
       product_reviews: null,
     },
-  })
+  });
 
   const handleSearchResults = (data: CompanyData) => {
-    console.log("page.tsx search results", data)
-    setSearchResults(data)
-  }
+    console.log("page.tsx search results", data);
+    setSearchResults(data);
+  };
 
   // Handle updates from child components
   const handleDataUpdate = (updatedData: Partial<CompanyData>) => {
-    console.log("Updating main state with:", updatedData)
+    console.log("Updating main state with:", updatedData);
     setSearchResults((prevData) => ({
       ...prevData,
       ...updatedData,
-    }))
-  }
+    }));
+  };
 
   return (
     <div className="flex h-screen bg-[#f7f9f9]">
       <Sidebar onSearchResults={handleSearchResults} />
       <main className="flex-1 overflow-y-auto w-full">
-        <Sections searchResults={searchResults} onUpdateData={handleDataUpdate} />
+        <Sections
+          searchResults={searchResults}
+          onUpdateData={handleDataUpdate}
+        />
       </main>
     </div>
-  )
+  );
 }
-
