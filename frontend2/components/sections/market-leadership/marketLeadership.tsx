@@ -1,55 +1,57 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import type { MarketLeadership } from "@/types/market_leadership"
-import { PencilIcon, PlusIcon, XIcon } from "lucide-react"
-import { SectionLayout } from "@/components/ui/section-layout"
+import type React from "react";
+import { useState, useEffect } from "react";
+import type { MarketLeadership } from "@/types/market_leadership";
+import { PencilIcon, PlusIcon, XIcon } from "lucide-react";
+import { SectionLayout } from "@/components/ui/section-layout";
 
 // Default state for the component
 const defaultState: MarketLeadership = {
   industry: null,
   rank_category: null,
   rank_global: null,
-}
+};
 
 // Award card component
 type AwardCardProps = {
-  data: MarketLeadership
-  isEditing: boolean
-  onUpdate: (updated: MarketLeadership) => void
-}
+  data: MarketLeadership;
+  isEditing: boolean;
+  onUpdate: (updated: MarketLeadership) => void;
+};
 
 const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
   // Handle null values
-  const rankCategory = data.rank_category !== null ? data.rank_category : "N/A"
-  const rankGlobal = data.rank_global !== null ? data.rank_global : "N/A"
+  const rankCategory = data.rank_category !== null ? data.rank_category : "N/A";
+  const rankGlobal = data.rank_global !== null ? data.rank_global : "N/A";
 
   // Handle form input changes
   const handleChange = (field: keyof MarketLeadership, value: string) => {
-    const updated = { ...data }
+    const updated = { ...data };
 
     if (field === "industry") {
-      updated.industry = value
+      updated.industry = value;
     } else {
       // Convert to number or null if empty
-      const numValue = value === "" ? null : Number(value)
+      const numValue = value === "" ? null : Number(value);
       if (field === "rank_category") {
-        updated.rank_category = numValue
+        updated.rank_category = numValue;
       } else if (field === "rank_global") {
-        updated.rank_global = numValue
+        updated.rank_global = numValue;
       }
     }
 
-    onUpdate(updated)
-  }
+    onUpdate(updated);
+  };
 
   return (
     <div className="bg-gray-50 p-6 rounded-lg">
       {isEditing ? (
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Industry
+            </label>
             <input
               type="text"
               className="w-full p-2 border border-gray-300 rounded"
@@ -59,7 +61,9 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category Rank</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Category Rank
+            </label>
             <input
               type="number"
               className="w-full p-2 border border-gray-300 rounded"
@@ -69,7 +73,9 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Global Rank</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Global Rank
+            </label>
             <input
               type="number"
               className="w-full p-2 border border-gray-300 rounded"
@@ -95,57 +101,65 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
 type MarketLeadershipProps = {
-  initialData?: MarketLeadership | MarketLeadership[]
-}
+  initialData?: MarketLeadership | MarketLeadership[];
+};
 
 const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
   initialData = defaultState,
 }: MarketLeadershipProps) => {
   // Convert initialData to array if it's a single object
-  const getInitialDataArray = (data: MarketLeadership | MarketLeadership[]): MarketLeadership[] => {
+  const getInitialDataArray = (
+    data: MarketLeadership | MarketLeadership[]
+  ): MarketLeadership[] => {
     if (Array.isArray(data)) {
-      return data
+      return data;
     }
-    return [data]
-  }
+    return [data];
+  };
 
-  const [data, setData] = useState<MarketLeadership[]>(getInitialDataArray(initialData))
-  const [isEditing, setIsEditing] = useState<boolean>(false)
-  const [editData, setEditData] = useState<MarketLeadership[]>(getInitialDataArray(initialData))
-  const [sourceText, setSourceText] = useState<string>("Source: 1.PromenadeAI, 2.Crunchbase")
+  const [data, setData] = useState<MarketLeadership[]>(
+    getInitialDataArray(initialData)
+  );
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editData, setEditData] = useState<MarketLeadership[]>(
+    getInitialDataArray(initialData)
+  );
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: 1.PromenadeAI, 2.Crunchbase"
+  );
 
   // Update data when initialData changes
   useEffect(() => {
-    if (!initialData) return
+    if (!initialData) return;
 
-    console.log("market leadership initialData update:", initialData)
+    console.log("market leadership initialData update:", initialData);
 
     // Convert initialData to array if it's a single object
-    const updatedData = getInitialDataArray(initialData)
+    const updatedData = getInitialDataArray(initialData);
 
     // Update the state with the new data
-    setData(updatedData)
+    setData(updatedData);
 
     // If we're not in edit mode, also update the edit data
     if (!isEditing) {
-      setEditData(updatedData)
+      setEditData(updatedData);
     }
-  }, [initialData, isEditing])
+  }, [initialData, isEditing]);
 
   // Start editing
   const startEditing = (): void => {
-    setIsEditing(true)
-    setEditData(JSON.parse(JSON.stringify(data)))
-  }
+    setIsEditing(true);
+    setEditData(JSON.parse(JSON.stringify(data)));
+  };
 
   // Cancel editing
   const cancelEditing = (): void => {
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
   // Save changes
   const saveChanges = (): void => {
@@ -153,22 +167,22 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
     const userAttachment = {
       name: "market-leadership-page-rfIK0zPoqztIbqDKai2QIJFCnsyyM7.tsx",
       url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/market-leadership-page-rfIK0zPoqztIbqDKai2QIJFCnsyyM7.tsx",
-    }
+    };
 
-    console.log("Creating UserAttachment:", userAttachment)
-    setData(editData)
-    setIsEditing(false)
+    console.log("Creating UserAttachment:", userAttachment);
+    setData(editData);
+    setIsEditing(false);
 
     // Update the source text to include the user
-    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update")
-  }
+    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
+  };
 
   // Update a specific award
   const updateAward = (index: number, updated: MarketLeadership): void => {
-    const newEditData = [...editData]
-    newEditData[index] = updated
-    setEditData(newEditData)
-  }
+    const newEditData = [...editData];
+    newEditData[index] = updated;
+    setEditData(newEditData);
+  };
 
   // Add new award
   const addAward = (): void => {
@@ -176,30 +190,33 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
       industry: "New Industry",
       rank_category: null,
       rank_global: null,
-    }
+    };
 
-    setEditData([...editData, newAward])
-  }
+    setEditData([...editData, newAward]);
+  };
 
   // Remove award
   const removeAward = (index: number): void => {
-    const newEditData = [...editData]
-    newEditData.splice(index, 1)
-    setEditData(newEditData)
-  }
+    const newEditData = [...editData];
+    newEditData.splice(index, 1);
+    setEditData(newEditData);
+  };
 
   // Safely access data
-  const displayData = isEditing ? editData : data
+  const displayData = isEditing ? editData : data;
 
   // Limit to top 3 items
-  const limitedData = displayData.slice(0, 3)
+  const limitedData = displayData.slice(0, 3);
 
   return (
-    <SectionLayout title="Market Leadership and Industry Recognition" source={sourceText}>
+    <SectionLayout
+      title="Market Leadership and Industry Recognition"
+      sourceText={sourceText}
+    >
       {!isEditing ? (
         <button
           onClick={startEditing}
-          className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
+          className="hidden bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
         >
           <PencilIcon className="h-4 w-4 mr-2" />
           Edit
@@ -228,7 +245,10 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
           No market leadership data available.
           {isEditing && (
             <div className="mt-4">
-              <button onClick={addAward} className="text-blue-700 hover:text-blue-900 flex items-center mx-auto">
+              <button
+                onClick={addAward}
+                className="text-blue-700 hover:text-blue-900 flex items-center mx-auto"
+              >
                 <PlusIcon className="h-6 w-6 mr-2" />
                 Add Award
               </button>
@@ -239,7 +259,11 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {limitedData.map((item, index) => (
             <div key={index} className="relative">
-              <AwardCard data={item} isEditing={isEditing} onUpdate={(updated) => updateAward(index, updated)} />
+              <AwardCard
+                data={item}
+                isEditing={isEditing}
+                onUpdate={(updated) => updateAward(index, updated)}
+              />
 
               {isEditing && (
                 <button
@@ -255,7 +279,10 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
 
           {isEditing && (
             <div className="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-              <button onClick={addAward} className="text-blue-700 hover:text-blue-900 flex items-center">
+              <button
+                onClick={addAward}
+                className="text-blue-700 hover:text-blue-900 flex items-center"
+              >
                 <PlusIcon className="h-6 w-6 mr-2" />
                 Add Award
               </button>
@@ -264,8 +291,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
         </div>
       )}
     </SectionLayout>
-  )
-}
+  );
+};
 
-export default MarketLeadershipPage
-
+export default MarketLeadershipPage;
