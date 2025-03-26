@@ -193,11 +193,7 @@ export interface ProductLaunch {
 }
 
 export interface Service {
-  uuid: string | null;
-  value: string | null;
-  image_id?: string | null;
-  permalink?: string | null;
-  entity_def_id?: string | null;
+  name: string | null;
   description?: string | null;
 }
 

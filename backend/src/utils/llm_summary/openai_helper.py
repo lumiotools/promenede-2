@@ -204,73 +204,102 @@ Please ensure the descriptions are concise but informative. """
     # Get the response from the model and parse it
     content =json.loads(response.choices[0].message.content)
     return content
+
+def get_openai_productsServices(company_name, business_data):
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    system_prompt = f"""
+    You are given the key products and services data for the company: {company_name}. Today's date is {time}.
+
+      Provide the latest 20 products or services that the company {company_name} has introduced or is currently offering, in descending order from today. Today's date is {time}.
+
+    For each product or service, please provide the following details in a strict JSON format:
+
+    1. **name**: The name of the product or service.
+    2. **description**: A brief description of the product or service and its impact on the company's portfolio or market position.
+
+    Please ensure that the descriptions are concise but informative, focusing on the latest offerings from the company.
+```json
+{{
+       "products_services":{{
+           "name": "string", 
+           "description":"string"
+       }}
+
+}}
+Please ensure the descriptions are concise but informative. """
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": json.dumps(business_data, indent=2)}
+        ]
+    )
+    
+    # Get the response from the model and parse it
+    content =json.loads(response.choices[0].message.content)
+    return content
+
+
 # Main function to test
 def main():
     company_name = "Apple"
     business_data = """
 
-As of 2025, Apple Inc. is continuously innovating and expanding its technological offerings. While specific details on the latest technologies might not be fully disclosed, here are ten key technologies Apple has been working on or has recently developed, focusing on publicly available information:
+Here are the latest 10 products or services from Apple Inc., listed in descending order from today, along with their descriptions in JSON format:
 
 ```json
 [
   {
-    "Technology Name": "Apple Intelligence",
-    "Description": "A new AI-driven feature set expected to enhance user experience across Apple devices, potentially integrating AI capabilities into various products.",
-    "Reported At": "2025-March"
+    "Product/Service Name": "iPhone 16 Pro",
+    "Description": "The latest flagship smartphone from Apple, featuring advanced camera capabilities and improved performance, further solidifying Apple's position in the premium smartphone market."
   },
   {
-    "Technology Name": "AirPods Pro 2 with Hearing Aid and Hearing Test Features",
-    "Description": "An update to AirPods Pro 2 that includes features for hearing aid compatibility and hearing tests, enhancing accessibility.",
-    "Reported At": "2024-September"
+    "Product/Service Name": "iPhone 16",
+    "Description": "A new iteration of Apple's popular iPhone series, offering enhanced features and design improvements, appealing to a wide range of consumers."
   },
   {
-    "Technology Name": "Active Noise Cancellation in AirPods 4",
-    "Description": "An advancement in noise cancellation technology for AirPods, improving audio quality and user experience.",
-    "Reported At": "2024-September"
+    "Product/Service Name": "AirPods 4",
+    "Description": "The fourth generation of Apple's iconic wireless earbuds, now with Active Noise Cancellation, enhancing user experience and expanding Apple's audio product lineup."
   },
   {
-    "Technology Name": "Apple Vision Pro",
-    "Description": "A mixed reality headset that combines AR and VR capabilities, marking Apple's entry into the immersive technology market.",
-    "Reported At": "2023-June"
+    "Product/Service Name": "AirPods Pro 2 with Hearing Aid and Hearing Test Features",
+    "Description": "An updated version of the AirPods Pro, introducing health-related features such as hearing aid compatibility and hearing tests, marking Apple's expansion into health technology."
   },
   {
-    "Technology Name": "M2 Ultra Chip",
-    "Description": "A powerful chip designed for high-performance computing, used in Mac products like the Mac Studio.",
-    "Reported At": "2023-January"
+    "Product/Service Name": "Apple Vision Pro",
+    "Description": "Apple's first mixed reality headset, expected to revolutionize the way users interact with digital information and environments, marking a significant entry into the AR/VR market."
   },
   {
-    "Technology Name": "Apple M1 Ultra Chip",
-    "Description": "A high-performance chip for Mac products, offering enhanced processing and graphics capabilities.",
-    "Reported At": "2022-March"
+    "Product/Service Name": "Apple Watch Series 9",
+    "Description": "The latest smartwatch from Apple, featuring improved health tracking and performance, reinforcing Apple's dominance in the wearable technology sector."
   },
   {
-    "Technology Name": "Apple Watch Series 8 with Crash Detection",
-    "Description": "A feature that detects severe car crashes and automatically contacts emergency services, enhancing safety.",
-    "Reported At": "2022-September"
+    "Product/Service Name": "iPad (10th Generation)",
+    "Description": "A new iteration of Apple's tablet, offering enhanced performance and design, catering to both personal and professional use cases."
   },
   {
-    "Technology Name": "Apple M2 Chip",
-    "Description": "A second-generation chip for Mac and iPad products, offering improved performance and efficiency.",
-    "Reported At": "2022-June"
+    "Product/Service Name": "Apple TV 4K (3rd Generation)",
+    "Description": "An updated version of Apple's streaming device, providing faster performance and improved video quality, enhancing the user experience for streaming services."
   },
   {
-    "Technology Name": "Apple M1 Pro and M1 Max Chips",
-    "Description": "High-performance chips designed for professional-grade Mac products, offering enhanced processing and graphics capabilities.",
-    "Reported At": "2021-October"
+    "Product/Service Name": "Apple M2 Ultra Chip",
+    "Description": "A powerful processor designed for high-performance computing, used in Apple's latest Mac models, further advancing Apple's position in the personal computer market."
   },
   {
-    "Technology Name": "Apple M1 Chip",
-    "Description": "A revolutionary chip marking Apple's transition to in-house silicon for Mac products, enhancing performance and efficiency.",
-    "Reported At": "2020-November"
+    "Product/Service Name": "Apple Music Classical",
+    "Description": "A dedicated music streaming service focused on classical music, expanding Apple's offerings in the music streaming sector and catering to a niche audience."
   }
 ]
 ```
 
-These technologies highlight Apple's focus on AI, chip design, augmented reality, and enhanced user experiences across its product lineup. However, note that some of these technologies might not be the very latest, as Apple often announces new developments at specific events like WWDC or product launches.
+**Note**: The search results do not provide specific details on all the latest products or services from Apple Inc. as of 2025. The list above includes some of the most recent offerings based on general knowledge and may not be exhaustive or entirely up-to-date. For the most accurate and current information, visiting Apple's official website or recent news sources is recommended.
 """
     
     # Get business summary from OpenAI
-    summary = get_openai_keyTechnology(company_name, business_data)
+    summary = get_openai_productsServices(company_name, business_data)
     
     print("Result:")
     print(summary)
