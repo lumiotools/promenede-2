@@ -30,6 +30,7 @@ router = APIRouter()
 # Pydantic model to define the request body
 class CompanyRequest(BaseModel):
     company_name: str
+    company_url: str
 @router.post("/")
 async def get_company_data(request: CompanyRequest):
     """
@@ -38,6 +39,18 @@ async def get_company_data(request: CompanyRequest):
     Prioritizes CoreSignal and Crunchbase data over SEC data.
     """
     company_name = request.company_name
+    company_url=request.company_url
+
+    company_enrichment_id = get_company_id(company_url)
+    print("enrichment id",company_enrichment_id)
+    if not company_enrichment_id:
+        return {"success":False,"message":"Company not found"}
+    coresignal_data = get_company_details(company_enrichment_id)
+    if not coresignal_data:
+        return {"success":False,"message":"Company not found"}
+    
+    coresignal_data=convert_null_to_none(coresignal_data)
+    company_name=coresignal_data.get("company_name","")
     
     # Get data from different sources
     crunchbase_data = get_organization_data(company_name)
@@ -51,19 +64,7 @@ async def get_company_data(request: CompanyRequest):
     company_cik = None
     sec_10k_data = {}
     
-    company_url = crunchbase_data.get("cards", {}).get("fields", {}).get("website", {}).get("value", "")
-    print("company url",company_url)
-    if not company_url and "domain" in crunchbase_data:
-        company_url = crunchbase_data.get("domain", "")
     
-    company_enrichment_id = get_company_id(company_url)
-    print("enrichment id",company_enrichment_id)
-    if not company_enrichment_id:
-        return {"success":False,"message":"Company not found"}
-    coresignal_data = get_company_details(company_enrichment_id)
-    if not coresignal_data:
-        return {"success":False,"message":"Company not found"}
-    coresignal_data=convert_null_to_none(coresignal_data)
     
     llmData =  fetch_company_data(company_name, 10000, "gpt-4o-mini")
     

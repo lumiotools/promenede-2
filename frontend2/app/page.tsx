@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Sections from "@/components/sections";
-import { Sidebar } from "@/components/sidebar";
+import { CompanySidebar } from "@/components/sidebar";
 import type { CompanyData } from "@/types/apiResponse";
 
 export default function Home() {
@@ -201,7 +201,7 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-[#f7f9f9]">
-      <Sidebar onSearchResults={handleSearchResults} />
+      <CompanySidebar onSearchResults={handleSearchResults} />
       <main className="flex-1 overflow-y-auto w-full">
         <Sections
           searchResults={searchResults}

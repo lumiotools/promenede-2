@@ -1,10 +1,42 @@
 "use client";
 
-import type React from "react";
-
-import { useState } from "react";
-import { Search, Plus, Loader2 } from "lucide-react";
+import * as React from "react";
+import { useEffect, useState } from "react";
+import {
+  Search,
+  Plus,
+  Loader2,
+  ChevronRight,
+  LayoutDashboard,
+  Globe,
+  X,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { CompanyData } from "@/types/apiResponse";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
 
 // Define the structure for our section categories
 interface SectionCategory {
@@ -14,8 +46,14 @@ interface SectionCategory {
     label: string;
   }[];
 }
+// Define the brand suggestion interface
+interface BrandSuggestion {
+  name: string;
+  domain: string;
+  logo?: string;
+}
 
-export function Sidebar({
+export function CompanySidebar({
   onSearchResults,
 }: {
   onSearchResults?: (data: CompanyData) => void;
@@ -33,6 +71,153 @@ export function Sidebar({
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // State for brand suggestions
+  const [brandSuggestions, setBrandSuggestions] = React.useState<
+    BrandSuggestion[]
+  >([]);
+  const [isFetchingSuggestions, setIsFetchingSuggestions] =
+    React.useState(false);
+  const [selectedBrand, setSelectedBrand] =
+    React.useState<BrandSuggestion | null>(null);
+  const [showSuggestions, setShowSuggestions] = React.useState(false);
+
+  // Ref for the search input to position the dropdown
+  const searchInputRef = React.useRef<HTMLDivElement>(null);
+
+  // Fetch brand suggestions as user types
+  useEffect(() => {
+    const fetchBrandSuggestions = async () => {
+      if (searchQuery.length < 2) {
+        setBrandSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      setIsFetchingSuggestions(true);
+      console.log("Fetching brand suggestions for:", searchQuery);
+
+      try {
+        // Now using our Next.js API route instead of directly calling the Brandfetch API
+        const response = await fetch(
+          `/api/brand-search?query=${encodeURIComponent(searchQuery)}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("API response:", data);
+
+        // The data is already processed in our API route
+        setBrandSuggestions(data);
+        setShowSuggestions(data.length > 0);
+      } catch (err) {
+        console.error("Error fetching brand suggestions:", err);
+        setBrandSuggestions([]);
+        setShowSuggestions(false);
+      } finally {
+        setIsFetchingSuggestions(false);
+      }
+    };
+
+    // Debounce the API call
+    const timeoutId = setTimeout(() => {
+      if (searchQuery.trim()) {
+        fetchBrandSuggestions();
+      } else {
+        setShowSuggestions(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Function to handle search with company URL
+  const handleSearch = async (e?: React.FormEvent, brandDomain?: string) => {
+    if (e) {
+      e.preventDefault();
+    }
+
+    const query = selectedBrand?.name || searchQuery;
+    const domain = brandDomain || selectedBrand?.domain || "";
+
+    if (!query.trim()) return;
+
+    setIsSearching(true);
+    setError(null);
+    setShowSuggestions(false);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/company/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            company_name: query,
+            company_url: domain, // Send the company URL to the backend
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(` ${data.message}`);
+      }
+      // Pass the data to the parent component
+      if (onSearchResults) {
+        console.log("add to search results", data.data);
+        onSearchResults(data.data);
+      }
+
+      // Clear selection after successful search
+      setSelectedBrand(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Search error:", err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Function to handle brand selection
+  const handleSelectBrand = (brand: BrandSuggestion) => {
+    setSelectedBrand(brand);
+    setSearchQuery(brand.name);
+    setShowSuggestions(false);
+  };
+
+  // Function to clear selected brand
+  const clearSelectedBrand = () => {
+    setSelectedBrand(null);
+    setSearchQuery("");
+    setShowSuggestions(false);
+  };
 
   // Define all sections based on your sections.tsx file
   const sectionCategories: SectionCategory[] = [
@@ -129,51 +314,6 @@ export function Sidebar({
     }));
   };
 
-  // Function to handle search
-  const handleSearch = async (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-
-    if (!searchQuery.trim()) return;
-
-    setIsSearching(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        "https://promenede-2.onrender.com/company/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ company_name: searchQuery }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(` ${data.message}`);
-      }
-      // Pass the data to the parent component
-      if (onSearchResults) {
-        console.log("add to search results", data.data);
-        onSearchResults(data.data);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      console.error("Search error:", err);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
   return (
     <div className="w-70 bg-[#000000] text-white overflow-y-auto h-screen flex-shrink-0 sidebar">
       {/* Header */}
@@ -223,35 +363,93 @@ export function Sidebar({
 
       {/* Search */}
       <div className="px-4 py-2">
-        <form onSubmit={handleSearch} className="relative">
-          <div className="bg-[#151517] border border-[#38383A] rounded-md flex items-center px-3 py-2">
-            <div className="flex-1 flex items-center">
-              {isSearching ? (
-                <Loader2 className="h-5 w-5 text-[#777] animate-spin" />
+        <form onSubmit={handleSearch} className="px-4 pb-3">
+          <div className="relative" ref={searchInputRef}>
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+              {isFetchingSuggestions ? (
+                <Loader2 className="h-4 w-4 text-zinc-500 animate-spin" />
               ) : (
-                <Search className="h-5 w-5 text-[#777]" />
+                <Search className="h-4 w-4 text-zinc-500" />
               )}
-              <input
-                type="text"
-                placeholder="Search Company"
-                className="bg-transparent border-none outline-none text-sm ml-2 w-full text-[#ccc] placeholder:text-[#777]"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
             </div>
-            <button
-              type="button"
-              onClick={() => handleSearch()}
+            <Input
+              type="text"
+              placeholder="Search Company"
+              className="pl-9 pr-10 bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-zinc-600"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => {
+                if (brandSuggestions.length > 0) {
+                  setShowSuggestions(true);
+                }
+              }}
+            />
+            {selectedBrand && (
+              <button
+                type="button"
+                onClick={clearSelectedBrand}
+                className="absolute inset-y-0 right-12 flex items-center pr-2 text-zinc-400 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+
+            <Button
+              type="submit"
+              size="sm"
+              variant="secondary"
+              className="absolute inset-y-0 right-0 px-3 rounded-l-none bg-zinc-800 hover:bg-zinc-700 text-white"
               disabled={isSearching || !searchQuery.trim()}
-              className={`ml-2 text-xs rounded px-3 py-1 ${
-                isSearching || !searchQuery.trim()
-                  ? "bg-[#2a2a2c] text-[#777] cursor-not-allowed"
-                  : "bg-[#2a2a2c] hover:bg-[#3a3a3c] text-white cursor-pointer"
-              }`}
             >
-              Search
-            </button>
+              {isSearching ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Search"
+              )}
+            </Button>
+
+            {/* Brand suggestions dropdown */}
+            {showSuggestions && brandSuggestions.length > 0 && (
+              <div className="absolute z-50 mt-1 w-full bg-zinc-900 border border-zinc-700 rounded-md shadow-lg overflow-hidden">
+                <div className="max-h-[300px] overflow-y-auto py-1">
+                  {brandSuggestions.map((brand, index) => (
+                    <button
+                      key={`${brand.domain}-${index}`}
+                      type="button"
+                      onClick={() => handleSelectBrand(brand)}
+                      className="flex items-center gap-2 w-full px-3 py-2 text-left text-white hover:bg-zinc-800"
+                    >
+                      {brand.logo ? (
+                        <img
+                          src={brand.logo || "/placeholder.svg"}
+                          alt={brand.name}
+                          className="w-5 h-5 rounded-full"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "/placeholder.svg?height=20&width=20";
+                          }}
+                        />
+                      ) : (
+                        <Globe className="w-4 h-4 text-zinc-400" />
+                      )}
+                      <span className="flex-1 truncate">{brand.name}</span>
+                      <span className="text-xs text-zinc-500">
+                        {brand.domain}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+
+          {selectedBrand && (
+            <div className="mt-2 flex items-center gap-2 px-2 py-1.5 bg-zinc-800 rounded-md text-sm text-white">
+              <Globe className="h-3.5 w-3.5 text-zinc-400" />
+              <span className="flex-1 truncate">{selectedBrand.domain}</span>
+            </div>
+          )}
+
           {error && <p className="text-red-500 text-xs mt-1 px-1">{error}</p>}
         </form>
       </div>
