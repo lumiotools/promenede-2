@@ -151,7 +151,7 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
 };
 
 type MarketLeadershipProps = {
-  initialData?: MarketLeadership | MarketLeadership[];
+  initialData?: MarketLeadership | MarketLeadership[] | null | undefined;
 };
 
 const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
@@ -159,7 +159,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
 }: MarketLeadershipProps) => {
   // Convert initialData to array if it's a single object
   const getInitialDataArray = (
-    data: MarketLeadership | MarketLeadership[]
+    data: MarketLeadership | MarketLeadership[] | null | undefined
   ): MarketLeadership[] => {
     if (!data) return [defaultState];
     if (Array.isArray(data)) {

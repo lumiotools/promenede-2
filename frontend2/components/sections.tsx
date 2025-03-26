@@ -65,14 +65,6 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
       });
     }
   };
-  const handleKeyTechnologyUpdate = (updatedTechData: KeyTechnology) => {
-    if (onUpdateData) {
-      // Create a partial update for the parent component
-      onUpdateData({
-        key_technology: updatedTechData,
-      });
-    }
-  };
 
   return (
     <div className="flex flex-col w-full">
@@ -96,11 +88,11 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
       </section>
 
       <section id="company-overview" className="p-6">
-      <CompanyOverview
-        initialData={searchResults?.company_overview}
-        urls={searchResults?.urls}
-      />
-       </section>
+        <CompanyOverview
+          initialData={searchResults?.company_overview}
+          urls={searchResults?.urls}
+        />
+      </section>
 
       <section id="financial-summary" className="p-6">
         <FinancialSummary
