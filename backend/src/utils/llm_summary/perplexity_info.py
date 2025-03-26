@@ -22,6 +22,7 @@ def generate_perplexity_businessDetail(company_name, user_data):
 
 def generate_perplexity_companyTimeline(company_name):
     time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
 
     """
     Generates a detailed prompt for getting the latest timeline of a company,
@@ -46,7 +47,7 @@ def generate_perplexity_companyTimeline(company_name):
 
 def generate_perplexity_productTimeline(company_name):
     time=datetime.datetime.now()
-    ('%Y-%m-%d')
+    time=time.strftime('%Y-%m-%d')
     # print(time)
 
     """
@@ -70,12 +71,41 @@ def generate_perplexity_productTimeline(company_name):
     response = ask_perplexity(system_prompt, company_name)
     return response
 
+def generate_perplexity_MarketLeadership(company_name):
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    # print(time)
+
+    """
+    Generates a detailed prompt for getting the latest timeline of a company,
+    focusing on recent milestones, product launches, partnerships, and future plans.
+    """
+    # Updated system prompt to get the latest company timeline
+    system_prompt = f"""
+    Provide the market leadership data for the company {company_name} over the past 5 years from today in descending order. Focus on the following aspects:
+    Today's date is {time}.
+
+    For each year in the past 5 years, please include the following details:
+    1. **Date**: The exact date (in 'yyyy-Month' format) of the milestone or event related to the company's market position.
+    2. **Industry**: The industry or sector in which the company operates .
+    3. **Rank Category**: The rank of the company within its specific category .
+    4. **Global Rank**: The global rank of the company based on revenue, market share, or other relevant metrics .
+    5. **Description**: A brief description of the company's market leadership, explaining how it achieved its position and what differentiates it from competitors.
+
+"""
+
+    print(f"Generating latest market leadership for {company_name}")
+    # Assuming `ask_perplexity` is a function that sends the prompt to the Perplexity API and returns the response.
+    response = ask_perplexity(system_prompt, company_name)
+    return response
+
+
 # Main function to test the company timeline generation
 def main():
     company_name = "Apple Inc."  # You can replace this with any company name you want to analyze.
     
     # Get the timeline summary for the company
-    company_timeline = generate_perplexity_companyTimeline(company_name)
+    company_timeline = generate_perplexity_MarketLeadership(company_name)
     
     # Print the detailed timeline of the company
     print(f"Company Timeline for {company_name}:")

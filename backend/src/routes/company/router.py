@@ -3,8 +3,8 @@ from pydantic import BaseModel
 import os
 import requests
 from dotenv import load_dotenv
-from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_productTimeline
-from src.utils.llm_summary.perplexity_info import generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_productTimeline
+from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_marketLeadership, get_openai_productTimeline
+from src.utils.llm_summary.perplexity_info import generate_perplexity_MarketLeadership, generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_productTimeline
 from src.utils.llmInfo.llm import fetch_company_data
 from src.utils.crunchbase.company import get_organization_data
 from src.utils.secFilings.getCik import get_cik_by_company_name
@@ -343,6 +343,10 @@ async def get_company_data(request: CompanyRequest):
     perplexity_product_timeline = generate_perplexity_productTimeline(company_name)
     openai_product_timeline=get_openai_productTimeline(company_name, perplexity_product_timeline)
     response_data['products_services']['launch_timeline']=openai_product_timeline['product_timeline']
+
+    perplexity_market_leadership=generate_perplexity_MarketLeadership(company_name)
+    openai_market_leadership=get_openai_marketLeadership(company_name,perplexity_market_leadership)
+    response_data["market_leadership"]=openai_market_leadership['market_leadership']
     
     
     return {"success":True,"company_name": company_name, "data": response_data}

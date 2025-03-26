@@ -130,60 +130,92 @@ Please ensure the descriptions are concise but informative. """
     content =json.loads(response.choices[0].message.content)
     return content
 
+def get_openai_marketLeadership(company_name, business_data):
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    system_prompt = f"""
+    You are given the market leadership data for the company: {company_name}, focusing on the past 5 years from today. Today's date is {time}.
+
+    For each year in the last 3 years, provide the following details in a strict JSON format:
+
+    1. **Date**: The exact date (in 'yyyy-Month' format) of the milestone or event related to the company's market position.
+    2. **Industry**: The industry or sector in which the company operates (e.g., Technology, Healthcare, Finance).
+    3. **Rank Category**: The rank of the company within its specific market category (e.g., 'Top 5 in smartphones', 'Top 3 in cloud computing').
+    4. **Global Rank**: The company's global rank based on relevant metrics like market share, revenue, or product sales (e.g., 'Ranked #1 globally in smartphone sales').
+    5. **Description**: A brief description of the company's market leadership, including key factors that have contributed to its position.
+Strictly follow the below JSON format for the response:
+```json
+{{
+       "market_leadership":{{
+           "date": "string", 
+           "industry": "string", 
+           "rank_category": "number", 
+           "rank_global":"number",
+           "description":"string"
+       }}
+
+}}
+Please ensure the descriptions are concise but informative. """
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": json.dumps(business_data, indent=2)}
+        ]
+    )
+    
+    # Get the response from the model and parse it
+    content =json.loads(response.choices[0].message.content)
+    return content
+
 # Main function to test
 def main():
     company_name = "Apple"
-    business_data = """Here is a detailed timeline of Apple Inc.'s recent product launches and significant product-related events over the past three years, from 2022 to 2025:
+    business_data = """
 
-## Recent Product Launches
+Here is the market leadership data for Apple Inc. over the past three years, focusing on the specified aspects:
 
-### 1. **iPhone 14 Series**
-   - **Launch Date**: 2022-September
-   - **Key Features**: 
-     - **iPhone 14**: Improved cameras, faster A16 Bionic chip in Pro models, new 48MP main camera, and enhanced video recording capabilities.
-     - **iPhone 14 Pro/Pro Max**: Always-On display, Dynamic Island for notifications, and a more efficient A16 Bionic chip.
-   - **Description**: The iPhone 14 series marked significant improvements in camera technology and design, with the introduction of the Dynamic Island feature on Pro models.
+### 2024
+- **Industry**: Technology Hardware, Storage & Peripherals
+- **Rank Category**: Largest vendor of mobile phones and tablet computers
+- **Global Rank**: Largest technology company by revenue
+- **Description**: In 2024, Apple maintained its position as the largest technology company by revenue, with $391.04 billion in revenue. It continued to lead as the largest vendor of mobile phones and tablet computers, driven by the success of its iPhone and iPad lines. Apple's strong brand loyalty and innovative products, such as the Apple Watch and AirPods, contributed to its market leadership.
 
-### 2. **iPad (10th Generation)**
-   - **Launch Date**: 2022-October
-   - **Key Features**: 
-     - Larger 10.9-inch display, USB-C port, and a more powerful A14 Bionic chip.
-   - **Description**: This iPad model updated the entry-level iPad with modern features like USB-C and a larger display.
+### 2023
+- **Industry**: Technology Hardware, Storage & Peripherals
+- **Rank Category**: Largest vendor of mobile phones and tablet computers
+- **Global Rank**: Largest company by market capitalization
+- **Description**: In 2023, Apple was the largest company by market capitalization and maintained its dominance in the mobile phone and tablet markets. Its ecosystem of interconnected devices and services, including Apple Music and Apple TV+, further solidified its market position. The company's focus on innovation and user experience helped it stay ahead of competitors.
 
-### 3. **Apple Watch Series 8 and Ultra**
-   - **Launch Date**: 2022-September
-   - **Key Features**: 
-     - **Series 8**: Enhanced health features, including temperature sensing for women's health.
-     - **Ultra**: Larger 49mm case, longer battery life, and designed for extreme sports.
-   - **Description**: The Apple Watch Series 8 focused on health monitoring, while the Ultra model targeted athletes and outdoor enthusiasts.
+### 2022
+- **Industry**: Technology Hardware, Storage & Peripherals
+- **Rank Category**: Largest vendor of mobile phones and tablet computers
+- **Global Rank**: Among the top companies by market capitalization
+- **Description**: In 2022, Apple continued to be a leader in the technology sector, with significant market share in mobile phones and tablets. Its strong brand and continuous innovation in products like the iPhone and Mac helped maintain its position. Apple's services segment, including Apple Music and Apple TV+, also contributed to its market leadership by providing a comprehensive ecosystem for users.
 
-### 4. **AirPods Pro 2**
-   - **Launch Date**: 2022-September
-   - **Key Features**: 
-     - Improved noise cancellation, longer battery life, and a new H2 chip for better audio quality.
-   - **Description**: The second generation of AirPods Pro enhanced audio quality and noise cancellation capabilities.
+### 2021
+- **Industry**: Technology Hardware, Storage & Peripherals
+- **Rank Category**: Largest vendor of mobile phones and tablet computers
+- **Global Rank**: Among the top companies by market capitalization
+- **Description**: In 2021, Apple remained a dominant force in the technology industry, driven by the success of its hardware products and expanding services. The company's ability to integrate its devices and services seamlessly enhanced user experience, contributing to its market leadership.
 
-### 5. **MacBook Air (M2)**
-   - **Launch Date**: 2022-June
-   - **Key Features**: 
-     - New M2 chip for improved performance, larger 13.6-inch display, and a more compact design.
-   - **Description**: This MacBook Air model introduced the M2 chip, offering better performance and efficiency.
+### 2020
+- **Industry**: Technology Hardware, Storage & Peripherals
+- **Rank Category**: Largest vendor of mobile phones and tablet computers
+- **Global Rank**: Among the top companies by market capitalization
+- **Description**: In 2020, Apple continued to lead in the technology sector, with its iPhone and iPad sales driving revenue growth. The company's focus on innovation and its expanding services segment helped maintain its market position despite global challenges like the COVID-19 pandemic.
 
-### 6. **iPhone 15 Series**
-   - **Launch Date**: 2023-September
-   - **Key Features**: 
-     - **iPhone 15 Pro/Pro Max**: New titanium frame, improved cameras, and a faster A17 Bionic chip.
-     - **USB-C port** across all models, replacing the Lightning port.
-   - **Description**: The iPhone 15 series transitioned to USB-C, aligning with EU regulations, and introduced a titanium frame for Pro models.
+For the years beyond the past three, Apple has consistently been a leader in the technology industry, with significant market capitalization and revenue. However, specific detailed rankings for each year beyond 2022 are not provided in the search results. 
 
-### 7. **Apple Vision Pro**
-   - **Launch Date**: Announced in 2023, expected release in 2024 or later
-   - **Key Features**: 
-     - Mixed reality capabilities, advanced eye-tracking technology, and a unique design.
-   - **Description**:"""
+### Additional Notes
+- **Market Capitalization**: As of December 2024, Apple was valued at over $3.74 trillion, making it one of the most valuable companies globally[2].
+- **Revenue and Market Share**: Apple's revenue and market share in various categories have consistently positioned it as a leader in the technology sector[2][3].
+"""
     
     # Get business summary from OpenAI
-    summary = get_openai_productTimeline(company_name, business_data)
+    summary = get_openai_marketLeadership(company_name, business_data)
     
     print("Result:")
     print(summary)

@@ -42,7 +42,7 @@ export type CompanyData = {
     employee_reviews2: EmployeeReviews;
   };
   executive_summary: ExecutiveSummary;
-  market_leadership: MarketLeadership;
+  market_leadership: MarketLeadership[] | null;
   key_technology: KeyTechnology;
   ma_activity: MAActivity;
   market_info: MarketInfo;

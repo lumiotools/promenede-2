@@ -8,9 +8,11 @@ import { SectionLayout } from "@/components/ui/section-layout";
 
 // Default state for the component
 const defaultState: MarketLeadership = {
+  date: null,
   industry: null,
   rank_category: null,
   rank_global: null,
+  description: null,
 };
 
 // Award card component
@@ -21,16 +23,25 @@ type AwardCardProps = {
 };
 
 const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
+  // Ensure data is not null or undefined
+  const safeData = data || defaultState;
+
   // Handle null values
-  const rankCategory = data.rank_category !== null ? data.rank_category : "N/A";
-  const rankGlobal = data.rank_global !== null ? data.rank_global : "N/A";
+  const rankCategory =
+    safeData.rank_category !== null ? safeData.rank_category : "N/A";
+  const rankGlobal =
+    safeData.rank_global !== null ? safeData.rank_global : "N/A";
 
   // Handle form input changes
   const handleChange = (field: keyof MarketLeadership, value: string) => {
-    const updated = { ...data };
+    const updated = { ...safeData };
 
     if (field === "industry") {
       updated.industry = value;
+    } else if (field === "date") {
+      updated.date = value;
+    } else if (field === "description") {
+      updated.description = value;
     } else {
       // Convert to number or null if empty
       const numValue = value === "" ? null : Number(value);
@@ -55,8 +66,20 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
             <input
               type="text"
               className="w-full p-2 border border-gray-300 rounded"
-              value={data.industry || ""}
+              value={safeData.industry || ""}
               onChange={(e) => handleChange("industry", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Date
+            </label>
+            <input
+              type="date"
+              className="w-full p-2 border border-gray-300 rounded"
+              value={safeData.date || ""}
+              onChange={(e) => handleChange("date", e.target.value)}
             />
           </div>
 
@@ -67,7 +90,9 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
             <input
               type="number"
               className="w-full p-2 border border-gray-300 rounded"
-              value={data.rank_category === null ? "" : data.rank_category}
+              value={
+                safeData.rank_category === null ? "" : safeData.rank_category
+              }
               onChange={(e) => handleChange("rank_category", e.target.value)}
             />
           </div>
@@ -79,8 +104,19 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
             <input
               type="number"
               className="w-full p-2 border border-gray-300 rounded"
-              value={data.rank_global === null ? "" : data.rank_global}
+              value={safeData.rank_global === null ? "" : safeData.rank_global}
               onChange={(e) => handleChange("rank_global", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              className="w-full p-2 border border-gray-300 rounded"
+              value={safeData.description || ""}
+              onChange={(e) => handleChange("description", e.target.value)}
             />
           </div>
         </div>
@@ -88,16 +124,26 @@ const AwardCard: React.FC<AwardCardProps> = ({ data, isEditing, onUpdate }) => {
         <>
           <div className="mb-2">
             <p className="text-sm text-gray-500">Industry</p>
-            <p className="font-medium">{data.industry || "N/A"}</p>
+            <p className="font-medium">{safeData.industry || "N/A"}</p>
+          </div>
+          <div className="mb-2">
+            <p className="text-sm text-gray-500">Date</p>
+            <p className="font-medium">{safeData.date || "N/A"}</p>
           </div>
           <div className="mb-2">
             <p className="text-sm text-gray-500">Category Rank</p>
             <p className="font-medium">{rankCategory}</p>
           </div>
-          <div>
+          <div className="mb-2">
             <p className="text-sm text-gray-500">Global Rank</p>
             <p className="font-medium">{rankGlobal}</p>
           </div>
+          {safeData.description && (
+            <div className="mb-2">
+              <p className="text-sm text-gray-500">Description</p>
+              <p className="font-medium">{safeData.description}</p>
+            </div>
+          )}
         </>
       )}
     </div>
@@ -115,8 +161,9 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
   const getInitialDataArray = (
     data: MarketLeadership | MarketLeadership[]
   ): MarketLeadership[] => {
+    if (!data) return [defaultState];
     if (Array.isArray(data)) {
-      return data;
+      return data.length > 0 ? data : [defaultState];
     }
     return [data];
   };
@@ -187,9 +234,11 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
   // Add new award
   const addAward = (): void => {
     const newAward: MarketLeadership = {
+      date: null,
       industry: "New Industry",
       rank_category: null,
       rank_global: null,
+      description: null,
     };
 
     setEditData([...editData, newAward]);
@@ -277,7 +326,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
             </div>
           ))}
 
-          {isEditing && (
+          {isEditing && limitedData.length < 3 && (
             <div className="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
               <button
                 onClick={addAward}
