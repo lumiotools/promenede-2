@@ -19,23 +19,6 @@ def generate_perplexity_businessDetail(company_name, user_data):
     response = ask_perplexity(system_prompt, user_data)
     return response
 
-def generate_perplexity_companyTimeline(company_name):
-    """
-    Generates a detailed prompt for getting comprehensive information about a company,
-    including description, business model, products, brands, and customers.
-    """
-    # Detailed system prompt to get comprehensive information about the company
-    system_prompt = f"""Provide a detailed overview of the {company_name}. Include the following aspects:\n"
-        "1. Company Description: A brief overview of the company, its history, and its mission.\n"
-        "2. Business Model: An explanation of how the company generates revenue and its core operations.\n"
-        "3. Products and Brands: A list of the company's key products, services, and any associated brands.\n"
-        "4. Customers: An outline of the company's target customers, market segmentation, and customer demographics.\n"
-        "Be detailed and cover each aspect comprehensively."""
-    
-    print("perplexity business request for ",company_name)
-    response = ask_perplexity(system_prompt, "")
-    return response
-
 
 def generate_perplexity_companyTimeline(company_name):
     time=datetime.datetime.now()
@@ -56,7 +39,33 @@ def generate_perplexity_companyTimeline(company_name):
         6. Other Timeline: Cover some of the other notable timeline of the company in the recent 3 years
         Be detailed and focus primarily on the last 3 years, with an outlook for the future. """
 
-    print(f"Generating latest business timeline for {company_name}")
+    print(f"Generating latest company timeline for {company_name}")
+    # Assuming `ask_perplexity` is a function that sends the prompt to the Perplexity API and returns the response.
+    response = ask_perplexity(system_prompt, company_name)
+    return response
+
+def generate_perplexity_productTimeline(company_name):
+    time=datetime.datetime.now()
+    ('%Y-%m-%d')
+    # print(time)
+
+    """
+    Generates a detailed prompt for getting the latest timeline of a company,
+    focusing on recent milestones, product launches, partnerships, and future plans.
+    """
+    # Updated system prompt to get the latest company timeline
+    system_prompt = f"""
+    Provide a detailed product timeline for the company {company_name}, focusing on the most recent product launches and product-related events in the past 3 years from today
+    Today's date is {time}.
+
+    For each product, please include the following details:
+    1. **Product Name**: The name of the product.
+    2. **Launch Date**: The date or year when the product was launched (e.g., 'yyyy-Month').
+    3. **Key Features**: The key features or innovations introduced with this product (if applicable) and also the features of the product.
+    4. **Description**: A brief description of the product and its significance.
+"""
+
+    print(f"Generating latest product timeline for {company_name}")
     # Assuming `ask_perplexity` is a function that sends the prompt to the Perplexity API and returns the response.
     response = ask_perplexity(system_prompt, company_name)
     return response

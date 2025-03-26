@@ -72,7 +72,7 @@ Strictly follow the below JSON format for the response:
        "company_timeline":{{
            "date": "string", 
            "event": "string", 
-           "descriptoin": "string", 
+           "description": "string", 
        }}
 
 }}
@@ -91,45 +91,99 @@ Please ensure the descriptions are concise but informative. """
     content =json.loads(response.choices[0].message.content)
     return content
 
+def get_openai_productTimeline(company_name, business_data):
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    system_prompt = f"""
+    You are given the following product timeline for the company: {company_name}, focusing on the last 3 years from today. Today's date is {time}.
+
+    For each product launch or significant product-related event within the past 3 years, provide the following details in a strict JSON format:
+
+    1. **Date**: The exact date (in 'yyyy-Month' format) when the product was launched or the event occurred.
+    2. **Product Name**: The name of the product or service that was launched or updated.
+    3. **Description**: A concise description of the product, its purpose, and its impact.
+    4. **Key Features**: A list of key features of the product, highlighting its main innovations and improvements.
+
+Strictly follow the below JSON format for the response:
+```json
+{{
+       "product_timeline":{{
+           "product_name": "string", 
+           "date": "string", 
+           "description": "string", 
+           "key_features":["string","string"...]
+       }}
+
+}}
+Please ensure the descriptions are concise but informative. """
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": json.dumps(business_data, indent=2)}
+        ]
+    )
+    
+    # Get the response from the model and parse it
+    content =json.loads(response.choices[0].message.content)
+    return content
 
 # Main function to test
 def main():
     company_name = "Apple"
-    business_data = """## Detailed Timeline for Apple Inc.
+    business_data = """Here is a detailed timeline of Apple Inc.'s recent product launches and significant product-related events over the past three years, from 2022 to 2025:
 
-### Recent Milestones (2022-2025)
+## Recent Product Launches
 
-- **March 2022**: Apple announced the **iPhone SE (3rd generation)** and **iPad Air (5th generation)**, focusing on improved performance and camera capabilities.
-- **June 2022**: At the **WWDC 2022**, Apple introduced **iOS 16**, **iPadOS 16**, and **macOS Ventura**, highlighting new features like a redesigned lock screen and enhanced multitasking.
-- **September 2022**: Apple launched the **iPhone 14 series**, including the iPhone 14, iPhone 14 Pro, and iPhone 14 Pro Max, with significant camera upgrades and a new notch design.
-- **October 2022**: Apple released the **iPad (10th generation)** and **iPad Pro (6th generation)**, featuring improved displays and performance.
-- **January 2023**: Apple reported a **record quarterly revenue of $117.15 billion** for Q1 2023, despite global economic challenges.
-- **March 2023**: Apple unveiled the **Mac Studio** and **Studio Display**, targeting creative professionals with powerful computing and high-quality display options.
-- **June 2023**: At **WWDC 2023**, Apple introduced **iOS 17**, **iPadOS 17**, and **macOS Sonoma**, focusing on AI-driven features and enhanced user experiences.
-- **September 2023**: Apple launched the **iPhone 15 series**, featuring new designs, improved cameras, and enhanced durability.
-- **October 2023**: Apple released the **iPad (9th generation)** and **iPad Pro (7th generation)**, with updates to performance and display technology.
-- **March 2024**: Apple reported a **fiscal year revenue of $391.04 billion**, solidifying its position as a technology leader.
-- **September 2024**: Apple announced the **iPhone 16 series**, with a focus on AI capabilities and advanced camera systems.
-- **March 2025**: Apple's market capitalization reached over **$3.74 trillion**, maintaining its status as one of the world's most valuable companies.
+### 1. **iPhone 14 Series**
+   - **Launch Date**: 2022-September
+   - **Key Features**: 
+     - **iPhone 14**: Improved cameras, faster A16 Bionic chip in Pro models, new 48MP main camera, and enhanced video recording capabilities.
+     - **iPhone 14 Pro/Pro Max**: Always-On display, Dynamic Island for notifications, and a more efficient A16 Bionic chip.
+   - **Description**: The iPhone 14 series marked significant improvements in camera technology and design, with the introduction of the Dynamic Island feature on Pro models.
 
-### Partnerships/Acquisitions
+### 2. **iPad (10th Generation)**
+   - **Launch Date**: 2022-October
+   - **Key Features**: 
+     - Larger 10.9-inch display, USB-C port, and a more powerful A14 Bionic chip.
+   - **Description**: This iPad model updated the entry-level iPad with modern features like USB-C and a larger display.
 
-- **2022**: Apple partnered with **TSMC** to develop advanced chip technology, enhancing its semiconductor capabilities.
-- **2023**: Apple expanded its partnership with **Major League Baseball (MLB)** to include exclusive streaming rights for Friday Night Baseball, further integrating Apple TV+ into sports broadcasting.
-- **2024**: Apple acquired **Miraheze**, a company specializing in AI-driven audio processing, to enhance its audio technology capabilities.
+### 3. **Apple Watch Series 8 and Ultra**
+   - **Launch Date**: 2022-September
+   - **Key Features**: 
+     - **Series 8**: Enhanced health features, including temperature sensing for women's health.
+     - **Ultra**: Larger 49mm case, longer battery life, and designed for extreme sports.
+   - **Description**: The Apple Watch Series 8 focused on health monitoring, while the Ultra model targeted athletes and outdoor enthusiasts.
 
-### Company Growth
+### 4. **AirPods Pro 2**
+   - **Launch Date**: 2022-September
+   - **Key Features**: 
+     - Improved noise cancellation, longer battery life, and a new H2 chip for better audio quality.
+   - **Description**: The second generation of AirPods Pro enhanced audio quality and noise cancellation capabilities.
 
-- **Revenue Growth**: Apple's annual revenue has consistently increased, reaching $391.04 billion in 2024, driven by strong sales of iPhones and services like Apple Music and Apple TV+.
-- **Market Share**: Apple remains the largest vendor of mobile phones and tablet computers globally, with significant market share in the personal computer sector.
-- **Employee Count**: As of 2024, Apple employs over 180,000 people worldwide, reflecting its expanding operations and product lines.
+### 5. **MacBook Air (M2)**
+   - **Launch Date**: 2022-June
+   - **Key Features**: 
+     - New M2 chip for improved performance, larger 13.6-inch display, and a more compact design.
+   - **Description**: This MacBook Air model introduced the M2 chip, offering better performance and efficiency.
 
-### Recent Innovations
+### 6. **iPhone 15 Series**
+   - **Launch Date**: 2023-September
+   - **Key Features**: 
+     - **iPhone 15 Pro/Pro Max**: New titanium frame, improved cameras, and a faster A17 Bionic chip.
+     - **USB-C port** across all models, replacing the Lightning port.
+   - **Description**: The iPhone 15 series transitioned to USB-C, aligning with EU regulations, and introduced a titanium frame for Pro models.
 
-- **AI Integration**: Apple has been integrating AI across its products, including AI-driven camera features in iPhones and AI-enhanced audio"""
+### 7. **Apple Vision Pro**
+   - **Launch Date**: Announced in 2023, expected release in 2024 or later
+   - **Key Features**: 
+     - Mixed reality capabilities, advanced eye-tracking technology, and a unique design.
+   - **Description**:"""
     
     # Get business summary from OpenAI
-    summary = get_openai_companyTimeline(company_name, business_data)
+    summary = get_openai_productTimeline(company_name, business_data)
     
     print("Result:")
     print(summary)

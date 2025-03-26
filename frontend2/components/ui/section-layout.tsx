@@ -85,7 +85,7 @@ export function SectionLayout({
                 <Button
                   onClick={handleEdit}
                   variant="outline"
-                  className="border-[#156082] text-[#156082] h-8 text-xs"
+                  className="hidden border-[#156082] text-[#156082] h-8 text-xs"
                 >
                   <Edit className="mr-1 h-3 w-3" /> Edit
                 </Button>
@@ -94,13 +94,13 @@ export function SectionLayout({
                   <Button
                     onClick={handleCancel}
                     variant="outline"
-                    className="border-red-500 text-red-500 h-8 text-xs"
+                    className="hidden border-red-500 text-red-500 h-8 text-xs"
                   >
                     <X className="mr-1 h-3 w-3" /> Cancel
                   </Button>
                   <Button
                     onClick={handleSave}
-                    className="bg-[#156082] hover:bg-[#092a38] h-8 text-xs"
+                    className="hidden bg-[#156082] hover:bg-[#092a38] h-8 text-xs"
                   >
                     <Save className="mr-1 h-3 w-3" /> Save
                   </Button>
