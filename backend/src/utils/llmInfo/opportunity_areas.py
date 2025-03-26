@@ -10,7 +10,7 @@ Generate a report on the opportunity areas for Company: {company_name} based on 
 
 Each opportunity area should include:
 1. **Opportunity Area**: A short name of the opportunity area or area of improvement.
-2. **Details**: A more detailed explanation of the opportunity, focusing on how it can benefit {company_name} based on the current market trends or areas of development.
+2. **Details**: A brief explanation of the opportunity, focusing on how it can benefit {company_name} based on the current market trends or areas of development.
 3. **Rationale**: A justification for why this is an opportunity, explaining the potential impact on {company_name}'s growth or competitiveness.
 
 For **{company_name}**, use the given **topic tags** to guide your identification of growth opportunities. Make sure the opportunities align with the company's focus and have a clear rationale explaining the potential impact.
@@ -21,7 +21,7 @@ For **{company_name}**, use the given **topic tags** to guide your identificatio
    "opportunity_areas": [
        {
            "area": "string", // The opportunity area or growth area
-           "detail": "string", // Explanation of the opportunity
+           "detail": "string", // Brief explanation of the opportunity
            "rationale": "string" // Justification for why this is a key opportunity
        }
    ]
@@ -47,3 +47,6 @@ For **{company_name}**, use the given **topic tags** to guide your identificatio
     )
     
     return json.loads(response.choices[0].message.content.split("```json\n")[1].split("```")[0])["opportunity_areas"]
+
+
+
