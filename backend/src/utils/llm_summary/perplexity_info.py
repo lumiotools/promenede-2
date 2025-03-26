@@ -99,13 +99,39 @@ def generate_perplexity_MarketLeadership(company_name):
     response = ask_perplexity(system_prompt, company_name)
     return response
 
+def generate_perplexity_KeyTechnologies(company_name):
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    # print(time)
+
+    """
+    Generates a detailed prompt for getting the latest timeline of a company,
+    focusing on recent milestones, product launches, partnerships, and future plans.
+    """
+    # Updated system prompt to get the latest company timeline
+    system_prompt = f"""
+    Provide the latest 10 key technologies that the company {company_name} is working on or has recently developed or the company uses in descending order. Focus on the following aspects:
+    Today's date is {time}.
+
+    For each technology, please provide the following details in a strict JSON format:
+
+    1. **Technology Name**: The name of the technology.
+    2. **Description**: A brief description of the technology and its impact on the company's products or services.
+    3. **Reported At**: The exact date when the technology was reported or introduced (in 'yyyy-Month' format).
+"""
+
+    print(f"Generating latest key technology for {company_name}")
+    # Assuming `ask_perplexity` is a function that sends the prompt to the Perplexity API and returns the response.
+    response = ask_perplexity(system_prompt, company_name)
+    return response
+
 
 # Main function to test the company timeline generation
 def main():
     company_name = "Apple Inc."  # You can replace this with any company name you want to analyze.
     
     # Get the timeline summary for the company
-    company_timeline = generate_perplexity_MarketLeadership(company_name)
+    company_timeline = generate_perplexity_KeyTechnologies(company_name)
     
     # Print the detailed timeline of the company
     print(f"Company Timeline for {company_name}:")

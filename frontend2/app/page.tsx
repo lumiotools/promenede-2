@@ -109,10 +109,7 @@ export default function Home() {
       employee_reviews: null,
     },
     market_leadership: null,
-    key_technology: {
-      technologies_used: [],
-      num_technologies: 0,
-    },
+    key_technology: null,
     ma_activity: {
       acquisitions: [],
       acquired_by: {

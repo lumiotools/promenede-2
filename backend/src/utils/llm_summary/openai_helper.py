@@ -170,52 +170,107 @@ Please ensure the descriptions are concise but informative. """
     content =json.loads(response.choices[0].message.content)
     return content
 
+def get_openai_keyTechnology(company_name, business_data):
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    system_prompt = f"""
+    You are given the key technologies data for the company: {company_name}. Today's date is {time}.
+
+    For each technology, please provide the following details in a strict JSON format:
+
+    1. **Technology Name**: The name of the technology.
+    2. **Description**: A brief description of the technology and its impact on the company's products or services.
+    3. **Date**: The exact date when the technology was reported or introduced (in 'yyyy-Month' format).
+```json
+{{
+       "key_technologies":{{
+           "date": "string", 
+           "technology": "string", 
+           "description":"string"
+       }}
+
+}}
+Please ensure the descriptions are concise but informative. """
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": json.dumps(business_data, indent=2)}
+        ]
+    )
+    
+    # Get the response from the model and parse it
+    content =json.loads(response.choices[0].message.content)
+    return content
 # Main function to test
 def main():
     company_name = "Apple"
     business_data = """
 
-Here is the market leadership data for Apple Inc. over the past three years, focusing on the specified aspects:
+As of 2025, Apple Inc. is continuously innovating and expanding its technological offerings. While specific details on the latest technologies might not be fully disclosed, here are ten key technologies Apple has been working on or has recently developed, focusing on publicly available information:
 
-### 2024
-- **Industry**: Technology Hardware, Storage & Peripherals
-- **Rank Category**: Largest vendor of mobile phones and tablet computers
-- **Global Rank**: Largest technology company by revenue
-- **Description**: In 2024, Apple maintained its position as the largest technology company by revenue, with $391.04 billion in revenue. It continued to lead as the largest vendor of mobile phones and tablet computers, driven by the success of its iPhone and iPad lines. Apple's strong brand loyalty and innovative products, such as the Apple Watch and AirPods, contributed to its market leadership.
+```json
+[
+  {
+    "Technology Name": "Apple Intelligence",
+    "Description": "A new AI-driven feature set expected to enhance user experience across Apple devices, potentially integrating AI capabilities into various products.",
+    "Reported At": "2025-March"
+  },
+  {
+    "Technology Name": "AirPods Pro 2 with Hearing Aid and Hearing Test Features",
+    "Description": "An update to AirPods Pro 2 that includes features for hearing aid compatibility and hearing tests, enhancing accessibility.",
+    "Reported At": "2024-September"
+  },
+  {
+    "Technology Name": "Active Noise Cancellation in AirPods 4",
+    "Description": "An advancement in noise cancellation technology for AirPods, improving audio quality and user experience.",
+    "Reported At": "2024-September"
+  },
+  {
+    "Technology Name": "Apple Vision Pro",
+    "Description": "A mixed reality headset that combines AR and VR capabilities, marking Apple's entry into the immersive technology market.",
+    "Reported At": "2023-June"
+  },
+  {
+    "Technology Name": "M2 Ultra Chip",
+    "Description": "A powerful chip designed for high-performance computing, used in Mac products like the Mac Studio.",
+    "Reported At": "2023-January"
+  },
+  {
+    "Technology Name": "Apple M1 Ultra Chip",
+    "Description": "A high-performance chip for Mac products, offering enhanced processing and graphics capabilities.",
+    "Reported At": "2022-March"
+  },
+  {
+    "Technology Name": "Apple Watch Series 8 with Crash Detection",
+    "Description": "A feature that detects severe car crashes and automatically contacts emergency services, enhancing safety.",
+    "Reported At": "2022-September"
+  },
+  {
+    "Technology Name": "Apple M2 Chip",
+    "Description": "A second-generation chip for Mac and iPad products, offering improved performance and efficiency.",
+    "Reported At": "2022-June"
+  },
+  {
+    "Technology Name": "Apple M1 Pro and M1 Max Chips",
+    "Description": "High-performance chips designed for professional-grade Mac products, offering enhanced processing and graphics capabilities.",
+    "Reported At": "2021-October"
+  },
+  {
+    "Technology Name": "Apple M1 Chip",
+    "Description": "A revolutionary chip marking Apple's transition to in-house silicon for Mac products, enhancing performance and efficiency.",
+    "Reported At": "2020-November"
+  }
+]
+```
 
-### 2023
-- **Industry**: Technology Hardware, Storage & Peripherals
-- **Rank Category**: Largest vendor of mobile phones and tablet computers
-- **Global Rank**: Largest company by market capitalization
-- **Description**: In 2023, Apple was the largest company by market capitalization and maintained its dominance in the mobile phone and tablet markets. Its ecosystem of interconnected devices and services, including Apple Music and Apple TV+, further solidified its market position. The company's focus on innovation and user experience helped it stay ahead of competitors.
-
-### 2022
-- **Industry**: Technology Hardware, Storage & Peripherals
-- **Rank Category**: Largest vendor of mobile phones and tablet computers
-- **Global Rank**: Among the top companies by market capitalization
-- **Description**: In 2022, Apple continued to be a leader in the technology sector, with significant market share in mobile phones and tablets. Its strong brand and continuous innovation in products like the iPhone and Mac helped maintain its position. Apple's services segment, including Apple Music and Apple TV+, also contributed to its market leadership by providing a comprehensive ecosystem for users.
-
-### 2021
-- **Industry**: Technology Hardware, Storage & Peripherals
-- **Rank Category**: Largest vendor of mobile phones and tablet computers
-- **Global Rank**: Among the top companies by market capitalization
-- **Description**: In 2021, Apple remained a dominant force in the technology industry, driven by the success of its hardware products and expanding services. The company's ability to integrate its devices and services seamlessly enhanced user experience, contributing to its market leadership.
-
-### 2020
-- **Industry**: Technology Hardware, Storage & Peripherals
-- **Rank Category**: Largest vendor of mobile phones and tablet computers
-- **Global Rank**: Among the top companies by market capitalization
-- **Description**: In 2020, Apple continued to lead in the technology sector, with its iPhone and iPad sales driving revenue growth. The company's focus on innovation and its expanding services segment helped maintain its market position despite global challenges like the COVID-19 pandemic.
-
-For the years beyond the past three, Apple has consistently been a leader in the technology industry, with significant market capitalization and revenue. However, specific detailed rankings for each year beyond 2022 are not provided in the search results. 
-
-### Additional Notes
-- **Market Capitalization**: As of December 2024, Apple was valued at over $3.74 trillion, making it one of the most valuable companies globally[2].
-- **Revenue and Market Share**: Apple's revenue and market share in various categories have consistently positioned it as a leader in the technology sector[2][3].
+These technologies highlight Apple's focus on AI, chip design, augmented reality, and enhanced user experiences across its product lineup. However, note that some of these technologies might not be the very latest, as Apple often announces new developments at specific events like WWDC or product launches.
 """
     
     # Get business summary from OpenAI
-    summary = get_openai_marketLeadership(company_name, business_data)
+    summary = get_openai_keyTechnology(company_name, business_data)
     
     print("Result:")
     print(summary)

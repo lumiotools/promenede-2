@@ -43,7 +43,7 @@ export type CompanyData = {
   };
   executive_summary: ExecutiveSummary;
   market_leadership: MarketLeadership[] | null;
-  key_technology: KeyTechnology;
+  key_technology: KeyTechnology[] | null;
   ma_activity: MAActivity;
   market_info: MarketInfo;
   competitive_analysis: CompetitiveAnalysis;

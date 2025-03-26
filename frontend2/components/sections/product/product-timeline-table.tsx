@@ -17,13 +17,16 @@ export default function ProductTimelineTable({
   );
 
   useEffect(() => {
-    if (initialData) {
+    if (initialData && Array.isArray(initialData)) {
       // Sort by date if available
       const sortedData = [...initialData].sort((a, b) => {
         if (!a.date || !b.date) return 0;
         return new Date(b.date).getTime() - new Date(a.date).getTime();
       });
       setData(sortedData);
+    } else {
+      // Handle the case when initialData is not an array
+      setData([]);
     }
   }, [initialData]);
 
