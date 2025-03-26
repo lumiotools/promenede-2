@@ -18,7 +18,7 @@ export default function StrategicDevelopmentTimeline({
   const [data, setData] = useState<StrategicDevelopment | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sourceText, setSourceText] = useState<string>(
-    "Source: Company Reports, Strategic Planning Documents"
+    "Source: Coresignal, OpenAI"
   );
 
   useEffect(() => {

@@ -43,7 +43,10 @@ export function EmployeeKeyMembers({
   const displayMembers = validMembers.slice(0, 9);
 
   return (
-    <SectionLayout title="Organization: Key Members">
+    <SectionLayout
+      title="Organization: Key Members"
+      sourceText="Source: Coresignal, OpenAI"
+    >
       {/* Grid Layout for Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayMembers.length > 0 ? (

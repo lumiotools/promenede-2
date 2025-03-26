@@ -39,7 +39,7 @@ export default function EmployeeReviewsPage({
   const [data, setData] = useState<EmployeeReviews | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Glassdoor"
+    "Source: Coresignal, OpenAI"
   );
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function EmployeeReviewsPage({
 
       // Update source text
       if (!sourceText.includes("User Update")) {
-        setSourceText("Source: 1.PromenadeAI, 2.Glassdoor, 3.User Update");
+        setSourceText("Source: Coresignal, OpenAI, User Update");
       }
     }
   };
@@ -188,9 +188,7 @@ export default function EmployeeReviewsPage({
 
                     // Update source text
                     if (!sourceText.includes("User Update")) {
-                      setSourceText(
-                        "Source: 1.PromenadeAI, 2.Glassdoor, 3.User Update"
-                      );
+                      setSourceText("Source: Coresignal, OpenAI, User Update");
                     }
                   }}
                 >

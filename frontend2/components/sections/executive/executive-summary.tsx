@@ -299,7 +299,7 @@ export function ExecutiveSummaryPage({
   return (
     <SectionLayout
       title="Executive Summary"
-      sourceText="Company filings, financial reports"
+      sourceText="Source: Coresignal, Crunchbase, Perplexity"
     >
       <div className="p-4">
         <div className="hidden flex justify-between items-center mb-2 border-b border-gray-200 pb-1">

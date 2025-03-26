@@ -18,9 +18,7 @@ interface WebTrafficProps {
 
 export default function WebTrafficComponent({ initialData }: WebTrafficProps) {
   const [data, setData] = useState<WebTraffic | null>(null);
-  const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.SimilarWeb"
-  );
+  const [sourceText, setSourceText] = useState<string>("Source: Coresignal");
 
   useEffect(() => {
     if (initialData) {

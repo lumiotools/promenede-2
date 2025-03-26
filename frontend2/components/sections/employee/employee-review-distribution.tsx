@@ -25,7 +25,7 @@ export default function EmployeeReviewDistribution({
   const [data, setData] = useState<EmployeeReviews | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Glassdoor"
+    "Source: Coresignal, OpenAI"
   );
 
   useEffect(() => {

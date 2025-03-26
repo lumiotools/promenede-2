@@ -29,7 +29,7 @@ export function CompanyTimeline({ initialData }: CompanyTimelineProps) {
 
   const [data, setData] = useState<TimelineEvent[]>(getInitialDataArray());
   const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
+    "Source: Coresignal, Perplexity"
   );
 
   // Update data when initialData changes

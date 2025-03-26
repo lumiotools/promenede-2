@@ -182,7 +182,7 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
     return (
       <SectionLayout
         title="Value Chain Analysis"
-        sourceText="Source: Company reports, industry analysis"
+        sourceText="Source: OpenAI"
         showEditButton={false}
       >
         <div className="space-y-4">
@@ -199,7 +199,7 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
     return (
       <SectionLayout
         title="Value Chain Analysis"
-        sourceText="Source: Company reports, industry analysis"
+        sourceText="Source: OpenAI"
         showEditButton={false}
       >
         <div className="space-y-4">
@@ -231,7 +231,7 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
   return (
     <SectionLayout
       title="Value Chain Analysis"
-      sourceText="Source: Company reports, industry analysis"
+      sourceText="Source: OpenAI"
       showEditButton={false}
     >
       <div className="space-y-4">

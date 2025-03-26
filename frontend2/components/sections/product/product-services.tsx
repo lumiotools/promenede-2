@@ -11,7 +11,7 @@ interface ProductServicesProps {
 export default function ProductServices({ initialData }: ProductServicesProps) {
   const [data, setData] = useState<Service[]>([]);
   const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
+    "Source: Coresignal, Perplexity"
   );
 
   useEffect(() => {

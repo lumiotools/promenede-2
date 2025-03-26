@@ -28,7 +28,7 @@ export default function Opportunities({
     initialData || defaultState
   );
   const [sourceText, setSourceText] = useState<string>(
-    "Source: PromenadeAI, Industry Analysis"
+    "Source: Coresignal, OpenAI"
   );
 
   // Fix: Only include initialData in the dependency array and add proper comparison
@@ -42,7 +42,7 @@ export default function Opportunities({
 
   const saveChanges = (): void => {
     setData(editData);
-    setSourceText("Source: PromenadeAI, Industry Analysis, User Update");
+    setSourceText("Source: Coresignal, OpenAI, User Update");
   };
 
   const updateOpportunity = (

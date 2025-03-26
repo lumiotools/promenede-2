@@ -23,7 +23,7 @@ export default function RegulationPage({
     initialData || defaultState
   );
   const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
+    "Source: Coresignal, OpenAI"
   );
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function RegulationPage({
     setIsEditing(false);
 
     // Update the source text to include the user
-    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
+    setSourceText("Source: Coresignal, OpenAI, User Update");
   };
 
   const updateRegulation = (

@@ -175,9 +175,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
   const [editData, setEditData] = useState<MarketLeadership[]>(
     getInitialDataArray(initialData)
   );
-  const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
-  );
+  const [sourceText, setSourceText] = useState<string>("Source: Perplexity");
 
   // Update data when initialData changes
   useEffect(() => {
@@ -221,7 +219,7 @@ const MarketLeadershipPage: React.FC<MarketLeadershipProps> = ({
     setIsEditing(false);
 
     // Update the source text to include the user
-    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
+    setSourceText("Source: Perplexity, User Update");
   };
 
   // Update a specific award

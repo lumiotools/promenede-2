@@ -84,10 +84,7 @@ export default function MarketMapPage({
   const topSegments = segments.slice(0, 4);
 
   return (
-    <SectionLayout
-      title="Market Map"
-      sourceText="Source: 1.PromenadeAI, 2.Crunchbase"
-    >
+    <SectionLayout title="Market Map" sourceText="Source: OpenAI">
       {segments.length === 0 ? (
         <div className="flex items-center justify-center h-full">
           <p className="text-[#57727e] text-lg">No market map data present</p>

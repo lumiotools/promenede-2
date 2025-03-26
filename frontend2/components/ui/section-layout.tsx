@@ -29,7 +29,7 @@ export function SectionLayout({
   children,
   onSave,
   initialData,
-  sourceText = "Source: 1.PromenadeAI, 2.Crunchbase",
+  sourceText = "",
   className = "",
   showEditButton = true,
 }: SectionLayoutProps) {

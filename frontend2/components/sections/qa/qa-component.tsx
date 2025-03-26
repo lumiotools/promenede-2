@@ -14,7 +14,7 @@ export default function QAComponent({ initialData = [] }: QAProps) {
   const [qaData, setQaData] = useState<QAItem[]>(initialData);
   const [editData, setEditData] = useState<QAItem[]>(initialData || []);
   const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
+    "Source: Coresignal, OpenAI"
   );
 
   // Fix: Only include initialData in the dependency array
@@ -38,7 +38,7 @@ export default function QAComponent({ initialData = [] }: QAProps) {
     setQaData(editData);
 
     // Update the source text to include the user
-    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
+    setSourceText("Source: Coresignal, OpenAI, User Update");
   };
 
   const updateQA = (

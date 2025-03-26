@@ -25,7 +25,7 @@ export default function CompetitiveLandscape({
 }: CompetitiveLandscapeProps) {
   const [data, setData] = useState<ProcessedCompetitor[] | null>(null);
   const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
+    "Source: Coresignal, OpenAI"
   );
 
   useEffect(() => {

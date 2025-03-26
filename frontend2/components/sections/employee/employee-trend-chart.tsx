@@ -1,10 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts"
-import { SectionLayout } from "@/components/ui/section-layout"
-import type { EmployeesTrend } from "@/types/employeeTrend"
+import { useEffect, useState } from "react";
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Area,
+  AreaChart,
+} from "recharts";
+import { SectionLayout } from "@/components/ui/section-layout";
+import type { EmployeesTrend } from "@/types/employeeTrend";
 
 // Default empty state with null safety
 const defaultState: EmployeesTrend = {
@@ -15,99 +23,108 @@ const defaultState: EmployeesTrend = {
   breakdown_by_country: null,
   breakdown_by_region: null,
   breakdown_by_seniority: null,
-}
+};
 
 interface EmployeeTrendChartProps {
-  initialData?: EmployeesTrend
+  initialData?: EmployeesTrend;
 }
 
 interface ChartDataPoint {
-  month: string
-  employees: number
+  month: string;
+  employees: number;
 }
 
-export function EmployeeTrendChart({ initialData = defaultState }: EmployeeTrendChartProps) {
-  const [data, setData] = useState<EmployeesTrend>(initialData)
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([])
-  const [increase, setIncrease] = useState<number>(0)
-  const [percentIncrease, setPercentIncrease] = useState<string>("0.0")
+export function EmployeeTrendChart({
+  initialData = defaultState,
+}: EmployeeTrendChartProps) {
+  const [data, setData] = useState<EmployeesTrend>(initialData);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [increase, setIncrease] = useState<number>(0);
+  const [percentIncrease, setPercentIncrease] = useState<string>("0.0");
 
   useEffect(() => {
     // Update state when initialData changes
     if (initialData) {
-      setData(initialData)
+      setData(initialData);
     }
-  }, [initialData])
+  }, [initialData]);
 
   useEffect(() => {
     // Process data for the chart when data changes
-    processChartData()
-  }, [data])
+    processChartData();
+  }, [data]);
 
   const processChartData = () => {
     if (!data.count_by_month || data.count_by_month.length === 0) {
-      setChartData([])
-      setIncrease(0)
-      setPercentIncrease("0.0")
-      return
+      setChartData([]);
+      setIncrease(0);
+      setPercentIncrease("0.0");
+      return;
     }
 
     // Filter out entries with null values
-    const validData = data.count_by_month.filter((entry) => entry.date !== null && entry.employees_count !== null) as {
-      date: string
-      employees_count: number
-    }[]
+    const validData = data.count_by_month.filter(
+      (entry) => entry.date !== null && entry.employees_count !== null
+    ) as {
+      date: string;
+      employees_count: number;
+    }[];
 
     // Sort data by date (oldest to newest)
     const sortedData = [...validData].sort((a, b) => {
-      const dateA = new Date(a.date)
-      const dateB = new Date(b.date)
-      return dateA.getTime() - dateB.getTime()
-    })
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime();
+    });
 
     // Take only the last 12 months of data for better visualization
-    const recentData = sortedData.slice(-12)
+    const recentData = sortedData.slice(-12);
 
     // Format data for the chart
     const formattedData = recentData.map((entry) => {
       // Parse date and format it
-      const date = new Date(entry.date)
+      const date = new Date(entry.date);
       const month = date.toLocaleString("en-US", {
         month: "short",
         year: "2-digit",
-      })
+      });
 
       return {
         month,
         employees: entry.employees_count,
-      }
-    })
+      };
+    });
 
-    setChartData(formattedData)
+    setChartData(formattedData);
 
     // Calculate increase
     if (formattedData.length > 0) {
-      const firstCount = formattedData[0]?.employees || 0
-      const lastCount = formattedData[formattedData.length - 1]?.employees || 0
-      const calculatedIncrease = lastCount - firstCount
-      setIncrease(calculatedIncrease)
+      const firstCount = formattedData[0]?.employees || 0;
+      const lastCount = formattedData[formattedData.length - 1]?.employees || 0;
+      const calculatedIncrease = lastCount - firstCount;
+      setIncrease(calculatedIncrease);
 
       // Calculate percent increase with null safety
       if (firstCount > 0) {
-        setPercentIncrease(((calculatedIncrease / firstCount) * 100).toFixed(1))
+        setPercentIncrease(
+          ((calculatedIncrease / firstCount) * 100).toFixed(1)
+        );
       } else {
-        setPercentIncrease("0.0")
+        setPercentIncrease("0.0");
       }
     }
-  }
+  };
 
   // Format number to K format (e.g., 2000 -> 2.0K)
   const formatToK = (num: number) => {
-    return `${(num / 1000).toFixed(1)}K`
-  }
+    return `${(num / 1000).toFixed(1)}K`;
+  };
 
   return (
-    <SectionLayout title="Employee Trend">
+    <SectionLayout
+      title="Employee Trend"
+      sourceText="Source: Coresignal, OpenAI"
+    >
       {({ isEditing, editData, setEditData }) => (
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Chart Section - 70% width */}
@@ -116,14 +133,35 @@ export function EmployeeTrendChart({ initialData = defaultState }: EmployeeTrend
               {chartData.length > 0 ? (
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
+                    <AreaChart
+                      data={chartData}
+                      margin={{ top: 10, right: 20, left: 10, bottom: 20 }}
+                    >
                       <defs>
-                        <linearGradient id="colorEmployees" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#002169" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="#002169" stopOpacity={0.1} />
+                        <linearGradient
+                          id="colorEmployees"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#002169"
+                            stopOpacity={0.8}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#002169"
+                            stopOpacity={0.1}
+                          />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        vertical={false}
+                        stroke="#e0e0e0"
+                      />
                       <XAxis
                         dataKey="month"
                         tick={{ fill: "#445963", fontSize: 11 }}
@@ -169,11 +207,14 @@ export function EmployeeTrendChart({ initialData = defaultState }: EmployeeTrend
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-[300px] bg-gray-50 rounded-md">
-                  <p className="text-gray-500 text-sm">No employee trend data available</p>
+                  <p className="text-gray-500 text-sm">
+                    No employee trend data available
+                  </p>
                 </div>
               )}
               <p className="text-xs text-[#445963] mt-2">
-                There has been a total {increase >= 0 ? "increase" : "decrease"} of {percentIncrease}% in employee count
+                There has been a total {increase >= 0 ? "increase" : "decrease"}{" "}
+                of {percentIncrease}% in employee count
               </p>
             </div>
           </div>
@@ -183,12 +224,16 @@ export function EmployeeTrendChart({ initialData = defaultState }: EmployeeTrend
             <h3 className="text-sm font-medium text-[#445963] mb-3">Summary</h3>
             <div className="prose prose-sm max-w-none">
               {initialData?.count_summary ? (
-                <p className="text-xs text-[#445963]">{initialData.count_summary}</p>
+                <p className="text-xs text-[#445963]">
+                  {initialData.count_summary}
+                </p>
               ) : (
                 <p className="text-xs text-[#445963]">
-                  The company has shown consistent growth in its workforce over the past year. This growth aligns with
-                  the company's expansion strategy and recent funding rounds. The hiring pace has accelerated in the
-                  last quarter, particularly in technical roles.
+                  The company has shown consistent growth in its workforce over
+                  the past year. This growth aligns with the company's expansion
+                  strategy and recent funding rounds. The hiring pace has
+                  accelerated in the last quarter, particularly in technical
+                  roles.
                 </p>
               )}
             </div>
@@ -196,6 +241,5 @@ export function EmployeeTrendChart({ initialData = defaultState }: EmployeeTrend
         </div>
       )}
     </SectionLayout>
-  )
+  );
 }
-

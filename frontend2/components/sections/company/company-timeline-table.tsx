@@ -35,7 +35,7 @@ export function CompanyTimelineTable({
   const [editData, setEditData] = useState<TimelineEvent[] | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
+    "Source: Coresignal, Perplexity"
   );
 
   // Helper function to check if a string is empty or null
@@ -109,7 +109,7 @@ export function CompanyTimelineTable({
       setData(editData);
 
       // Update the source text to include the user
-      setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
+      setSourceText("Source: Coresignal, Perplexity, User Update");
     }
     setIsEditing(false);
   };

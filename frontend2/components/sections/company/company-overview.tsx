@@ -37,7 +37,7 @@ export default function CompanyOverview({
     initialData
   );
   const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
+    "Source: Crunchbase, Perplexity"
   );
 
   // Fetch data if not provided as initialData
@@ -73,7 +73,7 @@ export default function CompanyOverview({
 
       // Update source text
       if (!sourceText.includes("User Update")) {
-        setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
+        setSourceText("SCrunchbase, Perplexity,User Update");
       }
     }
   };
@@ -111,7 +111,7 @@ export default function CompanyOverview({
         if (editData) {
           setData(editData);
           if (!sourceText.includes("User Update")) {
-            setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
+            setSourceText("Source: Crunchbase, Perplexity, 3.User Update");
           }
         }
       }}

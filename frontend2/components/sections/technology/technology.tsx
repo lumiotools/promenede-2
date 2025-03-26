@@ -11,7 +11,7 @@ interface TechnologyProps {
 export default function TechnologyComponent({ initialData }: TechnologyProps) {
   const [data, setData] = useState<KeyTechnology[] | null>(null);
   const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Company Reports"
+    "Source: Coresignal, Perplexity"
   );
 
   useEffect(() => {

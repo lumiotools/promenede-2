@@ -12,9 +12,7 @@ export default function FinancialComparables({
   initialData,
 }: FinancialComparablesProps) {
   const [data, setData] = useState<FinancialComparable[]>([]);
-  const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
-  );
+  const [sourceText, setSourceText] = useState<string>("Source: Coresignal");
 
   // Helper function to check if a comparable has valid data
   const isValidComparable = (comparable: FinancialComparable): boolean => {

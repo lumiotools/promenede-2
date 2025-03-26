@@ -12,9 +12,7 @@ export default function ProductTimelineTable({
   initialData,
 }: ProductTimelineTableProps) {
   const [data, setData] = useState<ProductLaunch[]>([]);
-  const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
-  );
+  const [sourceText, setSourceText] = useState<string>("Source: Perplexity");
 
   useEffect(() => {
     if (initialData && Array.isArray(initialData)) {

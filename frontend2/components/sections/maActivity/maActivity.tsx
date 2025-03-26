@@ -78,9 +78,7 @@ const MAStrategyPage: React.FC<MaActivityProps> = ({
   const [editData, setEditData] = useState<ExtendedAcquisition[]>(
     getExtendedData(safeAcquisitions)
   );
-  const [sourceText, setSourceText] = useState<string>(
-    "Source: 1.PromenadeAI, 2.Crunchbase"
-  );
+  const [sourceText, setSourceText] = useState<string>("Source: Coresignal");
 
   // Update data when initialData changes
   useEffect(() => {
@@ -123,7 +121,7 @@ const MAStrategyPage: React.FC<MaActivityProps> = ({
     setIsEditing(false);
 
     // Update the source text to include the user
-    setSourceText("Source: 1.PromenadeAI, 2.Crunchbase, 3.User Update");
+    setSourceText("Source: Coresignal, User Update");
   };
 
   const updateAcquisition = (
