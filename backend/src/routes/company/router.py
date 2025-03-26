@@ -3,6 +3,8 @@ from pydantic import BaseModel
 import os
 import requests
 from dotenv import load_dotenv
+from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline
+from src.utils.llm_summary.perplexity_info import generate_perplexity_businessDetail, generate_perplexity_companyTimeline
 from src.utils.llmInfo.llm import fetch_company_data
 from src.utils.crunchbase.company import get_organization_data
 from src.utils.secFilings.getCik import get_cik_by_company_name
@@ -324,5 +326,19 @@ async def get_company_data(request: CompanyRequest):
     
     market_map = get_market_map(company_name, response_data["market_info"]["market_map"])
     response_data["market_info"]["market_map"] = market_map 
+
+    business_detail=generate_perplexity_businessDetail(company_name,response_data['company_overview'])
+    # print("business detail",business_detail)
+    openai_business=get_openai_business(company_name,business_detail)
+    # print("openai business",openai_business)
+    response_data["executive_summary"]['description']=openai_business["business_description"]
+    response_data["company_overview"]['business_model']=openai_business["business_model"]
+    response_data["company_overview"]['products_brands']=openai_business["products_brands"]
+    response_data["company_overview"]['customers']=openai_business["customers"]
+
+    perplexity_company_timeline = generate_perplexity_companyTimeline(company_name)
+    openai_company_timeline=get_openai_companyTimeline(company_name,perplexity_company_timeline)
+    response_data["company_timeline"]=openai_company_timeline["company_timeline"]
+    
     
     return {"success":True,"company_name": company_name, "data": response_data}

@@ -39,24 +39,13 @@ export function CompanyTimeline({ initialData }: CompanyTimelineProps) {
     setData(newDataArray);
   }, [initialData]);
 
-  // Format date from YYYY-MM-DD to YYYY.MM.DD
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "N/A";
-    return dateString.replace(/-/g, ".");
-  };
-
   // Helper function to check if a string is empty or null
   const isValidString = (str: string | null | undefined): boolean => {
     return str !== null && str !== undefined && str.trim() !== "";
   };
 
-  // Helper function to determine display text from event or description
-  const getDisplayText = (event: TimelineEvent): string => {
-    return event.event || event.description || "N/A";
-  };
-
   // Filter events where date AND (event OR description) are not null/empty
-  // Sort by date (newest first) and limit to 5
+  // Sort by date (newest first) and limit to 6
   const sortedEvents = [...data]
     .filter((event) => {
       return (
@@ -68,7 +57,7 @@ export function CompanyTimeline({ initialData }: CompanyTimelineProps) {
       if (!a.date || !b.date) return 0;
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     })
-    .slice(0, 5);
+    .slice(0, 6);
 
   if (sortedEvents.length === 0) {
     return (
@@ -84,44 +73,57 @@ export function CompanyTimeline({ initialData }: CompanyTimelineProps) {
     );
   }
 
+  // Group events into 3 columns with 2 events each
+  const columns = [
+    sortedEvents.slice(0, 2),
+    sortedEvents.slice(2, 4),
+    sortedEvents.slice(4, 6),
+  ];
+
   return (
     <SectionLayout
       title="Company Timeline"
       sourceText={sourceText}
       initialData={initialData}
     >
-      {/* Timeline */}
-      <div className="relative py-16 px-4 h-[220px]">
-        {/* Horizontal line */}
-        <div className="absolute left-0 right-0 top-1/2 h-[1px] bg-[#d1d5db]"></div>
+      <div className="flex justify-between h-full py-4 px-2">
+        {columns.map((column, colIndex) => (
+          <div key={colIndex} className="relative flex-1 mx-2">
+            {/* Vertical line */}
+            <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-[#d1d5db] transform -translate-x-1/2"></div>
 
-        {/* Timeline points */}
-        <div className="relative h-full w-full">
-          {sortedEvents.map((event, index) => (
-            <div
-              key={index}
-              className="absolute flex flex-col items-center"
-              style={{
-                left: `${10 + (80 * index) / (sortedEvents.length - 1 || 1)}%`,
-                top: "50%",
-                transform: "translate(-50%, -50%)",
-              }}
-            >
-              {/* Date */}
-              <div className="absolute top-[-40px] text-sm text-[#4b5563] font-medium">
-                {formatDate(event.date || "")}
+            {/* Timeline events */}
+            {column.map((event, eventIndex) => (
+              <div
+                key={eventIndex}
+                className="relative"
+                style={{
+                  top: eventIndex === 0 ? "25%" : "75%",
+                  position: "absolute",
+                  width: "100%",
+                }}
+              >
+                {/* Point */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#1e40af]"></div>
+
+                {/* Date and Event on the left */}
+                <div className="absolute left-0 right-1/2 pr-4 text-center">
+                  <div className="text-sm text-[#4b5563] font-medium">
+                    {event.date || "N/A"}
+                  </div>
+                  <div className="text-xs text-[#4b5563]">
+                    {event.event || "N/A"}
+                  </div>
+                </div>
+
+                {/* Description on the right */}
+                <div className="absolute left-1/2 right-0 pl-4 text-xs text-[#4b5563] text-left">
+                  {event.description || ""}
+                </div>
               </div>
-
-              {/* Point */}
-              <div className="w-3 h-3 rounded-full bg-[#1f2937]"></div>
-
-              {/* Event */}
-              <div className="absolute top-[20px] text-xs text-[#4b5563] text-center max-w-[250px]">
-                {getDisplayText(event)}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ))}
       </div>
     </SectionLayout>
   );
