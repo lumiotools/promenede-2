@@ -45,7 +45,7 @@ export function CompanyTimeline({ initialData }: CompanyTimelineProps) {
   };
 
   // Filter events where date AND (event OR description) are not null/empty
-  // Sort by date (newest first) and limit to 6
+  // Sort by date (newest first) and limit to 3
   const sortedEvents = [...data]
     .filter((event) => {
       return (
@@ -57,7 +57,7 @@ export function CompanyTimeline({ initialData }: CompanyTimelineProps) {
       if (!a.date || !b.date) return 0;
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     })
-    .slice(0, 6);
+    .slice(0, 4);
 
   if (sortedEvents.length === 0) {
     return (
@@ -73,42 +73,29 @@ export function CompanyTimeline({ initialData }: CompanyTimelineProps) {
     );
   }
 
-  // Group events into 3 columns with 2 events each
-  const columns = [
-    sortedEvents.slice(0, 2),
-    sortedEvents.slice(2, 4),
-    sortedEvents.slice(4, 6),
-  ];
-
   return (
     <SectionLayout
       title="Company Timeline"
       sourceText={sourceText}
       initialData={initialData}
     >
-      <div className="flex justify-between h-full py-4 px-2">
-        {columns.map((column, colIndex) => (
-          <div key={colIndex} className="relative flex-1 mx-2">
-            {/* Vertical line */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-[#d1d5db] transform -translate-x-1/2"></div>
+      <div className="py-6 px-4 relative">
+        {/* Horizontal timeline line */}
+        <div className="relative w-full">
+          {/* Horizontal line across the entire width */}
+          <div className="absolute left-0 right-0 top-20 h-[1px] bg-[#d1d5db] w-full"></div>
 
-            {/* Timeline events */}
-            {column.map((event, eventIndex) => (
+          {/* Container for the events */}
+          <div className="flex justify-between w-full">
+            {sortedEvents.map((event, index) => (
               <div
-                key={eventIndex}
-                className="relative"
-                style={{
-                  top: eventIndex === 0 ? "25%" : "75%",
-                  position: "absolute",
-                  width: "100%",
-                }}
+                key={index}
+                className="relative flex flex-col items-center"
+                style={{ width: "33%" }}
               >
-                {/* Point */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#1e40af]"></div>
-
-                {/* Date and Event on the left */}
-                <div className="absolute left-0 right-1/2 pr-4 text-center">
-                  <div className="text-sm text-[#4b5563] font-medium">
+                {/* Date and Event above the line */}
+                <div className="mb-2 text-center">
+                  <div className="text-sm text-[#4b5563] font-medium mb-1">
                     {event.date || "N/A"}
                   </div>
                   <div className="text-xs text-[#4b5563]">
@@ -116,14 +103,17 @@ export function CompanyTimeline({ initialData }: CompanyTimelineProps) {
                   </div>
                 </div>
 
-                {/* Description on the right */}
-                <div className="absolute left-1/2 right-0 pl-4 text-xs text-[#4b5563] text-left">
+                {/* Circle point on the line */}
+                <div className="w-3 h-3 rounded-full bg-[#1e40af] relative z-10 mt-8"></div>
+
+                {/* Description below the line */}
+                <div className="text-xs text-[#4b5563] text-center mt-4 px-2 max-w-xs">
                   {event.description || ""}
                 </div>
               </div>
             ))}
           </div>
-        ))}
+        </div>
       </div>
     </SectionLayout>
   );
