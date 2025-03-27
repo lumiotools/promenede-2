@@ -51,6 +51,9 @@ async def get_company_data(request: CompanyRequest):
     
     coresignal_data=convert_null_to_none(coresignal_data)
     company_name=coresignal_data.get("company_name","")
+    crunchbase_url=coresignal_data.get("crunchbase_url","")
+    company_name = crunchbase_url.split("/")[-1]
+    print("crunchbase url",crunchbase_url, " Company name",company_name)
     
     # Get data from different sources
     crunchbase_data = get_organization_data(company_name)
