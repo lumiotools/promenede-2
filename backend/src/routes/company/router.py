@@ -642,7 +642,7 @@ async def get_company_data(request: CompanyRequest):
             )
             response_data['market_info']['value_chain'] = openai_valueChain.get('value_chain', {})
     except Exception as e:
-        print(f"Error enriching financial comparables: {e}")
+        print(f"Error enriching fvalue chain: {e}")
 
          # Handle financial comparables
     try:

@@ -294,26 +294,31 @@ def get_openai_financial_comparables(company_name, business_data):
     time=datetime.datetime.now()
     time=time.strftime('%Y-%m-%d')
     system_prompt = f"""
-    You are given the value chain data for the company: {company_name}. Today's date is {time}.
+    You are given the financial comparables data for the company: {company_name}. Today's date is {time}.
 
-    Provide the value chain information for the company {company_name}, including stages and activities over its business operations. Today's date is {time}.
+    Provide the financial comparables for the company {company_name} over the last 5 years, starting from the most recent information first. Today's date is {time}.
 
-    For each stage in the value chain, please provide the following details in a strict JSON format:
+    For each financial comparable, please provide the following details in a strict JSON format:
 
-    1. **Stage**: The name of the value chain stage (e.g., Research and Development, Manufacturing, Marketing).
-    2. **Activities**: A list of activities involved in that stage. Include a minimum of 4 activities and a maximum of 6 activities.
-    3. **Companies**: A list of companies (by name) involved in each stage. For example, tools used, suppliers, or partners. You should return 3 to 5 companies involved in each stage, not the company's own name, but the companies that contribute to that particular stage.
+    1. **Date**: The date the information is for (in yyyy-Month-Day format).
+    2. **Revenue**: The revenue for the company in USD or the relevant currency.
+    3. **Last Valuation**: The last valuation of the company in USD or the relevant currency.
+    4. **Last Funding**: The date of the last funding round and the amount raised (if available).
+    5. **Description**: A brief description of the company's financial performance for that date.
 
-    Please ensure that you return the most relevant value chain information for the company {company_name}, with the most recent information first, sorted in descending order by date. Ensure that the format strictly follows the instructions and the information is relevant to the company's value chain.
+    Please ensure that you return the most relevant financial information from the last 5 years, with the most recent information first, sorted in descending order by date. Ensure that the format strictly follows the instructions and the information is relevant to the last 5 years only.
 
 JSON Format is:
 ```json
 {{
-    "value_chain": {{
-        "stage": "string", 
-        "activities": ["string", "string", "string", "string", "string", "string"], 
-        "companies": ["string", "string", "string", "string", "string"]
+    "financial_comparables": {{
+        "date": "yyyy-Month-Day", 
+        "revenue": "string", 
+        "last_valuation": "string", 
+        "last_funding": "string", 
+        "description": "string"
     }}
+
 }}
 Please ensure the descriptions are concise but informative. """
 
