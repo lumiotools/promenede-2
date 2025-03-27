@@ -17,10 +17,9 @@ export default function FinancialComparables({
   // Helper function to check if a comparable has valid data
   const isValidComparable = (comparable: FinancialComparable): boolean => {
     return (
-      comparable.name !== null &&
-      comparable.name !== undefined &&
-      comparable.name.trim() !== "" &&
-      comparable.financial_data !== null
+      comparable.description !== null &&
+      comparable.description !== undefined &&
+      comparable.description.trim() !== ""
     );
   };
 
@@ -35,7 +34,7 @@ export default function FinancialComparables({
   // Limit to top 5 valid financial comparables
   const displayComparables = Array.isArray(data) ? data.slice(0, 5) : [];
 
-  // Format currency function - adjusted for string values
+  // Format currency function
   const formatCurrency = (value: string | null) => {
     if (value === null || value === undefined || value === "") return "N/A";
 
@@ -52,10 +51,20 @@ export default function FinancialComparables({
     }).format(numValue);
   };
 
-  // Format similarity score as percentage
-  const formatSimilarityScore = (value: number | null) => {
-    if (value === null || value === undefined) return "N/A";
-    return `${(value * 100).toFixed(0)}%`;
+  // Format date
+  const formatDate = (dateStr: string | null): string => {
+    if (!dateStr) return "N/A";
+
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch (e) {
+      return "N/A";
+    }
   };
 
   return (
@@ -71,39 +80,33 @@ export default function FinancialComparables({
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-[#002169] text-white">
-                <th className="p-4 text-left font-medium">Company</th>
-                <th className="p-4 text-right font-medium">Similarity</th>
+                <th className="p-4 text-left font-medium">Date</th>
                 <th className="p-4 text-right font-medium">Revenue</th>
-                <th className="p-4 text-right font-medium">Profit</th>
-                <th className="p-4 text-right font-medium">Employees</th>
+                <th className="p-4 text-right font-medium">Last Valuation</th>
+                <th className="p-4 text-right font-medium">Last Funding</th>
+                <th className="p-4 text-left font-medium">Description</th>
               </tr>
             </thead>
             <tbody>
-              {displayComparables.map((company, index) => (
+              {displayComparables.map((financial, index) => (
                 <tr
                   key={index}
-                  className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                  className="border-t border-gray-200 hover:bg-gray-50"
                 >
-                  <td className="p-4 border-t border-gray-200 font-medium">
-                    {company.name || "Unnamed Company"}
+                  <td className="p-4 border border-gray-200">
+                    {formatDate(financial.date)}
                   </td>
-                  <td className="p-4 border-t border-gray-200 text-right">
-                    {formatSimilarityScore(company.similarity_score)}
+                  <td className="p-4 border border-gray-200 text-right">
+                    {financial.revenue}
                   </td>
-                  <td className="p-4 border-t border-gray-200 text-right">
-                    {company.financial_data
-                      ? formatCurrency(company.financial_data.revenue)
-                      : "N/A"}
+                  <td className="p-4 border border-gray-200 text-right">
+                    {financial.last_valuation}
                   </td>
-                  <td className="p-4 border-t border-gray-200 text-right">
-                    {company.financial_data
-                      ? formatCurrency(company.financial_data.profit)
-                      : "N/A"}
+                  <td className="p-4 border border-gray-200 text-right">
+                    {financial.last_funding}
                   </td>
-                  <td className="p-4 border-t border-gray-200 text-right">
-                    {company.financial_data && company.financial_data.employees
-                      ? company.financial_data.employees
-                      : "N/A"}
+                  <td className="p-4 border border-gray-200">
+                    {financial.description || "N/A"}
                   </td>
                 </tr>
               ))}

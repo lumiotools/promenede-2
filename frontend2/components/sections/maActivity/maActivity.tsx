@@ -43,7 +43,9 @@ const MAStrategyPage: React.FC<MaActivityProps> = ({
   const [dealsData, setDealsData] = useState<MADeals[]>(safeMADeals);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editDealsData, setEditDealsData] = useState<MADeals[]>(safeMADeals);
-  const [sourceText, setSourceText] = useState<string>("Source: Coresignal");
+  const [sourceText, setSourceText] = useState<string>(
+    "Source: Coresignal, Perplexity"
+  );
 
   // Update data when initialData changes
   useEffect(() => {
@@ -85,7 +87,7 @@ const MAStrategyPage: React.FC<MaActivityProps> = ({
     setIsEditing(false);
 
     // Update the source text to include the user
-    setSourceText("Source: Coresignal, User Update");
+    setSourceText("Source: Coresignal, Perplexity User Update");
   };
 
   // Deal update handlers

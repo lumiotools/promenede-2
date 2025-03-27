@@ -3,8 +3,8 @@ from pydantic import BaseModel
 import os
 import requests
 from dotenv import load_dotenv
-from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_productTimeline, get_openai_productsServices
-from src.utils.llm_summary.perplexity_info import generate_perplexity_KeyTechnologies, generate_perplexity_MarketLeadership, generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_maStrategy, generate_perplexity_productTimeline, generate_perplexity_productsServices
+from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_financial_comparables, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_productTimeline, get_openai_productsServices
+from src.utils.llm_summary.perplexity_info import generate_perplexity_KeyTechnologies, generate_perplexity_MarketLeadership, generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_financial_comparables, generate_perplexity_maStrategy, generate_perplexity_productTimeline, generate_perplexity_productsServices
 from src.utils.llmInfo.llm import fetch_company_data
 from src.utils.crunchbase.company import get_organization_data
 from src.utils.secFilings.getCik import get_cik_by_company_name
@@ -360,6 +360,10 @@ async def get_company_data(request: CompanyRequest):
     perplexity_maStrategy=generate_perplexity_maStrategy(company_name)
     openai_maStrategy=get_openai_maStrategy(company_name, perplexity_maStrategy)
     response_data['ma_activity']['ma_deals']=openai_maStrategy['ma_deals']
+
+    perplexity_financialComparables=generate_perplexity_financial_comparables(company_name)
+    openai_financialComparables=get_openai_financial_comparables(company_name, perplexity_financialComparables)
+    response_data['competitive_analysis']['financial_comparables']=openai_financialComparables['financial_comparables']
     
     
     return {"success":True,"company_name": company_name, "data": response_data}

@@ -259,7 +259,7 @@ def get_openai_maStrategy(company_name, business_data):
     5. **Deal Value**: The value of the deal in USD or the currency involved.
 
     Please ensure that you return exactly 10 M&A deals from the last 3 years, sorted from the most recent to the oldest. Ensure the format strictly follows the instructions and the information is relevant to the last 3 years only.
-
+JSON Format is:
 ```json
 {{
        "ma_deals": {{
@@ -286,58 +286,104 @@ Please ensure the descriptions are concise but informative. """
     content =json.loads(response.choices[0].message.content)
     return content
 
+
+def get_openai_financial_comparables(company_name, business_data):
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    system_prompt = f"""
+    You are given the financial comparables data for the company: {company_name}. Today's date is {time}.
+
+    Provide the financial comparables for the company {company_name} over the last 5 years, starting from the most recent information first. Today's date is {time}.
+
+    For each financial comparable, please provide the following details in a strict JSON format:
+
+    1. **Date**: The date the information is for (in yyyy-Month-Day format).
+    2. **Revenue**: The revenue for the company in USD or the relevant currency.
+    3. **Last Valuation**: The last valuation of the company in USD or the relevant currency.
+    4. **Last Funding**: The date of the last funding round and the amount raised (if available).
+    5. **Description**: A brief description of the company's financial performance for that date.
+
+    Please ensure that you return the most relevant financial information from the last 5 years, with the most recent information first, sorted in descending order by date. Ensure that the format strictly follows the instructions and the information is relevant to the last 5 years only.
+
+JSON Format is:
+```json
+{{
+    "financial_comparables": {{
+        "date": "yyyy-Month-Day", 
+        "revenue": "string", 
+        "last_valuation": "string", 
+        "last_funding": "string", 
+        "description": "string"
+    }}
+
+}}
+Please ensure the descriptions are concise but informative. """
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": json.dumps(business_data, indent=2)}
+        ]
+    )
+    
+    # Get the response from the model and parse it
+    content =json.loads(response.choices[0].message.content)
+    return content
+
 # Main function to test
 def main():
     company_name = "Nvidia"
     business_data = """
 
-Over the last five years, Nvidia has been involved in several strategic partnerships and acquisitions, though specific details on recent M&A deals are limited in the provided search results. However, Nvidia has been actively expanding its technology portfolio through various collaborations and innovations. Here are some notable strategic moves and partnerships, presented in a JSON format for clarity:
+Here is the financial information for Nvidia over the last few years, focusing on the most recent data available:
 
 ```json
 [
   {
-    "Deal Name": "NVIDIA and Google DeepMind Collaboration on Newton",
-    "Description": "NVIDIA collaborates with Google DeepMind and Disney Research to develop Newton, an open-source physics engine for robotics simulation, enhancing robot learning capabilities.",
-    "Deal Type": "Joint Venture",
-    "Deal Date": "2025-03",
-    "Deal Value": "Not disclosed"
+    "Date": "2025-02-28",
+    "Revenue": "US$130.57 billion",
+    "Last Valuation": "Not explicitly stated, but market cap is typically around $1 trillion USD",
+    "Last Funding": "Nvidia is a publicly traded company and does not require funding rounds like startups.",
+    "Description": "Nvidia reported a significant increase in revenue for FY 2025, driven by strong demand for AI and gaming products."
   },
   {
-    "Deal Name": "NVIDIA Isaac GR00T N1 Announcement",
-    "Description": "NVIDIA introduces the Isaac GR00T N1, the world's first open humanoid robot foundation model, to accelerate robotics development.",
-    "Deal Type": "Product Launch",
-    "Deal Date": "2025-03",
-    "Deal Value": "Not disclosed"
+    "Date": "2024-02-28",
+    "Revenue": "US$76.67 billion",
+    "Last Valuation": "Market cap around $900 billion USD",
+    "Last Funding": "N/A",
+    "Description": "Nvidia's FY 2024 revenue was marked by growth in AI and data center segments."
   },
   {
-    "Deal Name": "NVIDIA's Acquisition of Arm Limited (Failed)",
-    "Description": "NVIDIA's proposed acquisition of Arm Limited from SoftBank was terminated in February 2022 due to regulatory hurdles.",
-    "Deal Type": "Failed Acquisition",
-    "Deal Date": "2022-02",
-    "Deal Value": "Approximately $40 billion"
+    "Date": "2023-02-28",
+    "Revenue": "US$26.97 billion",
+    "Last Valuation": "Market cap fluctuated around $500 billion USD",
+    "Last Funding": "N/A",
+    "Description": "FY 2023 saw a decline in revenue due to challenges in the gaming and consumer markets."
   },
   {
-    "Deal Name": "NVIDIA's Acquisition of DeepMap",
-    "Description": "NVIDIA acquires DeepMap, a company specializing in high-definition mapping technology for autonomous vehicles.",
-    "Deal Type": "Acquisition",
-    "Deal Date": "2021-06",
-    "Deal Value": "Not disclosed"
+    "Date": "2022-02-28",
+    "Revenue": "US$26.91 billion",
+    "Last Valuation": "Market cap around $600 billion USD",
+    "Last Funding": "N/A",
+    "Description": "Nvidia's FY 2022 revenue was stable, with growth in data center and AI segments."
   },
   {
-    "Deal Name": "NVIDIA's Acquisition of Arm Limited (Announced)",
-    "Description": "NVIDIA announces its intention to acquire Arm Limited from SoftBank, aiming to expand its presence in the semiconductor industry.",
-    "Deal Type": "Announced Acquisition",
-    "Deal Date": "2020-09",
-    "Deal Value": "Approximately $40 billion"
+    "Date": "2021-02-28",
+    "Revenue": "US$16.68 billion",
+    "Last Valuation": "Market cap around $500 billion USD",
+    "Last Funding": "N/A",
+    "Description": "FY 2021 marked significant growth for Nvidia, driven by gaming and data center demand."
   }
 ]
 ```
 
-**Note**: The most recent M&A deal involving Nvidia is not explicitly listed in the search results, but the company has been actively involved in strategic partnerships and product launches. The failed acquisition of Arm Limited is one of the most significant M&A attempts in recent years. For more detailed and up-to-date information on Nvidia's M&A activities, additional sources may be necessary.
+**Note**: The valuation figures are approximate and based on market capitalization, which can fluctuate. Nvidia, being a publicly traded company, does not engage in funding rounds like startups. The revenue figures are based on fiscal year data, which typically ends in January or February for Nvidia. The most recent financial data available is for FY 2025, with revenue reaching $130.57 billion[2].
 """
     
     # Get business summary from OpenAI
-    summary = get_openai_maStrategy(company_name, business_data)
+    summary = get_openai_financial_comparables(company_name, business_data)
     
     print("Result:")
     print(summary)

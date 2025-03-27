@@ -180,13 +180,36 @@ def generate_perplexity_maStrategy(company_name):
     response = ask_perplexity(system_prompt, company_name)
     return response
 
+def generate_perplexity_financial_comparables(company_name):
+    time = datetime.datetime.now()
+    time = time.strftime('%Y-%m-%d')
+    
+    # System prompt for getting financial comparables
+    system_prompt = f"""
+    Provide the all financial comparables for the company {company_name} over the last 5 years, with the most recent information first. Today's date is {time}.
+    
+    For each financial comparable, please provide the following details in a strict JSON format:
+
+    1. **Date**: The date the information is for (in yyyy-Month-Day format).
+    2. **Revenue**: The revenue for the company in USD or the relevant currency.
+    3. **Last Valuation**: The last valuation of the company in USD or the relevant currency.
+    4. **Last Funding**: The date of the last funding round and the amount raised (if available).
+    5. **Description**: A brief description of the company's financial performance for that date.
+
+    Please ensure that the descriptions are concise but informative, focusing on the most recent financial information of the company for the last 3 years, sorted in descending order by date.
+    """
+
+    print(f"Generating financial comparables for {company_name}")
+    # Assuming `ask_perplexity` is a function that sends the prompt to the Perplexity API and returns the response.
+    response = ask_perplexity(system_prompt, company_name)
+    return response
 
 # Main function to test the company timeline generation
 def main():
     company_name = "Nvidia"  # You can replace this with any company name you want to analyze.
     
     # Get the timeline summary for the company
-    company_timeline = generate_perplexity_maStrategy(company_name)
+    company_timeline = generate_perplexity_financial_comparables(company_name)
     
     # Print the detailed timeline of the company
     print(f"Result for for {company_name}:")
