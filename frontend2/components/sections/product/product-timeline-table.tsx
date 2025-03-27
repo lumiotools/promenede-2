@@ -70,7 +70,7 @@ export default function ProductTimelineTable({
                   className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
                 >
                   <td className="p-4 border-t border-gray-200">
-                    {formatDate(launch.date)}
+                    {launch.date}
                   </td>
                   <td className="p-4 border-t border-gray-200 font-medium">
                     {launch.product_name || "Unnamed Product"}
