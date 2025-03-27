@@ -3,6 +3,9 @@ import json
 from dotenv import load_dotenv
 import openai
 import datetime
+from concurrent.futures import ThreadPoolExecutor
+
+from src.utils.brandfetch.brandLogo import get_company_logo
 
 # Load environment variables
 load_dotenv()
@@ -291,31 +294,26 @@ def get_openai_financial_comparables(company_name, business_data):
     time=datetime.datetime.now()
     time=time.strftime('%Y-%m-%d')
     system_prompt = f"""
-    You are given the financial comparables data for the company: {company_name}. Today's date is {time}.
+    You are given the value chain data for the company: {company_name}. Today's date is {time}.
 
-    Provide the financial comparables for the company {company_name} over the last 5 years, starting from the most recent information first. Today's date is {time}.
+    Provide the value chain information for the company {company_name}, including stages and activities over its business operations. Today's date is {time}.
 
-    For each financial comparable, please provide the following details in a strict JSON format:
+    For each stage in the value chain, please provide the following details in a strict JSON format:
 
-    1. **Date**: The date the information is for (in yyyy-Month-Day format).
-    2. **Revenue**: The revenue for the company in USD or the relevant currency.
-    3. **Last Valuation**: The last valuation of the company in USD or the relevant currency.
-    4. **Last Funding**: The date of the last funding round and the amount raised (if available).
-    5. **Description**: A brief description of the company's financial performance for that date.
+    1. **Stage**: The name of the value chain stage (e.g., Research and Development, Manufacturing, Marketing).
+    2. **Activities**: A list of activities involved in that stage. Include a minimum of 4 activities and a maximum of 6 activities.
+    3. **Companies**: A list of companies (by name) involved in each stage. For example, tools used, suppliers, or partners. You should return 3 to 5 companies involved in each stage, not the company's own name, but the companies that contribute to that particular stage.
 
-    Please ensure that you return the most relevant financial information from the last 5 years, with the most recent information first, sorted in descending order by date. Ensure that the format strictly follows the instructions and the information is relevant to the last 5 years only.
+    Please ensure that you return the most relevant value chain information for the company {company_name}, with the most recent information first, sorted in descending order by date. Ensure that the format strictly follows the instructions and the information is relevant to the company's value chain.
 
 JSON Format is:
 ```json
 {{
-    "financial_comparables": {{
-        "date": "yyyy-Month-Day", 
-        "revenue": "string", 
-        "last_valuation": "string", 
-        "last_funding": "string", 
-        "description": "string"
+    "value_chain": {{
+        "stage": "string", 
+        "activities": ["string", "string", "string", "string", "string", "string"], 
+        "companies": ["string", "string", "string", "string", "string"]
     }}
-
 }}
 Please ensure the descriptions are concise but informative. """
 
@@ -332,58 +330,168 @@ Please ensure the descriptions are concise but informative. """
     content =json.loads(response.choices[0].message.content)
     return content
 
+def fetch_logos_for_companies(companies):
+    with ThreadPoolExecutor() as executor:
+        # Execute get_company_logo for each company in parallel
+        results = list(executor.map(get_company_logo, companies))
+    return results
+
+# Helper function to process the value chain and add logos for each company
+def process_value_chain_with_logos(value_chain_data):
+    # Ensure value_chain_data is a dictionary and contains the 'value_chain' key
+    if isinstance(value_chain_data, dict) and "value_chain" in value_chain_data:
+        value_chain_data = value_chain_data["value_chain"]
+
+        # Check if 'industryName' and 'stages' are in the value_chain
+        if isinstance(value_chain_data, dict) and "industryName" in value_chain_data and "stages" in value_chain_data:
+            stages = value_chain_data["stages"]
+            
+            # Check if 'stages' is a list and iterate over it
+            if isinstance(stages, list):
+                all_companies = []
+                for stage in stages:
+                    all_companies.extend(stage["companies"])
+
+                # Fetch logos for companies in parallel
+                logos = fetch_logos_for_companies(all_companies)
+
+                # Map logos to the companies
+                company_logo_map = {company: logo for company, logo in zip(all_companies, logos)}
+
+                # Add logos to each stage in the value chain data
+                for stage in stages:
+                    stage['company_logos'] = [company_logo_map.get(company, "No logo found") for company in stage["companies"]]
+
+                # Wrap the result inside a dictionary with 'value_chain' key
+                return {"value_chain": value_chain_data}
+            else:
+                raise ValueError("Invalid structure: 'stages' must be a list.")
+        else:
+            raise ValueError("Invalid structure: 'value_chain' must have 'industryName' and 'stages' keys.")
+    else:
+        raise ValueError("Invalid structure: 'value_chain_data' must be a dictionary with a 'value_chain' key.")
+
+def get_openai_valueChain(company_name, business_data):
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    system_prompt = f"""
+    You are given the value chain data for the company: {company_name}. Today's date is {time}.
+
+    Provide the value chain information for the company {company_name}, including stages and activities over its business operations. Today's date is {time}.
+
+    For each stage in the value chain, please provide the following details in a strict JSON format:
+
+    1. **Stage**: The name of the value chain stage (e.g., Research and Development, Manufacturing, Marketing).
+    2. **Activities**: A list of activities involved in that stage. Include a minimum of 4 activities and a maximum of 6 activities.
+    3. **Companies**: A list of companies (by name) involved in each stage. For example, tools used, suppliers, or partners. You should return 3 to 5 companies involved in each stage, not the company's own name, but the companies that contribute to that particular stage.
+
+    Please ensure that you return the most relevant value chain information for the company {company_name}, with the most recent information first, sorted in descending order by date. Ensure that the format strictly follows the instructions and the information is relevant to the company's value chain.
+
+JSON Format is:
+```json
+{{
+    "value_chain": {{
+    industryName: string;
+    stages{{
+    "stage": "string", 
+        "activities": ["string", "string", "string", "string", "string", "string"], 
+        "companies": ["string", "string", "string", "string", "string"]
+    }}
+        
+    }}
+}}
+Please ensure the descriptions are concise but informative. """
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": json.dumps(business_data, indent=2)}
+        ]
+    )
+    
+    # Get the response from the model and parse it
+    content =json.loads(response.choices[0].message.content)
+    processed_data = process_value_chain_with_logos(content)
+    return processed_data
+
 # Main function to test
 def main():
     company_name = "Nvidia"
     business_data = """
 
-Here is the financial information for Nvidia over the last few years, focusing on the most recent data available:
-
+Result for for Nvidia:
 ```json
-[
-  {
-    "Date": "2025-02-28",
-    "Revenue": "US$130.57 billion",
-    "Last Valuation": "Not explicitly stated, but market cap is typically around $1 trillion USD",
-    "Last Funding": "Nvidia is a publicly traded company and does not require funding rounds like startups.",
-    "Description": "Nvidia reported a significant increase in revenue for FY 2025, driven by strong demand for AI and gaming products."
-  },
-  {
-    "Date": "2024-02-28",
-    "Revenue": "US$76.67 billion",
-    "Last Valuation": "Market cap around $900 billion USD",
-    "Last Funding": "N/A",
-    "Description": "Nvidia's FY 2024 revenue was marked by growth in AI and data center segments."
-  },
-  {
-    "Date": "2023-02-28",
-    "Revenue": "US$26.97 billion",
-    "Last Valuation": "Market cap fluctuated around $500 billion USD",
-    "Last Funding": "N/A",
-    "Description": "FY 2023 saw a decline in revenue due to challenges in the gaming and consumer markets."
-  },
-  {
-    "Date": "2022-02-28",
-    "Revenue": "US$26.91 billion",
-    "Last Valuation": "Market cap around $600 billion USD",
-    "Last Funding": "N/A",
-    "Description": "Nvidia's FY 2022 revenue was stable, with growth in data center and AI segments."
-  },
-  {
-    "Date": "2021-02-28",
-    "Revenue": "US$16.68 billion",
-    "Last Valuation": "Market cap around $500 billion USD",
-    "Last Funding": "N/A",
-    "Description": "FY 2021 marked significant growth for Nvidia, driven by gaming and data center demand."
-  }
-]
-```
-
-**Note**: The valuation figures are approximate and based on market capitalization, which can fluctuate. Nvidia, being a publicly traded company, does not engage in funding rounds like startups. The revenue figures are based on fiscal year data, which typically ends in January or February for Nvidia. The most recent financial data available is for FY 2025, with revenue reaching $130.57 billion[2].
+{
+  "industryName": "Semiconductors",
+  "stages": [
+    {
+      "stage": "Research and Development",
+      "activities": [
+        "Designing graphics processing units (GPUs)",
+        "Developing application programming interfaces (APIs) for data science",
+        "Creating system on a chip units (SoCs) for mobile and automotive markets",
+        "Advancing artificial intelligence (AI) hardware and software",
+        "Collaborating on open-source projects like Newton physics engine"
+      ],
+      "companies": [
+        "Google DeepMind",
+        "Disney Research",
+        "Microsoft"
+      ]
+    },
+    {
+      "stage": "Manufacturing",
+      "activities": [
+        "Outsourcing hardware manufacturing to third-party fabs",
+        "Ensuring quality control and testing of manufactured products",
+        "Managing supply chain logistics for component sourcing",
+        "Implementing sustainable manufacturing practices",
+        "Collaborating with manufacturing partners for new technologies"
+      ],
+      "companies": [
+        "Taiwan Semiconductor Manufacturing Company (TSMC)",
+        "Samsung Electronics",
+        "Micron Technology"
+      ]
+    },
+    {
+      "stage": "Marketing and Sales",
+      "activities": [
+        "Promoting products through social media and events",
+        "Developing marketing campaigns for new product launches",
+        "Building strategic partnerships with industry leaders",
+        "Providing customer support and technical assistance",
+        "Engaging in market research to understand consumer needs"
+      ],
+      "companies": [
+        "ASUS",
+        "Dell",
+        "HP Inc."
+      ]
+    },
+    {
+      "stage": "Distribution and Retail",
+      "activities": [
+        "Managing distribution networks for global reach",
+        "Partnering with retailers for product availability",
+        "Ensuring timely delivery of products to customers",
+        "Providing after-sales support and warranty services",
+        "Monitoring inventory levels and supply chain efficiency"
+      ],
+      "companies": [
+        "Best Buy",
+        "Newegg",
+        "Amazon"
+      ]
+    }
+  ]
+}
 """
     
     # Get business summary from OpenAI
-    summary = get_openai_financial_comparables(company_name, business_data)
+    summary = get_openai_valueChain(company_name, business_data)
     
     print("Result:")
     print(summary)

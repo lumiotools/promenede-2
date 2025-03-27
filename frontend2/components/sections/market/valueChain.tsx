@@ -48,45 +48,6 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
     setEditMode(true);
   };
 
-  const handleAddData = () => {
-    const emptyData: ValueChain = {
-      industryName: "Consumer Electronics",
-      stages: [
-        {
-          stage: "Inbound Logistics",
-          activities: [
-            "Sourcing raw materials",
-            "Managing supplier relationships",
-          ],
-          companyLogos: [],
-        },
-        {
-          stage: "Operations",
-          activities: ["Manufacturing products", "Quality assurance testing"],
-          companyLogos: [],
-        },
-        {
-          stage: "Outbound Logistics",
-          activities: ["Order fulfillment", "Distribution channel management"],
-          companyLogos: [],
-        },
-        {
-          stage: "Marketing and Sales",
-          activities: ["Market research", "Advertising campaigns"],
-          companyLogos: [],
-        },
-        {
-          stage: "Service",
-          activities: ["Customer support", "Technical assistance"],
-          companyLogos: [],
-        },
-      ],
-    };
-
-    setEditData(emptyData);
-    setEditMode(true);
-  };
-
   const updateIndustryName = (value: string) => {
     if (!editData) return;
     setEditData({
@@ -133,6 +94,25 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
     });
   };
 
+  const updateCompanies = (stageIndex: number, companiesText: string) => {
+    if (!editData || !editData.stages) return;
+
+    const companies = companiesText
+      .split("\n")
+      .filter((item) => item.trim() !== "");
+
+    const updatedStages = [...editData.stages];
+    updatedStages[stageIndex] = {
+      ...updatedStages[stageIndex],
+      companies: companies,
+    };
+
+    setEditData({
+      ...editData,
+      stages: updatedStages,
+    });
+  };
+
   const updateCompanyLogos = (stageIndex: number, logosText: string) => {
     if (!editData || !editData.stages) return;
 
@@ -141,7 +121,7 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
     const updatedStages = [...editData.stages];
     updatedStages[stageIndex] = {
       ...updatedStages[stageIndex],
-      companyLogos: logos,
+      company_logos: logos,
     };
 
     setEditData({
@@ -151,13 +131,28 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
   };
 
   const addStage = () => {
-    if (!editData) return;
+    if (!editData) {
+      // If no data exists, create initial structure with first stage
+      setEditData({
+        industryName: "",
+        stages: [
+          {
+            stage: "",
+            activities: [],
+            companies: [],
+            company_logos: [],
+          },
+        ],
+      });
+      return;
+    }
 
     const updatedStages = editData.stages ? [...editData.stages] : [];
     updatedStages.push({
       stage: "",
       activities: [],
-      companyLogos: [],
+      companies: [],
+      company_logos: [],
     });
 
     setEditData({
@@ -205,7 +200,7 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Button
-              onClick={handleAddData}
+              onClick={addStage}
               className="bg-[#156082] hover:bg-[#092a38]"
             >
               <Plus className="mr-2 h-4 w-4" /> Add Value Chain Data
@@ -217,9 +212,6 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
                 <h3 className="text-xl font-medium text-[#35454c]">
                   No value chain data available
                 </h3>
-                <p className="text-[#57727e] mt-2">
-                  Click the button above to add value chain information
-                </p>
               </div>
             </CardContent>
           </Card>
@@ -245,14 +237,6 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
               >
                 <Edit className="mr-2 h-4 w-4" /> Edit Data
               </Button>
-              {!data && (
-                <Button
-                  onClick={handleAddData}
-                  className="bg-[#156082] hover:bg-[#092a38]"
-                >
-                  <Plus className="mr-2 h-4 w-4" /> Add Value Chain Data
-                </Button>
-              )}
             </div>
           ) : (
             <div className="space-x-2">
@@ -279,6 +263,7 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
             updateIndustryName={updateIndustryName}
             updateStage={updateStage}
             updateActivities={updateActivities}
+            updateCompanies={updateCompanies}
             updateCompanyLogos={updateCompanyLogos}
             addStage={addStage}
             removeStage={removeStage}
@@ -300,6 +285,7 @@ interface EditValueChainProps {
     value: any
   ) => void;
   updateActivities: (stageIndex: number, activitiesText: string) => void;
+  updateCompanies: (stageIndex: number, companiesText: string) => void;
   updateCompanyLogos: (stageIndex: number, logosText: string) => void;
   addStage: () => void;
   removeStage: (index: number) => void;
@@ -310,6 +296,7 @@ function EditValueChain({
   updateIndustryName,
   updateStage,
   updateActivities,
+  updateCompanies,
   updateCompanyLogos,
   addStage,
   removeStage,
@@ -377,17 +364,25 @@ function EditValueChain({
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">
-                Company Logos URLs (one per line)
+                Companies (one per line)
               </label>
               <Textarea
-                value={stage.companyLogos?.join("\n") || ""}
+                value={stage.companies?.join("\n") || ""}
+                onChange={(e) => updateCompanies(index, e.target.value)}
+                placeholder="Enter company names (one per line)"
+                rows={3}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Company Logo URLs (one per line)
+              </label>
+              <Textarea
+                value={stage.company_logos?.join("\n") || ""}
                 onChange={(e) => updateCompanyLogos(index, e.target.value)}
                 placeholder="Enter logo URLs (one per line)"
                 rows={3}
               />
-              <p className="text-xs text-[#57727e] mt-1">
-                Enter full URLs to company logos or favicons
-              </p>
             </div>
           </CardContent>
         </Card>
@@ -396,7 +391,7 @@ function EditValueChain({
       {!data.stages?.length && (
         <Card>
           <CardContent className="p-6 text-center text-[#57727e]">
-            No stages added. Click &quot;Add Stage&quot; to add one.
+            No stages added. Click "Add Stage" to add one.
           </CardContent>
         </Card>
       )}
@@ -410,6 +405,11 @@ interface ViewValueChainProps {
 
 function ViewValueChain({ data }: ViewValueChainProps) {
   if (!data) return null;
+
+  // Helper function to determine if a string is a URL
+  const isUrl = (str: string): boolean => {
+    return str.startsWith("http://") || str.startsWith("https://");
+  };
 
   return (
     <div className="space-y-6">
@@ -456,34 +456,97 @@ function ViewValueChain({ data }: ViewValueChainProps) {
                     )}
                   </ul>
 
-                  {stage.companyLogos && stage.companyLogos.length > 0 && (
+                  {/* Display company logos or names */}
+                  {((stage.companies && stage.companies.length > 0) ||
+                    (stage.company_logos &&
+                      stage.company_logos.length > 0)) && (
                     <div className="border-t pt-2 mt-2">
                       <div className="flex flex-wrap gap-1 justify-center">
-                        {stage.companyLogos
-                          .slice(0, 6)
-                          .map((logo, logoIndex) => (
-                            <div key={logoIndex} className="w-6 h-6 relative">
-                              <Image
-                                src={
-                                  logo || "/placeholder.svg?height=24&width=24"
-                                }
-                                alt="Company logo"
-                                width={24}
-                                height={24}
-                                className="object-contain"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.src =
-                                    "/placeholder.svg?height=24&width=24";
-                                }}
-                              />
+                        {/* Display companies */}
+                        {stage.companies &&
+                          stage.companies.map((company, compIndex) => {
+                            // If there's a matching logo, use it
+                            const logo =
+                              stage.company_logos &&
+                              compIndex < stage.company_logos.length
+                                ? stage.company_logos[compIndex]
+                                : null;
+
+                            return (
+                              <div
+                                key={`company-${compIndex}`}
+                                className="mr-1"
+                              >
+                                {logo && isUrl(logo) ? (
+                                  <div className="w-6 h-6 relative">
+                                    <Image
+                                      src={logo}
+                                      alt={company}
+                                      width={24}
+                                      height={24}
+                                      className="object-contain"
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="text-xs text-[#35454c] px-1">
+                                    {company}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+
+                        {/* Display any extra logos without companies */}
+                        {stage.company_logos &&
+                          stage.companies &&
+                          stage.company_logos.length > stage.companies.length &&
+                          stage.company_logos
+                            .slice(stage.companies.length)
+                            .map((logo, logoIndex) => (
+                              <div key={`logo-${logoIndex}`} className="mr-1">
+                                {isUrl(logo) ? (
+                                  <div className="w-6 h-6 relative">
+                                    <Image
+                                      src={logo}
+                                      alt="Company logo"
+                                      width={24}
+                                      height={24}
+                                      className="object-contain"
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="text-xs text-[#35454c] px-1">
+                                    {logo}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+
+                        {/* Handle case where we have company_logos but no companies array */}
+                        {(!stage.companies || stage.companies.length === 0) &&
+                          stage.company_logos &&
+                          stage.company_logos.map((logo, logoIndex) => (
+                            <div
+                              key={`solo-logo-${logoIndex}`}
+                              className="mr-1"
+                            >
+                              {isUrl(logo) ? (
+                                <div className="w-6 h-6 relative">
+                                  <Image
+                                    src={logo}
+                                    alt="Company logo"
+                                    width={24}
+                                    height={24}
+                                    className="object-contain"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="text-xs text-[#35454c] px-1">
+                                  {logo}
+                                </div>
+                              )}
                             </div>
                           ))}
-                        {stage.companyLogos.length > 6 && (
-                          <div className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-[10px] text-gray-500">
-                            +{stage.companyLogos.length - 6}
-                          </div>
-                        )}
                       </div>
                     </div>
                   )}

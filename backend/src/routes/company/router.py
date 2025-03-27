@@ -4,8 +4,8 @@ import os
 import requests
 from functools import reduce
 from dotenv import load_dotenv
-from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_financial_comparables, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_productTimeline, get_openai_productsServices
-from src.utils.llm_summary.perplexity_info import generate_perplexity_KeyTechnologies, generate_perplexity_MarketLeadership, generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_financial_comparables, generate_perplexity_maStrategy, generate_perplexity_productTimeline, generate_perplexity_productsServices
+from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_financial_comparables, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_productTimeline, get_openai_productsServices, get_openai_valueChain
+from src.utils.llm_summary.perplexity_info import generate_perplexity_KeyTechnologies, generate_perplexity_MarketLeadership, generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_financial_comparables, generate_perplexity_maStrategy, generate_perplexity_productTimeline, generate_perplexity_productsServices, generate_perplexity_value_chain
 from src.utils.llmInfo.llm import fetch_company_data
 from src.utils.crunchbase.company import get_organization_data
 from src.utils.secFilings.getCik import get_cik_by_company_name
@@ -625,7 +625,26 @@ async def get_company_data(request: CompanyRequest):
     except Exception as e:
         print(f"Error enriching M&A strategy: {e}")
     
-    # Handle financial comparables
+    # Handle value  chain
+    try:
+        perplexity_valueChain = safe_call(
+            generate_perplexity_value_chain,
+            company_name,
+            default=""
+        )
+        
+        if perplexity_valueChain:
+            openai_valueChain = safe_call(
+                get_openai_valueChain,
+                company_name,
+                perplexity_valueChain,
+                default={"value_chain": {}}
+            )
+            response_data['market_info']['value_chain'] = openai_valueChain.get('value_chain', {})
+    except Exception as e:
+        print(f"Error enriching financial comparables: {e}")
+
+         # Handle financial comparables
     try:
         perplexity_financialComparables = safe_call(
             generate_perplexity_financial_comparables,

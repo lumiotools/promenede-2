@@ -21,6 +21,7 @@ def get_first_logo(data):
 def get_company_logo(company_name):
     # Construct the API URL with the company name
     url = f"{BRANDFETCH_API_URL}{company_name}"
+    print("Get company logo of ",company_name)
     
     # Send the GET request to the Brandfetch API
     headers = {
@@ -34,7 +35,7 @@ def get_company_logo(company_name):
         
         # Parse the JSON response
         data = response.json()
-        print("data",data)
+        # print("data",data)
         logo=get_first_logo(data)
         # Check if logos exist and return the first logo URL
         return logo

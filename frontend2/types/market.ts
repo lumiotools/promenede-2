@@ -46,14 +46,16 @@ export interface YearData {
 
 // Updated ValueChain interfaces
 export interface ValueChainStage {
-  stage: string;
-  activities: string[];
-  companyLogos: string[];
+  stage: string; // The name of the stage (e.g., "Research and Development")
+  activities: string[]; // A list of activities in the stage
+  companies: string[]; // A list of companies involved in the stage
+  company_logos: string[]; // A list of logos for each company in the stage
 }
 
+// The ValueChain object structure
 export interface ValueChain {
-  industryName: string | null;
-  stages: ValueChainStage[] | null;
+  industryName: string | null; // The name of the industry
+  stages: ValueChainStage[] | null; // A list of stages in the value chain
   // Keep old structure for backward compatibility
   summary?: string | null;
   primaryActivities?: PrimaryActivity[] | null;
@@ -61,7 +63,6 @@ export interface ValueChain {
   keyStrengths?: string[] | null;
   keyChallenges?: string[] | null;
 }
-
 export interface PrimaryActivity {
   name: string | null;
   description: string | null;
