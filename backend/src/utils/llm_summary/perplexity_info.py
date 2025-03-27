@@ -151,16 +151,45 @@ def generate_perplexity_productsServices(company_name):
     response = ask_perplexity(system_prompt, company_name)
     return response
 
+def generate_perplexity_maStrategy(company_name):
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    # print(time)
+
+    """
+    Generates a detailed prompt for getting the latest timeline of a company,
+    focusing on recent milestones, product launches, partnerships, and future plans.
+    """
+    # Updated system prompt to get the latest company timeline
+    system_prompt = f"""
+    Provide all the Mergers and Acquisitions strategy for the company {company_name} over the last 5 years, with the most recent deal first. Today's date is {time}.
+    
+    For each Mergers and Acquisitions deal, please provide the following details in a strict JSON format:
+    
+    1. **Deal Name**: The name or title of the deal.
+    2. **Description**: A brief description of the deal and its strategic importance to the company.
+    3. **Deal Type**: The type of deal (e.g., acquisition, merger, joint venture).
+    4. **Deal Date**: The date the deal was announced or completed in (yyyy-Month-Date)
+    5. **Deal Value**: The value of the deal in USD or the currency involved.
+
+    Please ensure that the descriptions are concise but informative, focusing on the most important strategic deals of the company.
+    """
+
+    print(f"Generating latest ma strategy for {company_name}")
+    # Assuming `ask_perplexity` is a function that sends the prompt to the Perplexity API and returns the response.
+    response = ask_perplexity(system_prompt, company_name)
+    return response
+
 
 # Main function to test the company timeline generation
 def main():
-    company_name = "Apple Inc."  # You can replace this with any company name you want to analyze.
+    company_name = "Nvidia"  # You can replace this with any company name you want to analyze.
     
     # Get the timeline summary for the company
-    company_timeline = generate_perplexity_productsServices(company_name)
+    company_timeline = generate_perplexity_maStrategy(company_name)
     
     # Print the detailed timeline of the company
-    print(f"Company Timeline for {company_name}:")
+    print(f"Result for for {company_name}:")
     print(company_timeline)
 
 # Run the test
