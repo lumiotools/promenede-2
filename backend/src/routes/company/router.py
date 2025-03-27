@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import os
 import requests
+from functools import reduce
 from dotenv import load_dotenv
 from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_financial_comparables, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_productTimeline, get_openai_productsServices
 from src.utils.llm_summary.perplexity_info import generate_perplexity_KeyTechnologies, generate_perplexity_MarketLeadership, generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_financial_comparables, generate_perplexity_maStrategy, generate_perplexity_productTimeline, generate_perplexity_productsServices
@@ -9,9 +10,9 @@ from src.utils.llmInfo.llm import fetch_company_data
 from src.utils.crunchbase.company import get_organization_data
 from src.utils.secFilings.getCik import get_cik_by_company_name
 from src.utils.secFilings.analyse10K import analyze_10K_filing
-from src.utils.coresignal.company import get_company_details,get_company_id
+from src.utils.coresignal.company import get_company_details, get_company_id
 from src.utils.yahoo.shareholder import get_shareholder_info
-from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer,convert_null_to_none
+from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer, convert_null_to_none
 
 from src.utils.llm_summary.employeer_reviews import get_employee_reviews_summary, get_employee_ratings_summary, get_areas_of_improvement
 from src.utils.llmInfo.competitive_analysis import get_competitive_analysis
@@ -31,6 +32,7 @@ router = APIRouter()
 class CompanyRequest(BaseModel):
     company_name: str
     company_url: str
+
 @router.post("/")
 async def get_company_data(request: CompanyRequest):
     """
@@ -39,334 +41,608 @@ async def get_company_data(request: CompanyRequest):
     Prioritizes CoreSignal and Crunchbase data over SEC data.
     """
     company_name = request.company_name
-    company_url=request.company_url
+    company_url = request.company_url
 
-    company_enrichment_id = get_company_id(company_url)
-    print("enrichment id",company_enrichment_id)
-    if not company_enrichment_id:
-        return {"success":False,"message":"Company not found"}
-    coresignal_data = get_company_details(company_enrichment_id)
+    # Initialize default empty structures to avoid NoneType errors
+    coresignal_data = {}
+    crunchbase_data = {"cards": {"fields": {}}}
+    yahooData = {}
+    
+    # Try to get CoreSignal data
+    try:
+        company_enrichment_id = get_company_id(company_url)
+        print("enrichment id", company_enrichment_id)
+        if company_enrichment_id:
+            coresignal_data = get_company_details(company_enrichment_id) or {}
+            coresignal_data = convert_null_to_none(coresignal_data)
+    except Exception as e:
+        print(f"Error getting CoreSignal data: {e}")
+        coresignal_data = {}
+    
     if not coresignal_data:
-        return {"success":False,"message":"Company not found"}
+        print("No CoreSignal data found")
     
-    coresignal_data=convert_null_to_none(coresignal_data)
-    company_name=coresignal_data.get("company_name","")
-    crunchbase_url=coresignal_data.get("crunchbase_url","")
-    company_name = crunchbase_url.split("/")[-1]
-    print("crunchbase url",crunchbase_url, " Company name",company_name)
+    # Try to get company name from either source
+    if coresignal_data and coresignal_data.get("company_name"):
+        company_name = coresignal_data.get("company_name", company_name)
     
-    # Get data from different sources
-    crunchbase_data = get_organization_data(company_name)
-    print("crunchbase data",crunchbase_data)
-    stock_name=crunchbase_data.get("cards", {}).get("fields", {}).get("stock_symbol", {}).get("value", "")
-    print("stock name",stock_name)
-    yahooData=get_shareholder_info(stock_name)
-    print("yahoo data",yahooData)
+    # Try to get Crunchbase data using the URL from CoreSignal if available
+    try:
+        crunchbase_url = coresignal_data.get("crunchbase_url", "")
+        if crunchbase_url:
+            crunchbase_company_name = crunchbase_url.split("/")[-1]
+            print("crunchbase url", crunchbase_url, " Company name", crunchbase_company_name)
+            crunchbase_data = get_organization_data(crunchbase_company_name) or {"cards": {"fields": {}}}
+        else:
+            # Fallback to original company name
+            crunchbase_data = get_organization_data(company_name) or {"cards": {"fields": {}}}
+        print("crunchbase data", crunchbase_data)
+    except Exception as e:
+        print(f"Error getting Crunchbase data: {e}")
+        crunchbase_data = {"cards": {"fields": {}}}
+    
+    # Try to get Yahoo data
+    try:
+        stock_name = crunchbase_data.get("cards", {}).get("fields", {}).get("stock_symbol", {}).get("value", "")
+        print("stock name", stock_name)
+        if stock_name:
+            yahooData = get_shareholder_info(stock_name) or {}
+        print("yahoo data", yahooData)
+    except Exception as e:
+        print(f"Error getting Yahoo data: {e}")
+        yahooData = {}
     
     # Only get SEC data as fallback
     company_cik = None
     sec_10k_data = {}
     
+    # Get LLM data with safe fallbacks
+    try:
+        llmData = fetch_company_data(company_name, 10000, "gpt-4o-mini")
+    except Exception as e:
+        print(f"Error getting LLM data: {e}")
+        llmData = {
+            "leadership_executives": [],
+            "launch_timeline": [],
+            "strategic_alliances": [],
+            "strategic_development": [],
+            "company_strategy": [],
+            "market_size": {},
+            "value_chain": {},
+            "regulations": []
+        }
     
-    
-    llmData =  fetch_company_data(company_name, 10000, "gpt-4o-mini")
-    
+    # Get key members with safe fallbacks
     key_members = []
+    try:
+        for i, member in enumerate(llmData.get("leadership_executives", [])):
+            try:
+                linkedin_url, experience, education = get_people_experience_and_education(
+                    member.get("name", ""), 
+                    member.get("position", ""), 
+                    company_name
+                )
+                key_members.append({
+                    "member_id": i,
+                    "member_full_name": member.get("name", ""),
+                    "member_position_title": member.get("position", ""),
+                    "member_linkedin_url": linkedin_url,
+                    "member_experience": experience,
+                    "member_education": education
+                })
+            except Exception as e:
+                print(f"Error processing member {i}: {e}")
+    except Exception as e:
+        print(f"Error processing key members: {e}")
     
-    for i, member in enumerate(llmData["leadership_executives"]):
-        linkedin_url, experience, education = get_people_experience_and_education(member["name"], member["position"], company_name)
-        key_members.append({
-            "member_id": i,
-            "member_full_name": member["name"],
-            "member_position_title": member["position"],
-            "member_linkedin_url": linkedin_url,
-            "member_experience": experience,
-            "member_education": education
-        })
-
+    # Safe data extraction helper functions
+    def safe_get(data, *keys, default=None):
+        """Safely navigate nested dictionaries and return default if any key is missing"""
+        current = data
+        for key in keys:
+            if not isinstance(current, dict):
+                return default
+            current = current.get(key, {})
+        return current if current != {} else default
     
-    # If critical data is missing, then try SEC as fallback
-    # if not coresignal_data or not coresignal_data.get("company_name"):
-    #     company_cik = get_cik_by_company_name(company_name)
-    #     sec_10k_data = analyze_10K_filing(company_cik) if company_cik else {}
+    def safe_call(func, *args, default=None, **kwargs):
+        """Safely call a function and return default if it raises an exception"""
+        try:
+            result = func(*args, **kwargs)
+            return result if result is not None else default
+        except Exception as e:
+            print(f"Error calling {func.__name__}: {e}")
+            return default
     
-    # Prepare the comprehensive response
+    # Prepare the comprehensive response with safe defaults
     response_data = {
         # 1. Executive Summary
         "executive_summary": {
-            "industry": coresignal_data.get("industry",""),
-            "topic_tags":coresignal_data.get("categories_and_keywords",""),
-            "valuation":crunchbase_data.get("cards", {}).get("fields", {}).get("valuation", ""),
-            "equity_funding_total": crunchbase_data.get("cards", {}).get("fields", {}).get("equity_funding_total", ""),
-            "funding_total":crunchbase_data.get("cards", {}).get("fields", {}).get("funding_total", ""),
-            "description":crunchbase_data.get("cards", {}).get("fields", {}).get("short_description", ""),
-            "financial_highlights":{
-                "operating_revenue": extract_financial_data(coresignal_data, "revenue"),
-                "operating_profit": extract_financial_data(coresignal_data, "ebit"),
-                "ebitda": extract_financial_data(coresignal_data, "ebitda"),
-                "net_income": extract_financial_data(coresignal_data, "net_income"),
-                "per": calculate_per(coresignal_data),
+            "industry": safe_get(coresignal_data, "industry", default=""),
+            "topic_tags": safe_get(coresignal_data, "categories_and_keywords", default=[]),
+            "valuation": safe_get(crunchbase_data, "cards", "fields", "valuation", default=""),
+            "equity_funding_total": safe_get(crunchbase_data, "cards", "fields", "equity_funding_total", default=""),
+            "funding_total": safe_get(crunchbase_data, "cards", "fields", "funding_total", default=""),
+            "description": safe_get(crunchbase_data, "cards", "fields", "short_description", default=""),
+            "financial_highlights": {
+                "operating_revenue": safe_call(extract_financial_data, coresignal_data, "revenue", default={}),
+                "operating_profit": safe_call(extract_financial_data, coresignal_data, "ebit", default={}),
+                "ebitda": safe_call(extract_financial_data, coresignal_data, "ebitda", default={}),
+                "net_income": safe_call(extract_financial_data, coresignal_data, "net_income", default={}),
+                "per": safe_call(calculate_per, coresignal_data, default={}),
             }
-            
-
         },
         
         # 2. Company Profile
         "company_profile": {
             # a. Firmographic
             "firmographic": {
-                "name": coresignal_data.get("company_name", ""),
-                "legal_name": coresignal_data.get("company_legal_name", ""),
-                "incorporation_date": crunchbase_data.get("cards", {}).get("fields", {}).get("founded_on", {}).get("value", ""),
-                "hq_address": coresignal_data.get("hq_location", ""),
-                "hq_city": coresignal_data.get("hq_city", ""),
-                "hq_state": coresignal_data.get("hq_state", ""),
-                "hq_country": coresignal_data.get("hq_country", ""),
-                "industry": coresignal_data.get("industry", ""),
-                "type": coresignal_data.get("type", ""),
-                "revenue_range": coresignal_data.get("revenue_annual_range", {}),
-                "employees_count": coresignal_data.get("employees_count", 0),
-                "products_services": crunchbase_data.get("cards", {}).get("fields", {}).get("categories", ""),
-                "description": coresignal_data.get("description", "")
+                "name": safe_get(coresignal_data, "company_name", default=""),
+                "legal_name": safe_get(coresignal_data, "company_legal_name", default=""),
+                "incorporation_date": safe_get(crunchbase_data, "cards", "fields", "founded_on", "value", default=""),
+                "hq_address": safe_get(coresignal_data, "hq_location", default=""),
+                "hq_city": safe_get(coresignal_data, "hq_city", default=""),
+                "hq_state": safe_get(coresignal_data, "hq_state", default=""),
+                "hq_country": safe_get(coresignal_data, "hq_country", default=""),
+                "industry": safe_get(coresignal_data, "industry", default=""),
+                "type": safe_get(coresignal_data, "type", default=""),
+                "revenue_range": safe_get(coresignal_data, "revenue_annual_range", default={}),
+                "employees_count": safe_get(coresignal_data, "employees_count", default=0),
+                "products_services": safe_get(crunchbase_data, "cards", "fields", "categories", default=""),
+                "description": safe_get(coresignal_data, "description", default="")
             },
             
             # b. Key Financials
             "key_financials": {
-                "income_statements": coresignal_data.get("income_statements", []),
-                 "operating_revenue": extract_financial_data(coresignal_data, "revenue"),
-                "operating_profit": extract_financial_data(coresignal_data, "ebit"),
-                "ebitda": extract_financial_data(coresignal_data, "ebitda"),
-                "net_income": extract_financial_data(coresignal_data, "net_income"),
-                "per": calculate_per(coresignal_data),
-                "revenue_growth": calculate_revenue_growth(coresignal_data)
+                "income_statements": safe_get(coresignal_data, "income_statements", default=[]),
+                "operating_revenue": safe_call(extract_financial_data, coresignal_data, "revenue", default={}),
+                "operating_profit": safe_call(extract_financial_data, coresignal_data, "ebit", default={}),
+                "ebitda": safe_call(extract_financial_data, coresignal_data, "ebitda", default={}),
+                "net_income": safe_call(extract_financial_data, coresignal_data, "net_income", default={}),
+                "per": safe_call(calculate_per, coresignal_data, default={}),
+                "revenue_growth": safe_call(calculate_revenue_growth, coresignal_data, default={})
             },
             
             # c. Shareholders
-            "shareholders": yahooData
+            "shareholders": yahooData or {}
         },
         
         # 3. Company Overview
         "company_overview": {
-            "business_model": coresignal_data.get("is_b2b", 0) == 1 and "B2B" or "B2C",
-            "products_brands": crunchbase_data.get("cards", {}).get("fields", {}).get("categories", ""),
-            "customers": coresignal_data.get("categories_and_keywords", []) or [],
-            "description_enriched": coresignal_data.get("description_enriched", ""),
-            "website_screenshot": f"data:image/png;base64,{get_website_screenshot(company_url)}"
+            "business_model": "B2B" if safe_get(coresignal_data, "is_b2b") == 1 else "B2C",
+            "products_brands": safe_get(crunchbase_data, "cards", "fields", "categories", default=""),
+            "customers": safe_get(coresignal_data, "categories_and_keywords", default=[]),
+            "description_enriched": safe_get(coresignal_data, "description_enriched", default=""),
+            "website_screenshot": safe_call(
+                lambda url: f"data:image/png;base64,{get_website_screenshot(url)}" if url else "",
+                company_url,
+                default=""
+            )
         },
         
         # 4. Financial Summary
-        "financial_summary": coresignal_data.get("income_statements", []),
+        "financial_summary": safe_get(coresignal_data, "income_statements", default=[]),
         
         # 5. Web Traffic
         "web_traffic": {
-            "monthly_visits": coresignal_data.get("total_website_visits_monthly", 0),
-            "visits_by_country": coresignal_data.get("visits_breakdown_by_country", []),
-            "visits_by_month": coresignal_data.get("total_website_visits_by_month", []),
-            "visits_change": coresignal_data.get("total_website_visits_change", {}),
-            "bounce_rate": coresignal_data.get("bounce_rate", 0),
-            "pages_per_visit": coresignal_data.get("pages_per_visit", 0),
-            "average_visit_duration": coresignal_data.get("average_visit_duration_seconds", 0)
+            "monthly_visits": safe_get(coresignal_data, "total_website_visits_monthly", default=0),
+            "visits_by_country": safe_get(coresignal_data, "visits_breakdown_by_country", default=[]),
+            "visits_by_month": safe_get(coresignal_data, "total_website_visits_by_month", default=[]),
+            "visits_change": safe_get(coresignal_data, "total_website_visits_change", default={}),
+            "bounce_rate": safe_get(coresignal_data, "bounce_rate", default=0),
+            "pages_per_visit": safe_get(coresignal_data, "pages_per_visit", default=0),
+            "average_visit_duration": safe_get(coresignal_data, "average_visit_duration_seconds", default=0)
         },
         
         # 6. Company Group Structure
         "group_structure": {
-            "parent_company": coresignal_data.get("parent_company_information", {}),
-            "subsidiaries": crunchbase_data.get("child_organizations", []) or []
+            "parent_company": safe_get(coresignal_data, "parent_company_information", default={}),
+            "subsidiaries": safe_get(crunchbase_data, "child_organizations", default=[])
         },
         
         # 7. Company Timeline
-        "company_timeline": extract_company_timeline(coresignal_data, crunchbase_data),
+        "company_timeline": safe_call(extract_company_timeline, coresignal_data, crunchbase_data, default=[]),
         
         # 8-9. Products & Services and Launch Timeline
         "products_services": {
-            "services": crunchbase_data.get("cards", {}).get("fields", {}).get("categories", {}) or crunchbase_data.get("cards", {}).get("fields", {}).get("category_groups", {}),
-            "details": extract_product_details(coresignal_data, crunchbase_data),
-            "launch_timeline": llmData["launch_timeline"],
-            "pricing_available": coresignal_data.get("pricing_available", False),
-            "free_trial_available": coresignal_data.get("free_trial_available", False),
-            "demo_available": coresignal_data.get("demo_available", False),
+            "services": safe_get(crunchbase_data, "cards", "fields", "categories", default="") or 
+                       safe_get(crunchbase_data, "cards", "fields", "category_groups", default=""),
+            "details": safe_call(extract_product_details, coresignal_data, crunchbase_data, default={}),
+            "launch_timeline": safe_get(llmData, "launch_timeline", default=[]),
+            "pricing_available": safe_get(coresignal_data, "pricing_available", default=False),
+            "free_trial_available": safe_get(coresignal_data, "free_trial_available", default=False),
+            "demo_available": safe_get(coresignal_data, "demo_available", default=False),
             "product_reviews": {
-                "count": coresignal_data.get("product_reviews_count", 0),
-                "score": coresignal_data.get("product_reviews_aggregate_score", 0),
-                "by_month": coresignal_data.get("product_reviews_score_by_month", []),
-                "distribution": coresignal_data.get("product_reviews_score_distribution", {})
+                "count": safe_get(coresignal_data, "product_reviews_count", default=0),
+                "score": safe_get(coresignal_data, "product_reviews_aggregate_score", default=0),
+                "by_month": safe_get(coresignal_data, "product_reviews_score_by_month", default=[]),
+                "distribution": safe_get(coresignal_data, "product_reviews_score_distribution", default={})
             }
         },
         
         # 10-12. Organization: Employees, Key Members, Leadership
         "organization": {
             "employees_trend": {
-                "count_by_month": coresignal_data.get("employees_count_by_month", []),
-                "count_change": coresignal_data.get("employees_count_change", {}),
-                "breakdown_by_department": coresignal_data.get("employees_count_breakdown_by_department", {}),
-                "breakdown_by_department_by_month": coresignal_data.get("employees_count_breakdown_by_department_by_month", {}),
-                "breakdown_by_country": coresignal_data.get("employees_count_by_country", []),
-                "breakdown_by_region": coresignal_data.get("employees_count_breakdown_by_region", {}),
-                "breakdown_by_seniority": coresignal_data.get("employees_count_breakdown_by_seniority", {})
+                "count_by_month": safe_get(coresignal_data, "employees_count_by_month", default=[]),
+                "count_change": safe_get(coresignal_data, "employees_count_change", default={}),
+                "breakdown_by_department": safe_get(coresignal_data, "employees_count_breakdown_by_department", default={}),
+                "breakdown_by_department_by_month": safe_get(coresignal_data, "employees_count_breakdown_by_department_by_month", default={}),
+                "breakdown_by_country": safe_get(coresignal_data, "employees_count_by_country", default=[]),
+                "breakdown_by_region": safe_get(coresignal_data, "employees_count_breakdown_by_region", default={}),
+                "breakdown_by_seniority": safe_get(coresignal_data, "employees_count_breakdown_by_seniority", default={})
             },
             "key_members": key_members,
-            "leadership_executives":llmData["leadership_executives"],
+            "leadership_executives": safe_get(llmData, "leadership_executives", default=[]),
             "leadership": {
-                "key_executives": coresignal_data.get("key_executives", []),
-                "arrivals": coresignal_data.get("key_executive_arrivals", []),
-                "departures": coresignal_data.get("key_executive_departures", []),
-                "change_events": coresignal_data.get("key_employee_change_events", [])
+                "key_executives": safe_get(coresignal_data, "key_executives", default=[]),
+                "arrivals": safe_get(coresignal_data, "key_executive_arrivals", default=[]),
+                "departures": safe_get(coresignal_data, "key_executive_departures", default=[]),
+                "change_events": safe_get(coresignal_data, "key_employee_change_events", default=[])
             },
             
             # 13-15. Employee Reviews
             "employee_reviews2": {
-                "count": coresignal_data.get("company_employee_reviews_count", 0),
-                "score": coresignal_data.get("company_employee_reviews_aggregate_score", 0),
-                "breakdown": coresignal_data.get("employee_reviews_score_breakdown", {}),
-                "distribution": coresignal_data.get("employee_reviews_score_distribution", {}),
+                "count": safe_get(coresignal_data, "company_employee_reviews_count", default=0),
+                "score": safe_get(coresignal_data, "company_employee_reviews_aggregate_score", default=0),
+                "breakdown": safe_get(coresignal_data, "employee_reviews_score_breakdown", default={}),
+                "distribution": safe_get(coresignal_data, "employee_reviews_score_distribution", default={}),
                 "by_category": {
-                    "business_outlook": get_employee_review_trend(coresignal_data, "business_outlook"),
-                    "career_opportunities": get_employee_review_trend(coresignal_data, "career_opportunities"),
-                    "ceo_approval": get_employee_review_trend(coresignal_data, "ceo_approval"),
-                    "compensation_benefits": get_employee_review_trend(coresignal_data, "compensation_benefits"),
-                    "culture_values": get_employee_review_trend(coresignal_data, "culture_values"),
-                    "diversity_inclusion": get_employee_review_trend(coresignal_data, "diversity_inclusion"),
-                    "recommend": get_employee_review_trend(coresignal_data, "recommend"),
-                    "senior_management": get_employee_review_trend(coresignal_data, "senior_management"),
-                    "work_life_balance": get_employee_review_trend(coresignal_data, "work_life_balance")
+                    "business_outlook": safe_call(get_employee_review_trend, coresignal_data, "business_outlook", default={}),
+                    "career_opportunities": safe_call(get_employee_review_trend, coresignal_data, "career_opportunities", default={}),
+                    "ceo_approval": safe_call(get_employee_review_trend, coresignal_data, "ceo_approval", default={}),
+                    "compensation_benefits": safe_call(get_employee_review_trend, coresignal_data, "compensation_benefits", default={}),
+                    "culture_values": safe_call(get_employee_review_trend, coresignal_data, "culture_values", default={}),
+                    "diversity_inclusion": safe_call(get_employee_review_trend, coresignal_data, "diversity_inclusion", default={}),
+                    "recommend": safe_call(get_employee_review_trend, coresignal_data, "recommend", default={}),
+                    "senior_management": safe_call(get_employee_review_trend, coresignal_data, "senior_management", default={}),
+                    "work_life_balance": safe_call(get_employee_review_trend, coresignal_data, "work_life_balance", default={})
                 }
             }
         },
         
         # 16. Strategic Alliance & Partnership
-        "strategic_alliances": llmData["strategic_alliances"],
+        "strategic_alliances": safe_get(llmData, "strategic_alliances", default=[]),
         
         # 17. Market Leadership
         "market_leadership": {
-            "industry": coresignal_data.get("industry", ""),
-            "rank_category": coresignal_data.get("rank_category", 0),
-            "rank_global": coresignal_data.get("rank_global", 0)
+            "industry": safe_get(coresignal_data, "industry", default=""),
+            "rank_category": safe_get(coresignal_data, "rank_category", default=0),
+            "rank_global": safe_get(coresignal_data, "rank_global", default=0)
         },
         
         # 18. Key Technology
         "key_technology": {
-            "technologies_used": coresignal_data.get("technologies_used", []),
-            "num_technologies": coresignal_data.get("num_technologies_used", 0)
+            "technologies_used": safe_get(coresignal_data, "technologies_used", default=[]),
+            "num_technologies": safe_get(coresignal_data, "num_technologies_used", default=0)
         },
         
         # 19-21. Strategic Development, Strategy, Customer Success
-        "strategic_development": llmData["strategic_development"],
-        "strategy": llmData["company_strategy"],
-        "customer_success": extract_customer_success(coresignal_data, crunchbase_data),
+        "strategic_development": safe_get(llmData, "strategic_development", default=[]),
+        "strategy": safe_get(llmData, "company_strategy", default=[]),
+        "customer_success": safe_call(extract_customer_success, coresignal_data, crunchbase_data, default=[]),
         
         # 22-23. M&A
         "ma_activity": {
-            "acquisitions": get_acquisitions(coresignal_data),
-            "acquired_by": coresignal_data.get("acquired_by_summary", {})
+            "acquisitions": safe_call(get_acquisitions, coresignal_data, default=[]),
+            "acquired_by": safe_get(coresignal_data, "acquired_by_summary", default={})
         },
         
         # 24-26. Market Info
         "market_info": {
-            "size": llmData["market_size"],
-            "value_chain": llmData["value_chain"],
-            "market_map": extract_market_map(coresignal_data, crunchbase_data)
+            "size": safe_get(llmData, "market_size", default={}),
+            "value_chain": safe_get(llmData, "value_chain", default={}),
+            "market_map": safe_call(extract_market_map, coresignal_data, crunchbase_data, default={})
         },
         
         # 27-30. Competitive Analysis
         "competitive_analysis": {
-            "landscape": extract_competitive_landscape(coresignal_data),
-            "competitors": coresignal_data.get("competitors", []),
-            "competitors_websites": coresignal_data.get("competitors_websites", []),
-            "financial_comparables": extract_financial_comparables(coresignal_data),
+            "landscape": safe_call(extract_competitive_landscape, coresignal_data, default={}),
+            "competitors": safe_get(coresignal_data, "competitors", default=[]),
+            "competitors_websites": safe_get(coresignal_data, "competitors_websites", default=[]),
+            "financial_comparables": safe_call(extract_financial_comparables, coresignal_data, default={}),
             "peer_developments": {
-                "funding_vs_founded": combine_funding_and_founding(coresignal_data, crunchbase_data),
-                "webtraffic_vs_founded": combine_webtraffic_and_founding(coresignal_data)
+                "funding_vs_founded": safe_call(combine_funding_and_founding, coresignal_data, crunchbase_data, default=[]),
+                "webtraffic_vs_founded": safe_call(combine_webtraffic_and_founding, coresignal_data, default=[])
             }
         },
         
         # 31-35. Regulation, Opportunities/Risks, Q&A
-        # "regulation": extract_regulation_info(coresignal_data, crunchbase_data),
-        "regulations": llmData["regulations"],
+        "regulations": safe_get(llmData, "regulations", default=[]),
         "opportunities_risks": {
-            "opportunities": extract_opportunities(coresignal_data, crunchbase_data),
-            "risks": extract_risks(coresignal_data, crunchbase_data)
+            "opportunities": safe_call(extract_opportunities, coresignal_data, crunchbase_data, default=[]),
+            "risks": safe_call(extract_risks, coresignal_data, crunchbase_data, default=[])
         },
-        "qa": extract_common_questions(coresignal_data, crunchbase_data),
+        "qa": safe_call(extract_common_questions, coresignal_data, crunchbase_data, default=[]),
         
         # URLs for the frontend
         "urls": {
-            "company_url": coresignal_data.get("website", ""),
-            "image_url": crunchbase_data.get("cards", {}).get("fields", {}).get("image_url", ""),
-            "linkedin_url": coresignal_data.get("professional_network_url", ""),
-            "facebook_url": coresignal_data.get("facebook_url", []),
-            "twitter_url": coresignal_data.get("twitter_url", ""),
-            "youtube_url": coresignal_data.get("youtube_url", []),
-            "instagram_url": coresignal_data.get("instagram_url", []),
-            "github_url": coresignal_data.get("github_url", []),
-            "discord_url": coresignal_data.get("discord_url", [])
+            "company_url": safe_get(coresignal_data, "website", default=""),
+            "image_url": safe_get(crunchbase_data, "cards", "fields", "image_url", default=""),
+            "linkedin_url": safe_get(coresignal_data, "professional_network_url", default=""),
+            "facebook_url": safe_get(coresignal_data, "facebook_url", default=[]),
+            "twitter_url": safe_get(coresignal_data, "twitter_url", default=""),
+            "youtube_url": safe_get(coresignal_data, "youtube_url", default=[]),
+            "instagram_url": safe_get(coresignal_data, "instagram_url", default=[]),
+            "github_url": safe_get(coresignal_data, "github_url", default=[]),
+            "discord_url": safe_get(coresignal_data, "discord_url", default=[])
         }
     }
     
+    # Safely call additional functions to enrich the data
+    try:
+        employeeReviewsSummary = safe_call(
+            get_employee_reviews_summary, 
+            company_name, 
+            response_data["organization"]["employee_reviews2"],
+            default=""
+        )
+        response_data["organization"]["employee_reviews2"]["reviews_summary"] = employeeReviewsSummary
+    except Exception as e:
+        print(f"Error getting employee reviews summary: {e}")
+        response_data["organization"]["employee_reviews2"]["reviews_summary"] = ""
     
-    employeeReviewsSummary = get_employee_reviews_summary(company_name, response_data["organization"]["employee_reviews2"])
-    response_data["organization"]["employee_reviews2"]["reviews_summary"] = employeeReviewsSummary
+    # Handle competitive analysis
+    try:
+        competitiveAnalysis = safe_call(
+            get_competitive_analysis, 
+            company_name, 
+            response_data["competitive_analysis"],
+            default=""
+        )
+        response_data["competitive_analysis"]["competitive_analysis"] = competitiveAnalysis
+    except Exception as e:
+        print(f"Error getting competitive analysis: {e}")
+        response_data["competitive_analysis"]["competitive_analysis"] = ""
     
-    competitiveAnalysis = get_competitive_analysis(company_name, response_data["competitive_analysis"])
-    response_data["competitive_analysis"]["competitive_analysis"] = competitiveAnalysis
+    # Handle opportunity areas
+    try:
+        opportunityAreas = safe_call(
+            get_opportunity_areas,
+            company_name,
+            response_data["executive_summary"]["topic_tags"],
+            default=[]
+        )
+        response_data["opportunities_risks"]["opportunities"] = opportunityAreas
+    except Exception as e:
+        print(f"Error getting opportunity areas: {e}")
+        response_data["opportunities_risks"]["opportunities"] = []
     
-    opportunityAreas = get_opportunity_areas(company_name, response_data["executive_summary"]["topic_tags"])
-    response_data["opportunities_risks"]["opportunities"] = opportunityAreas
+    # Handle product services
+    try:
+        productServices = safe_call(
+            get_product_services,
+            company_name,
+            response_data["products_services"]["services"],
+            default=""
+        )
+        response_data["products_services"]["services"] = productServices
+    except Exception as e:
+        print(f"Error getting product services: {e}")
+        response_data["products_services"]["services"] = ""
     
-    productServices = get_product_services(company_name, response_data["products_services"]["services"])
-    response_data["products_services"]["services"] = productServices
+    # Handle employee trend department summary
+    try:
+        employeeTrendDepartmentSummary = safe_call(
+            get_employee_trend_summary,
+            company_name,
+            response_data["organization"]["employees_trend"]["breakdown_by_department"],
+            response_data["organization"]["employees_trend"]["breakdown_by_department_by_month"],
+            default=""
+        )
+        response_data["organization"]["employees_trend"]["department_summary"] = employeeTrendDepartmentSummary
+    except Exception as e:
+        print(f"Error getting employee trend department summary: {e}")
+        response_data["organization"]["employees_trend"]["department_summary"] = ""
     
-    employeeTrendDepartmentSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["breakdown_by_department"], response_data["organization"]["employees_trend"]["breakdown_by_department_by_month"])
-    response_data["organization"]["employees_trend"]["department_summary"] = employeeTrendDepartmentSummary
+    # Handle employee trend count summary
+    try:
+        employeeTrendCountSummary = safe_call(
+            get_employee_trend_summary,
+            company_name,
+            response_data["organization"]["employees_trend"]["count_by_month"],
+            response_data["organization"]["employees_trend"]["count_change"],
+            default=""
+        )
+        response_data["organization"]["employees_trend"]["count_summary"] = employeeTrendCountSummary
+    except Exception as e:
+        print(f"Error getting employee trend count summary: {e}")
+        response_data["organization"]["employees_trend"]["count_summary"] = ""
     
-    employeeTrendCountSummary = get_employee_trend_summary(company_name, response_data["organization"]["employees_trend"]["count_by_month"], response_data["organization"]["employees_trend"]["count_change"])
-    response_data["organization"]["employees_trend"]["count_summary"] = employeeTrendCountSummary
+    # Handle employee ratings summary
+    try:
+        employeeRatingsSummary = safe_call(
+            get_employee_ratings_summary,
+            company_name,
+            response_data["organization"]["employee_reviews2"],
+            default=""
+        )
+        response_data["organization"]["employee_reviews2"]["ratings_summary"] = employeeRatingsSummary
+    except Exception as e:
+        print(f"Error getting employee ratings summary: {e}")
+        response_data["organization"]["employee_reviews2"]["ratings_summary"] = ""
     
+    # Handle employee ratings areas of improvement
+    try:
+        employeeRatingsAreasOfImprovement = safe_call(
+            get_areas_of_improvement,
+            company_name,
+            response_data["organization"]["employee_reviews2"],
+            default=""
+        )
+        response_data["organization"]["employee_reviews2"]["areas_of_improvements"] = employeeRatingsAreasOfImprovement
+    except Exception as e:
+        print(f"Error getting employee ratings areas of improvement: {e}")
+        response_data["organization"]["employee_reviews2"]["areas_of_improvements"] = ""
     
-    employeeRatingsSummary = get_employee_ratings_summary(company_name, response_data["organization"]["employee_reviews2"])
-    response_data["organization"]["employee_reviews2"]["ratings_summary"] = employeeRatingsSummary
-    
-    employeeRatingsAreasOfImprovement = get_areas_of_improvement(company_name, response_data["organization"]["employee_reviews2"])
-    response_data["organization"]["employee_reviews2"]["areas_of_improvements"] = employeeRatingsAreasOfImprovement
-    
-    market_map = get_market_map(company_name, response_data["market_info"]["market_map"])
-    response_data["market_info"]["market_map"] = market_map 
+    # Handle market map
+    try:
+        market_map = safe_call(
+            get_market_map,
+            company_name,
+            response_data["market_info"]["market_map"],
+            default={}
+        )
+        response_data["market_info"]["market_map"] = market_map
+    except Exception as e:
+        print(f"Error getting market map: {e}")
+        response_data["market_info"]["market_map"] = {}
 
-    business_detail=generate_perplexity_businessDetail(company_name,response_data['company_overview'])
-    # print("business detail",business_detail)
-    openai_business=get_openai_business(company_name,business_detail)
-    # print("openai business",openai_business)
-    response_data["executive_summary"]['description']=openai_business["business_description"]
-    response_data["company_overview"]['business_model']=openai_business["business_model"]
-    response_data["company_overview"]['products_brands']=openai_business["products_brands"]
-    response_data["company_overview"]['customers']=openai_business["customers"]
-
-    perplexity_company_timeline = generate_perplexity_companyTimeline(company_name)
-    openai_company_timeline=get_openai_companyTimeline(company_name,perplexity_company_timeline)
-    response_data["company_timeline"]=openai_company_timeline["company_timeline"]
-
-    perplexity_product_timeline = generate_perplexity_productTimeline(company_name)
-    openai_product_timeline=get_openai_productTimeline(company_name, perplexity_product_timeline)
-    response_data['products_services']['launch_timeline']=openai_product_timeline['product_timeline']
-
-    perplexity_market_leadership=generate_perplexity_MarketLeadership(company_name)
-    openai_market_leadership=get_openai_marketLeadership(company_name,perplexity_market_leadership)
-    response_data["market_leadership"]=openai_market_leadership['market_leadership']
-
-    perplexity_key_technology=generate_perplexity_KeyTechnologies(company_name)
-    openai_key_technology=get_openai_keyTechnology(company_name, perplexity_key_technology)
-    response_data["key_technology"]=openai_key_technology['key_technologies']
-
-    perplexity_products_services=generate_perplexity_productsServices(company_name)
-    openai_products_services=get_openai_productsServices(company_name, perplexity_products_services)
-    response_data["products_services"]["services"]=openai_products_services['products_services']
-
-    perplexity_maStrategy=generate_perplexity_maStrategy(company_name)
-    openai_maStrategy=get_openai_maStrategy(company_name, perplexity_maStrategy)
-    response_data['ma_activity']['ma_deals']=openai_maStrategy['ma_deals']
-
-    perplexity_financialComparables=generate_perplexity_financial_comparables(company_name)
-    openai_financialComparables=get_openai_financial_comparables(company_name, perplexity_financialComparables)
-    response_data['competitive_analysis']['financial_comparables']=openai_financialComparables['financial_comparables']
+    # Handle perplexity and OpenAI data
+    try:
+        business_detail = safe_call(
+            generate_perplexity_businessDetail,
+            company_name,
+            response_data['company_overview'],
+            default=""
+        )
+        
+        if business_detail:
+            openai_business = safe_call(
+                get_openai_business,
+                company_name,
+                business_detail,
+                default={"business_description": "", "business_model": "", "products_brands": "", "customers": ""}
+            )
+            
+            response_data["executive_summary"]['description'] = openai_business.get("business_description", "")
+            response_data["company_overview"]['business_model'] = openai_business.get("business_model", "")
+            response_data["company_overview"]['products_brands'] = openai_business.get("products_brands", "")
+            response_data["company_overview"]['customers'] = openai_business.get("customers", "")
+    except Exception as e:
+        print(f"Error enriching business details: {e}")
     
+    # Handle company timeline
+    try:
+        perplexity_company_timeline = safe_call(
+            generate_perplexity_companyTimeline,
+            company_name,
+            default=""
+        )
+        
+        if perplexity_company_timeline:
+            openai_company_timeline = safe_call(
+                get_openai_companyTimeline,
+                company_name,
+                perplexity_company_timeline,
+                default={"company_timeline": []}
+            )
+            response_data["company_timeline"] = openai_company_timeline.get("company_timeline", [])
+    except Exception as e:
+        print(f"Error enriching company timeline: {e}")
     
-    return {"success":True,"company_name": company_name, "data": response_data}
+    # Handle product timeline
+    try:
+        perplexity_product_timeline = safe_call(
+            generate_perplexity_productTimeline,
+            company_name,
+            default=""
+        )
+        
+        if perplexity_product_timeline:
+            openai_product_timeline = safe_call(
+                get_openai_productTimeline,
+                company_name,
+                perplexity_product_timeline,
+                default={"product_timeline": []}
+            )
+            response_data['products_services']['launch_timeline'] = openai_product_timeline.get('product_timeline', [])
+    except Exception as e:
+        print(f"Error enriching product timeline: {e}")
+    
+    # Handle market leadership
+    try:
+        perplexity_market_leadership = safe_call(
+            generate_perplexity_MarketLeadership,
+            company_name,
+            default=""
+        )
+        
+        if perplexity_market_leadership:
+            openai_market_leadership = safe_call(
+                get_openai_marketLeadership,
+                company_name,
+                perplexity_market_leadership,
+                default={"market_leadership": {}}
+            )
+            response_data["market_leadership"] = openai_market_leadership.get('market_leadership', {})
+    except Exception as e:
+        print(f"Error enriching market leadership: {e}")
+    
+    # Handle key technology
+    try:
+        perplexity_key_technology = safe_call(
+            generate_perplexity_KeyTechnologies,
+            company_name,
+            default=""
+        )
+        
+        if perplexity_key_technology:
+            openai_key_technology = safe_call(
+                get_openai_keyTechnology,
+                company_name,
+                perplexity_key_technology,
+                default={"key_technologies": {}}
+            )
+            response_data["key_technology"] = openai_key_technology.get('key_technologies', {})
+    except Exception as e:
+        print(f"Error enriching key technology: {e}")
+    
+    # Handle products and services
+    try:
+        perplexity_products_services = safe_call(
+            generate_perplexity_productsServices,
+            company_name,
+            default=""
+        )
+        
+        if perplexity_products_services:
+            openai_products_services = safe_call(
+                get_openai_productsServices,
+                company_name,
+                perplexity_products_services,
+                default={"products_services": ""}
+            )
+            response_data["products_services"]["services"] = openai_products_services.get('products_services', "")
+    except Exception as e:
+        print(f"Error enriching products and services: {e}")
+    
+    # Handle M&A strategy
+    try:
+        perplexity_maStrategy = safe_call(
+            generate_perplexity_maStrategy,
+            company_name,
+            default=""
+        )
+        
+        if perplexity_maStrategy:
+            openai_maStrategy = safe_call(
+                get_openai_maStrategy,
+                company_name,
+                perplexity_maStrategy,
+                default={"ma_deals": []}
+            )
+            response_data['ma_activity']['ma_deals'] = openai_maStrategy.get('ma_deals', [])
+    except Exception as e:
+        print(f"Error enriching M&A strategy: {e}")
+    
+    # Handle financial comparables
+    try:
+        perplexity_financialComparables = safe_call(
+            generate_perplexity_financial_comparables,
+            company_name,
+            default=""
+        )
+        
+        if perplexity_financialComparables:
+            openai_financialComparables = safe_call(
+                get_openai_financial_comparables,
+                company_name,
+                perplexity_financialComparables,
+                default={"financial_comparables": {}}
+            )
+            response_data['competitive_analysis']['financial_comparables'] = openai_financialComparables.get('financial_comparables', {})
+    except Exception as e:
+        print(f"Error enriching financial comparables: {e}")
+    
+    return {"success": True, "company_name": company_name, "data": response_data}
+
