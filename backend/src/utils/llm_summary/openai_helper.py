@@ -421,82 +421,151 @@ Please ensure the descriptions are concise but informative. """
     processed_data = process_value_chain_with_logos(content)
     return processed_data
 
+def add_logo_to_companies(data):
+    # Extract companies_info from the input data
+    companies_info = data.get('companies_info', [])
+
+    # Create a function to add the logo to each company info
+    def fetch_logo_for_company(company):
+        if isinstance(company, dict):  # Ensure it's a dictionary
+            logo = get_company_logo(company['name'])
+            company['logo'] = logo
+            return company
+        else:
+            print(f"Unexpected data format for company: {company}")
+            return company  # Return the company unmodified if not a dictionary
+    
+    # Use ThreadPoolExecutor to fetch logos in parallel
+    with ThreadPoolExecutor() as executor:
+        companies_with_logos = list(executor.map(fetch_logo_for_company, companies_info))
+    
+    # Return the updated structure with the logos added
+    data['companies_info'] = companies_with_logos
+    return data
+
+def get_openai_peer_developments(company_name, business_data):
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    system_prompt = f"""
+You are given the data . Today's date is {time}.
+
+For each company, please provide the following details in a strict JSON format:
+
+1. **name**: The name of the company.
+2. **founded_year**: The year the company was founded (approximate).
+3. **total_funding**: The total funding raised by the company (approximate).
+4. **currency**: The currency of the fundings
+5. **web_traffic**: The estimated web traffic for the company (approximate monthly visits).
+  
+Please ensure that you return the most relevant company data, with the most recent information first, sorted in descending order by date. Ensure that the format strictly follows the instructions and the information is relevant to the company's profile.
+
+JSON Format is:
+```json
+{{
+    "companies_info": {{
+        "name": "string", 
+        "founded_year": "number", 
+        "currency": "string",
+        "total_funding": "number", 
+        "web_traffic": "number"
+    }}
+}}
+Please ensure the descriptions are concise but informative.
+"""
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": json.dumps(business_data, indent=2)}
+        ]
+    )
+    
+    # Get the response from the model and parse it
+    content =json.loads(response.choices[0].message.content)
+    processedData=add_logo_to_companies(content)
+    return processedData
+
+def add_logo_url_to_competitive_analysis(competitive_analysis_data):
+    # Function to fetch the logo for each company using the get_company_logo helper function
+    def fetch_logo_for_company(company_name):
+        return get_company_logo(company_name)
+    
+    # Use ThreadPoolExecutor to fetch logos in parallel
+    with ThreadPoolExecutor() as executor:
+        # Extract company names from the competitive analysis data
+        company_names = [entry['company_name'] for entry in competitive_analysis_data['competitive_analysis']]
+        
+        # Fetch logos in parallel
+        logos = list(executor.map(fetch_logo_for_company, company_names))
+    
+    # Loop through each entry and add the corresponding logo URL
+    for idx, entry in enumerate(competitive_analysis_data['competitive_analysis']):
+        entry['logo_url'] = logos[idx]  # Assign the fetched logo URL to each entry
+    
+    return competitive_analysis_data
+def get_openai_peer_competitorAnalysis(company_name, business_data):
+    # print("hit")
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    system_prompt = f"""
+
+Generate a competitive analysis report for Company: {company_name} based on the input competitor data. You need to create a JSON report with 3 fields for each of the competitors, resulting in a total of 9 entries.
+
+The fields for {company_name} should be determined dynamically based on the company's industry, market focus, or main services. These fields will be specific to {company_name} and should be applied consistently across all competitors.
+
+For example, if {company_name} is a payment processor, the fields could include "Payment Processing", "User Experience", and "Security". If {company_name} is an e-commerce platform, the fields could include "Customer Satisfaction", "Product Selection", and "Supply Chain Efficiency".
+
+For each competitor, include 3 entries—one for each of the fields related to {company_name}'s focus areas. This means you'll generate 9 unique entries in total, with each field being evaluated for each competitor.
+
+Each entry should contain:
+1. **Company Name**: The name of the competitor, formatted in the brand's style.
+2. **Field**: A key area where {company_name} is focused.
+3. **Score**: A score between 0 and 100 indicating the competitor's performance in that field.
+4. **Description**: A brief explanation of why the competitor excels in that field.
+
+The **description** should explain what the competitor is doing better in each field and why they excel in that area.
+
+**Strictly Follow This JSON Format for output**:
+```json
+{{
+   "competitive_analysis": [
+       {{
+           "company_name": "string", // Competitor's name in their brand style
+           "field": "string", // Area of expertise (e.g., AI Integration)
+           "score": number, // 0-100 score reflecting the competitor's performance
+           "description": "string" // Why the competitor excels in this field
+       }}
+   ]
+}}
+```"""
+    competitors_str = str(business_data)
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": competitors_str}
+        ]
+    )
+    
+    # Get the response from the model and parse it
+    content =json.loads(response.choices[0].message.content)
+    # print("content",content)
+    processedData=add_logo_url_to_competitive_analysis(content)
+    return processedData
+
 # Main function to test
 def main():
-    company_name = "Nvidia"
+    company_name = "Paypal"
     business_data = """
 
-Result for for Nvidia:
-```json
-{
-  "industryName": "Semiconductors",
-  "stages": [
-    {
-      "stage": "Research and Development",
-      "activities": [
-        "Designing graphics processing units (GPUs)",
-        "Developing application programming interfaces (APIs) for data science",
-        "Creating system on a chip units (SoCs) for mobile and automotive markets",
-        "Advancing artificial intelligence (AI) hardware and software",
-        "Collaborating on open-source projects like Newton physics engine"
-      ],
-      "companies": [
-        "Google DeepMind",
-        "Disney Research",
-        "Microsoft"
-      ]
-    },
-    {
-      "stage": "Manufacturing",
-      "activities": [
-        "Outsourcing hardware manufacturing to third-party fabs",
-        "Ensuring quality control and testing of manufactured products",
-        "Managing supply chain logistics for component sourcing",
-        "Implementing sustainable manufacturing practices",
-        "Collaborating with manufacturing partners for new technologies"
-      ],
-      "companies": [
-        "Taiwan Semiconductor Manufacturing Company (TSMC)",
-        "Samsung Electronics",
-        "Micron Technology"
-      ]
-    },
-    {
-      "stage": "Marketing and Sales",
-      "activities": [
-        "Promoting products through social media and events",
-        "Developing marketing campaigns for new product launches",
-        "Building strategic partnerships with industry leaders",
-        "Providing customer support and technical assistance",
-        "Engaging in market research to understand consumer needs"
-      ],
-      "companies": [
-        "ASUS",
-        "Dell",
-        "HP Inc."
-      ]
-    },
-    {
-      "stage": "Distribution and Retail",
-      "activities": [
-        "Managing distribution networks for global reach",
-        "Partnering with retailers for product availability",
-        "Ensuring timely delivery of products to customers",
-        "Providing after-sales support and warranty services",
-        "Monitoring inventory levels and supply chain efficiency"
-      ],
-      "companies": [
-        "Best Buy",
-        "Newegg",
-        "Amazon"
-      ]
-    }
-  ]
-}
+
 """
     
     # Get business summary from OpenAI
-    summary = get_openai_valueChain(company_name, business_data)
+    summary = get_openai_peer_competitorAnalysis(company_name, ['stripe', 'square', 'wepay'])
     
     print("Result:")
     print(summary)

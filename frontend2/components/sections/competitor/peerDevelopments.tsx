@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14,11 +13,8 @@ import {
   Legend,
 } from "chart.js";
 import { Scatter } from "react-chartjs-2";
-import type {
-  CompanyData,
-  CompanyTrafficData,
-  CompetitiveAnalysis,
-} from "@/types/competitor";
+import { SectionLayout } from "@/components/ui/section-layout";
+import type { PeerDevelopments } from "@/types/competitor";
 
 // Register Chart.js components
 ChartJS.register(
@@ -30,188 +26,80 @@ ChartJS.register(
   Legend
 );
 
-// Helper function to format numbers
-const formatNumber = (num: number | string | null | undefined): string => {
-  if (num === null || num === undefined || num === "N/A") return "N/A";
-  if (typeof num === "string") return num;
-  if (num >= 1000000000) return `${(num / 1000000000).toFixed(1)}B`;
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-  return num.toString();
-};
-
 type PeerDevelopmentsProps = {
-  initialData?: CompetitiveAnalysis;
+  initialData?: PeerDevelopments[];
 };
 
 // Define strongly typed default values
-const defaultFundingCompanyData: CompanyData = {
-  monthly_traffic: 0,
+const defaultPeerDevelopment: PeerDevelopments = {
   name: "",
   founded_year: "",
   total_funding: 0,
-};
-
-const defaultTrafficCompanyData: CompanyTrafficData = {
-  name: "",
-  founded_year: "",
-  monthly_traffic: 0,
-};
-
-const defaultState: CompetitiveAnalysis = {
-  landscape: [],
-  competitors: [],
-  competitors_websites: [],
-  financial_comparables: [],
-  peer_developments: {
-    funding_vs_founded: {
-      company_data: defaultFundingCompanyData,
-      competitors_data: [],
-    },
-    webtraffic_vs_founded: {
-      company_data: defaultTrafficCompanyData,
-      competitors_data: [],
-    },
-  },
+  currency: "$",
+  web_traffic: 0,
+  logo: null,
 };
 
 export default function PeerDevelopmentsPage({
-  initialData = defaultState,
+  initialData = [],
 }: PeerDevelopmentsProps) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [sourceText, setSourceText] = useState<string>("Source: Coresignal");
+  const [data, setData] = useState<PeerDevelopments[]>([]);
+  const [editData, setEditData] = useState<PeerDevelopments[]>([]);
 
-  // Ensure initialData is not null and has expected structure
-  const safeInitialData = initialData || defaultState;
-
-  // Ensure peer_developments exists with proper structure
-  const safePeerDevelopments = safeInitialData.peer_developments || {
-    funding_vs_founded: {
-      company_data: defaultFundingCompanyData,
-      competitors_data: [],
-    },
-    webtraffic_vs_founded: {
-      company_data: defaultTrafficCompanyData,
-      competitors_data: [],
-    },
-  };
-
-  // Ensure funding_vs_founded exists with proper structure
-  const safeFundingVsFounded = safePeerDevelopments.funding_vs_founded || {
-    company_data: defaultFundingCompanyData,
-    competitors_data: [],
-  };
-
-  // Ensure webtraffic_vs_founded exists with proper structure
-  const safeWebtrafficVsFounded =
-    safePeerDevelopments.webtraffic_vs_founded || {
-      company_data: defaultTrafficCompanyData,
-      competitors_data: [],
-    };
-
-  // Ensure company_data exists in both sections with correct types
-  const safeFundingCompanyData: CompanyData =
-    safeFundingVsFounded.company_data || defaultFundingCompanyData;
-  const safeWebtrafficCompanyData: CompanyTrafficData =
-    safeWebtrafficVsFounded.company_data || defaultTrafficCompanyData;
-
-  // Ensure competitors_data arrays exist in both sections
-  const safeFundingCompetitorsData: CompanyData[] =
-    safeFundingVsFounded.competitors_data || [];
-  const safeWebtrafficCompetitorsData: CompanyTrafficData[] =
-    safeWebtrafficVsFounded.competitors_data || [];
-
-  const [data, setData] = useState<CompetitiveAnalysis>({
-    ...safeInitialData,
-    competitors: safeInitialData.competitors || [],
-    competitors_websites: safeInitialData.competitors_websites || [],
-    peer_developments: {
-      funding_vs_founded: {
-        company_data: safeFundingCompanyData,
-        competitors_data: safeFundingCompetitorsData,
-      },
-      webtraffic_vs_founded: {
-        company_data: safeWebtrafficCompanyData,
-        competitors_data: safeWebtrafficCompetitorsData,
-      },
-    },
-  });
-
+  // Ensure the data is properly formatted and safe to use
   useEffect(() => {
-    if (!initialData) return; // Ensure initialData exists before updating
+    if (!initialData || !Array.isArray(initialData)) {
+      setData([]);
+      return;
+    }
 
     console.log("peer development initialData update:", initialData);
 
-    // Create a properly structured data object with all the necessary defaults
-    const updatedData = {
-      ...initialData,
-      competitors: initialData.competitors || [],
-      competitors_websites: initialData.competitors_websites || [],
-      peer_developments: initialData.peer_developments || {
-        funding_vs_founded: {
-          company_data: defaultFundingCompanyData,
-          competitors_data: [],
-        },
-        webtraffic_vs_founded: {
-          company_data: defaultTrafficCompanyData,
-          competitors_data: [],
-        },
-      },
-    };
+    // Process the data to ensure all values are properly formatted
+    const processedData = initialData.map((item) => ({
+      name: item.name || "",
+      founded_year: item.founded_year || "",
+      total_funding: parseNumericValue(item.total_funding),
+      currency: item.currency || "$",
+      web_traffic: parseNumericValue(item.web_traffic),
+      logo: item.logo || null,
+    }));
 
-    // Completely replace the state with the new data
-    setData(updatedData);
-  }, [initialData]); // Only depend on initialData
+    setData(processedData);
+  }, [initialData]);
 
-  // Create separate state for editing different sections
-  const [editData, setEditData] = useState({
-    funding_vs_founded: {
-      company_data: { ...safeFundingCompanyData },
-      competitors_data: [...safeFundingCompetitorsData],
-    },
-    webtraffic_vs_founded: {
-      company_data: { ...safeWebtrafficCompanyData },
-      competitors_data: [...safeWebtrafficCompetitorsData],
-    },
-  });
+  // Parse numeric values from either string or number
+  const parseNumericValue = (value: string | number | null): number => {
+    if (value === null || value === undefined) return 0;
+
+    if (typeof value === "number") return value;
+
+    // Try to convert string to number
+    const parsed = parseFloat(value.replace(/[^0-9.-]+/g, ""));
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  // Format numbers for display
+  const formatNumber = (value: number | string | null): string => {
+    const numValue = parseNumericValue(value);
+
+    if (numValue >= 1000000000) {
+      return `${(numValue / 1000000000).toFixed(1)}B`;
+    } else if (numValue >= 1000000) {
+      return `${(numValue / 1000000).toFixed(1)}M`;
+    } else if (numValue >= 1000) {
+      return `${(numValue / 1000).toFixed(1)}K`;
+    } else {
+      return numValue.toString();
+    }
+  };
 
   const startEditing = (): void => {
     setIsEditing(true);
-
     // Create a deep copy to avoid reference issues
-    const dataCopy = data.peer_developments
-      ? JSON.parse(JSON.stringify(data.peer_developments))
-      : JSON.parse(
-          JSON.stringify({
-            funding_vs_founded: {
-              company_data: defaultFundingCompanyData,
-              competitors_data: [],
-            },
-            webtraffic_vs_founded: {
-              company_data: defaultTrafficCompanyData,
-              competitors_data: [],
-            },
-          })
-        );
-
-    // Ensure the structure is maintained after parsing
-    const editDataWithDefaults = {
-      funding_vs_founded: {
-        company_data: dataCopy.funding_vs_founded?.company_data || {
-          ...defaultFundingCompanyData,
-        },
-        competitors_data: dataCopy.funding_vs_founded?.competitors_data || [],
-      },
-      webtraffic_vs_founded: {
-        company_data: dataCopy.webtraffic_vs_founded?.company_data || {
-          ...defaultTrafficCompanyData,
-        },
-        competitors_data:
-          dataCopy.webtraffic_vs_founded?.competitors_data || [],
-      },
-    };
-
-    setEditData(editDataWithDefaults);
+    setEditData(JSON.parse(JSON.stringify(data)));
   };
 
   const cancelEditing = (): void => {
@@ -221,293 +109,103 @@ export default function PeerDevelopmentsPage({
   const saveChanges = (): void => {
     // Create UserAttachment entity
     const userAttachment = {
-      name: "peer-developments-page-mxW7m4ypuvj5UDPAYcM1jKFEpJnmwe.tsx",
-      url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/peer-developments-page-mxW7m4ypuvj5UDPAYcM1jKFEpJnmwe.tsx",
+      name: "peer-developments-page-updated.tsx",
+      url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/peer-developments-page-updated.tsx",
     };
 
     console.log("Creating UserAttachment:", userAttachment);
-
-    const updatedData = { ...data };
-    updatedData.peer_developments = editData;
-    setData(updatedData);
+    setData(editData);
     setIsEditing(false);
 
     // Update the source text to include the user
     setSourceText("Source: Coresignal, User Update");
   };
 
-  // Type-safe update function for company data
-  const updateFundingCompanyData = (
-    field: keyof CompanyData,
-    value: string | number
-  ): void => {
-    const newData = { ...editData };
-
-    if (!newData.funding_vs_founded) {
-      newData.funding_vs_founded = {
-        company_data: { ...defaultFundingCompanyData },
-        competitors_data: [],
-      };
-    }
-
-    if (!newData.funding_vs_founded.company_data) {
-      newData.funding_vs_founded.company_data = {
-        ...defaultFundingCompanyData,
-      };
-    }
-
-    if (
-      field === "total_funding" &&
-      typeof value === "string" &&
-      value !== "N/A"
-    ) {
-      newData.funding_vs_founded.company_data[field] = Number(value);
-    } else {
-      newData.funding_vs_founded.company_data[field] = value as never;
-    }
-
-    setEditData(newData);
-  };
-
-  // Type-safe update function for traffic company data
-  const updateTrafficCompanyData = (
-    field: keyof CompanyTrafficData,
-    value: string | number
-  ): void => {
-    const newData = { ...editData };
-
-    if (!newData.webtraffic_vs_founded) {
-      newData.webtraffic_vs_founded = {
-        company_data: { ...defaultTrafficCompanyData },
-        competitors_data: [],
-      };
-    }
-
-    if (!newData.webtraffic_vs_founded.company_data) {
-      newData.webtraffic_vs_founded.company_data = {
-        ...defaultTrafficCompanyData,
-      };
-    }
-
-    if (
-      field === "monthly_traffic" &&
-      typeof value === "string" &&
-      value !== "N/A"
-    ) {
-      newData.webtraffic_vs_founded.company_data[field] = Number(value);
-    } else {
-      newData.webtraffic_vs_founded.company_data[field] = value as never;
-    }
-
-    setEditData(newData);
-  };
-
-  // Type-safe update function for funding competitor data
-  const updateFundingCompetitor = (
+  // Update a field for a specific peer
+  const updatePeerField = (
     index: number,
-    field: keyof CompanyData,
+    field: keyof PeerDevelopments,
     value: string | number
   ): void => {
-    const newData = { ...editData };
+    const newData = [...editData];
 
-    if (!newData.funding_vs_founded) {
-      newData.funding_vs_founded = {
-        company_data: { ...defaultFundingCompanyData },
-        competitors_data: [],
-      };
-    }
+    if (!newData[index]) return;
 
-    if (!newData.funding_vs_founded.competitors_data) {
-      newData.funding_vs_founded.competitors_data = [];
-    }
-
-    if (!newData.funding_vs_founded.competitors_data[index]) {
-      return;
-    }
-
-    if (
-      field === "total_funding" &&
-      typeof value === "string" &&
-      value !== "N/A"
-    ) {
-      newData.funding_vs_founded.competitors_data[index][field] = Number(value);
+    if (field === "total_funding" || field === "web_traffic") {
+      // For numeric fields, try to parse as number
+      newData[index][field] = value;
     } else {
-      newData.funding_vs_founded.competitors_data[index][field] =
-        value as never;
+      newData[index][field] = value as never;
     }
 
     setEditData(newData);
   };
 
-  // Type-safe update function for traffic competitor data
-  const updateTrafficCompetitor = (
-    index: number,
-    field: keyof CompanyTrafficData,
-    value: string | number
-  ): void => {
-    const newData = { ...editData };
-
-    if (!newData.webtraffic_vs_founded) {
-      newData.webtraffic_vs_founded = {
-        company_data: { ...defaultTrafficCompanyData },
-        competitors_data: [],
-      };
-    }
-
-    if (!newData.webtraffic_vs_founded.competitors_data) {
-      newData.webtraffic_vs_founded.competitors_data = [];
-    }
-
-    if (!newData.webtraffic_vs_founded.competitors_data[index]) {
-      return;
-    }
-
-    if (
-      field === "monthly_traffic" &&
-      typeof value === "string" &&
-      value !== "N/A"
-    ) {
-      newData.webtraffic_vs_founded.competitors_data[index][field] =
-        Number(value);
-    } else {
-      newData.webtraffic_vs_founded.competitors_data[index][field] =
-        value as never;
-    }
-
+  // Add a new peer
+  const addPeer = (): void => {
+    const newData = [...editData];
+    newData.push({ ...defaultPeerDevelopment, name: "New Company" });
     setEditData(newData);
   };
 
-  // Add new competitor to funding vs founded section
-  const addFundingCompetitor = (): void => {
-    const newData = { ...editData };
-
-    if (!newData.funding_vs_founded) {
-      newData.funding_vs_founded = {
-        company_data: { ...defaultFundingCompanyData },
-        competitors_data: [],
-      };
-    }
-
-    if (!newData.funding_vs_founded.competitors_data) {
-      newData.funding_vs_founded.competitors_data = [];
-    }
-
-    newData.funding_vs_founded.competitors_data.push({
-      monthly_traffic: 0,
-      name: "New Competitor",
-      founded_year: "2020",
-      total_funding: 0,
-    });
-
+  // Remove a peer
+  const removePeer = (index: number): void => {
+    const newData = [...editData];
+    newData.splice(index, 1);
     setEditData(newData);
   };
 
-  // Add new competitor to web traffic vs founded section
-  const addTrafficCompetitor = (): void => {
-    const newData = { ...editData };
+  // Display only top 5 peers
+  const displayPeers = (isEditing ? editData : data).slice(0, 5);
 
-    if (!newData.webtraffic_vs_founded) {
-      newData.webtraffic_vs_founded = {
-        company_data: { ...defaultTrafficCompanyData },
-        competitors_data: [],
-      };
-    }
+  // Get company data (the first entry) and competitor data (the rest)
+  const companyData =
+    displayPeers.length > 0 ? displayPeers[0] : defaultPeerDevelopment;
+  const competitorData = displayPeers.slice(1);
 
-    if (!newData.webtraffic_vs_founded.competitors_data) {
-      newData.webtraffic_vs_founded.competitors_data = [];
-    }
+  // Calculate the highest funding value to set chart scale
+  const highestFunding = Math.max(
+    parseNumericValue(companyData.total_funding),
+    ...competitorData.map((comp) => parseNumericValue(comp.total_funding))
+  );
 
-    newData.webtraffic_vs_founded.competitors_data.push({
-      name: "New Competitor",
-      founded_year: "2020",
-      monthly_traffic: 0,
-    });
+  // Calculate the highest web traffic value to set chart scale
+  const highestTraffic = Math.max(
+    parseNumericValue(companyData.web_traffic),
+    ...competitorData.map((comp) => parseNumericValue(comp.web_traffic))
+  );
 
-    setEditData(newData);
+  // Get display name function - returns name if logo not valid
+  const getDisplayName = (peer: PeerDevelopments): string => {
+    return peer.name || "Unnamed Company";
   };
-
-  // Remove competitor from funding vs founded section
-  const removeFundingCompetitor = (index: number): void => {
-    const newData = { ...editData };
-
-    if (
-      !newData.funding_vs_founded ||
-      !newData.funding_vs_founded.competitors_data
-    ) {
-      return;
-    }
-
-    newData.funding_vs_founded.competitors_data.splice(index, 1);
-    setEditData(newData);
-  };
-
-  // Remove competitor from web traffic vs founded section
-  const removeTrafficCompetitor = (index: number): void => {
-    const newData = { ...editData };
-
-    if (
-      !newData.webtraffic_vs_founded ||
-      !newData.webtraffic_vs_founded.competitors_data
-    ) {
-      return;
-    }
-
-    newData.webtraffic_vs_founded.competitors_data.splice(index, 1);
-    setEditData(newData);
-  };
-
-  // Safely access the required data for charts
-  const fundingCompanyData: CompanyData =
-    data.peer_developments?.funding_vs_founded?.company_data ||
-    defaultFundingCompanyData;
-
-  // Get only top 5 competitors
-  const fundingCompetitorsData: CompanyData[] = (
-    data.peer_developments?.funding_vs_founded?.competitors_data || []
-  ).slice(0, 5);
-
-  const trafficCompanyData: CompanyTrafficData =
-    data.peer_developments?.webtraffic_vs_founded?.company_data ||
-    defaultTrafficCompanyData;
-
-  // Get only top 5 competitors
-  const trafficCompetitorsData: CompanyTrafficData[] = (
-    data.peer_developments?.webtraffic_vs_founded?.competitors_data || []
-  ).slice(0, 5);
 
   // Prepare data for funding vs founded year chart
   const fundingChartData = {
     datasets: [
       {
-        label: fundingCompanyData.name || "Company",
+        label: getDisplayName(companyData),
         data: [
           {
-            x: fundingCompanyData.founded_year || "N/A",
-            y:
-              typeof fundingCompanyData.total_funding === "number"
-                ? fundingCompanyData.total_funding / 1000000
-                : 0,
+            x: companyData.founded_year || "N/A",
+            y: parseNumericValue(companyData.total_funding) / 1000000,
           },
         ],
         backgroundColor: "#1ba9f5",
         borderColor: "#1ba9f5",
+        pointRadius: 8,
       },
-      ...fundingCompetitorsData.map((competitor, index) => ({
-        label: competitor.name || `Competitor ${index + 1}`,
+      ...competitorData.map((competitor, index) => ({
+        label: getDisplayName(competitor),
         data: [
           {
-            x:
-              competitor.founded_year === "N/A"
-                ? 0
-                : competitor.founded_year || "",
-            y:
-              typeof competitor.total_funding === "number"
-                ? competitor.total_funding / 1000000
-                : 0,
+            x: competitor.founded_year || "N/A",
+            y: parseNumericValue(competitor.total_funding) / 1000000,
           },
         ],
         backgroundColor: index === 0 ? "#fa0c00" : "#00bfb3",
         borderColor: index === 0 ? "#fa0c00" : "#00bfb3",
+        pointRadius: 8,
       })),
     ],
   };
@@ -516,47 +214,42 @@ export default function PeerDevelopmentsPage({
   const trafficChartData = {
     datasets: [
       {
-        label: trafficCompanyData.name || "Company",
+        label: getDisplayName(companyData),
         data: [
           {
-            x: trafficCompanyData.founded_year || "N/A",
-            y:
-              typeof trafficCompanyData.monthly_traffic === "number"
-                ? trafficCompanyData.monthly_traffic / 1000000
-                : 0,
+            x: companyData.founded_year || "N/A",
+            y: parseNumericValue(companyData.web_traffic) / 1000000,
           },
         ],
         backgroundColor: "#1ba9f5",
         borderColor: "#1ba9f5",
+        pointRadius: 8,
       },
-      ...trafficCompetitorsData.map((competitor, index) => ({
-        label: competitor.name || `Competitor ${index + 1}`,
+      ...competitorData.map((competitor, index) => ({
+        label: getDisplayName(competitor),
         data: [
           {
-            x:
-              competitor.founded_year === "N/A"
-                ? 0
-                : competitor.founded_year || "",
-            y:
-              typeof competitor.monthly_traffic === "number"
-                ? competitor.monthly_traffic / 1000000
-                : 0,
+            x: competitor.founded_year || "N/A",
+            y: parseNumericValue(competitor.web_traffic) / 1000000,
           },
         ],
         backgroundColor: index === 0 ? "#fa0c00" : "#00bfb3",
         borderColor: index === 0 ? "#fa0c00" : "#00bfb3",
+        pointRadius: 8,
       })),
     ],
   };
 
-  const chartOptions: ChartOptions<"scatter"> = {
+  // Chart options based on the highest values
+  const fundingChartOptions: ChartOptions<"scatter"> = {
     scales: {
       y: {
         beginAtZero: true,
         title: {
           display: true,
-          text: "Millions",
+          text: "Funding (Millions)",
         },
+        max: Math.ceil(highestFunding / 1000000) + 1, // Round up to the next million
       },
     },
     plugins: {
@@ -564,41 +257,67 @@ export default function PeerDevelopmentsPage({
         callbacks: {
           label: (context: {
             dataset: { label?: string };
-            parsed: { y: number };
+            parsed: { x: string | number; y: number };
           }) => {
             const label = context.dataset.label || "";
             const value = context.parsed.y;
-            return `${label}: ${value}M`;
+            const year = context.parsed.x;
+            return `${label} (${year}): $${value}M`;
           },
         },
+      },
+      legend: {
+        position: "top",
       },
     },
     maintainAspectRatio: false,
   };
 
-  // Safely access edit data
-  const editFundingCompanyData: CompanyData =
-    editData.funding_vs_founded?.company_data || defaultFundingCompanyData;
-  const editFundingCompetitorsData: CompanyData[] =
-    editData.funding_vs_founded?.competitors_data || [];
-  const editTrafficCompanyData: CompanyTrafficData =
-    editData.webtraffic_vs_founded?.company_data || defaultTrafficCompanyData;
-  const editTrafficCompetitorsData: CompanyTrafficData[] =
-    editData.webtraffic_vs_founded?.competitors_data || [];
+  const trafficChartOptions: ChartOptions<"scatter"> = {
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: "Web Traffic (Millions)",
+        },
+        max: Math.ceil(highestTraffic / 1000000) + 1, // Round up to the next million
+      },
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (context: {
+            dataset: { label?: string };
+            parsed: { x: string | number; y: number };
+          }) => {
+            const label = context.dataset.label || "";
+            const value = context.parsed.y;
+            const year = context.parsed.x;
+            return `${label} (${year}): ${value}M visitors`;
+          },
+        },
+      },
+      legend: {
+        position: "top",
+      },
+    },
+    maintainAspectRatio: false,
+  };
+
+  // Check if logo string contains http or https
+  const isValidLogoUrl = (logo: string | null): boolean => {
+    if (!logo) return false;
+    return logo.startsWith("http://") || logo.startsWith("https://");
+  };
 
   return (
-    <div
-      className="max-w-6xl mx-auto px-4 py-2 bg-white"
-      style={{ minHeight: "100%", aspectRatio: "16/9" }}
-    >
+    <SectionLayout title="Peer Developments" sourceText={sourceText}>
       <div className="flex justify-between items-center mb-2">
-        <h1 className="text-gray-700 text-5xl font-normal">
-          Peer Developments
-        </h1>
         {!isEditing ? (
           <button
             onClick={startEditing}
-            className="hidden bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
+            className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
           >
             <PencilIcon className="h-4 w-4 mr-2" />
             Edit
@@ -622,288 +341,169 @@ export default function PeerDevelopmentsPage({
           </div>
         )}
       </div>
-      <div className="border-t border-gray-300 mb-8"></div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Funding vs Founded Year Section */}
-        <div className="border border-gray-200 rounded-sm overflow-hidden">
-          <div className="flex justify-between items-center p-3 border-b border-gray-200">
+      {isEditing ? (
+        <div className="border border-gray-200 rounded-sm overflow-hidden p-4">
+          <div className="flex justify-between items-center mb-4">
             <h2 className="text-gray-700 text-xl font-medium">
-              Funding Vs Founded Year
+              Peer Companies
             </h2>
-            {isEditing && (
-              <button
-                onClick={addFundingCompetitor}
-                className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-sm flex items-center"
-              >
-                <PlusIcon className="h-4 w-4 mr-1" />
-                Add Competitor
-              </button>
-            )}
+            <button
+              onClick={addPeer}
+              className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-sm flex items-center"
+            >
+              <PlusIcon className="h-4 w-4 mr-1" />
+              Add Peer
+            </button>
           </div>
 
-          {isEditing ? (
-            <div className="p-4">
-              <h3 className="font-medium text-gray-700 mb-2">Company Data</h3>
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div>
-                  <label className="block text-sm text-gray-500 mb-1">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    value={editFundingCompanyData.name || ""}
-                    onChange={(e) =>
-                      updateFundingCompanyData("name", e.target.value)
-                    }
-                    className="w-full border border-gray-300 p-2 rounded"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-500 mb-1">
-                    Founded Year
-                  </label>
-                  <input
-                    type="text"
-                    value={editFundingCompanyData.founded_year || ""}
-                    onChange={(e) =>
-                      updateFundingCompanyData("founded_year", e.target.value)
-                    }
-                    className="w-full border border-gray-300 p-2 rounded"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-500 mb-1">
-                    Total Funding
-                  </label>
-                  <input
-                    type="text"
-                    value={editFundingCompanyData.total_funding || 0}
-                    onChange={(e) =>
-                      updateFundingCompanyData("total_funding", e.target.value)
-                    }
-                    className="w-full border border-gray-300 p-2 rounded"
-                  />
-                </div>
-              </div>
-
-              <h3 className="font-medium text-gray-700 mb-2">
-                Competitors Data
-              </h3>
-              {editFundingCompetitorsData
-                .slice(0, 5)
-                .map((competitor, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-3 gap-4 mb-4 relative"
-                  >
-                    <div>
-                      <label className="block text-sm text-gray-500 mb-1">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        value={competitor.name || ""}
-                        onChange={(e) =>
-                          updateFundingCompetitor(index, "name", e.target.value)
-                        }
-                        className="w-full border border-gray-300 p-2 rounded"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-500 mb-1">
-                        Founded Year
-                      </label>
-                      <input
-                        type="text"
-                        value={competitor.founded_year || ""}
-                        onChange={(e) =>
-                          updateFundingCompetitor(
-                            index,
-                            "founded_year",
-                            e.target.value
-                          )
-                        }
-                        className="w-full border border-gray-300 p-2 rounded"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-500 mb-1">
-                        Total Funding
-                      </label>
-                      <div className="flex items-center">
-                        <input
-                          type="text"
-                          value={competitor.total_funding || 0}
-                          onChange={(e) =>
-                            updateFundingCompetitor(
-                              index,
-                              "total_funding",
-                              e.target.value
-                            )
-                          }
-                          className="w-full border border-gray-300 p-2 rounded"
-                        />
-                        <button
-                          onClick={() => removeFundingCompetitor(index)}
-                          className="ml-2 text-red-500 hover:text-red-700"
-                        >
-                          <TrashIcon size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          ) : (
-            <div className="h-[300px] p-4">
-              <Scatter data={fundingChartData} options={chartOptions} />
-            </div>
-          )}
+          <table className="w-full border-collapse mb-4">
+            <thead>
+              <tr style={{ backgroundColor: "#002169", color: "white" }}>
+                <th className="p-3 text-left font-medium">Company</th>
+                <th className="p-3 text-left font-medium">Founded</th>
+                <th className="p-3 text-left font-medium">Total Funding</th>
+                <th className="p-3 text-left font-medium">Currency</th>
+                <th className="p-3 text-left font-medium">Web Traffic</th>
+                <th className="p-3 text-left font-medium">Logo URL</th>
+                <th className="p-3 text-center font-medium w-16">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayPeers.map((peer, index) => (
+                <tr
+                  key={index}
+                  className="border-t border-gray-200 hover:bg-gray-50"
+                >
+                  <td className="p-3 border border-gray-200">
+                    <input
+                      type="text"
+                      value={peer.name || ""}
+                      onChange={(e) =>
+                        updatePeerField(index, "name", e.target.value)
+                      }
+                      className="w-full p-1 border border-gray-300 rounded"
+                    />
+                  </td>
+                  <td className="p-3 border border-gray-200">
+                    <input
+                      type="text"
+                      value={peer.founded_year || ""}
+                      onChange={(e) =>
+                        updatePeerField(index, "founded_year", e.target.value)
+                      }
+                      className="w-full p-1 border border-gray-300 rounded"
+                    />
+                  </td>
+                  <td className="p-3 border border-gray-200">
+                    <input
+                      type="text"
+                      value={peer.total_funding || ""}
+                      onChange={(e) =>
+                        updatePeerField(index, "total_funding", e.target.value)
+                      }
+                      className="w-full p-1 border border-gray-300 rounded"
+                    />
+                  </td>
+                  <td className="p-3 border border-gray-200">
+                    <select
+                      value={peer.currency || "$"}
+                      onChange={(e) =>
+                        updatePeerField(index, "currency", e.target.value)
+                      }
+                      className="w-full p-1 border border-gray-300 rounded"
+                    >
+                      <option value="$">$</option>
+                      <option value="€">€</option>
+                      <option value="£">£</option>
+                      <option value="¥">¥</option>
+                    </select>
+                  </td>
+                  <td className="p-3 border border-gray-200">
+                    <input
+                      type="text"
+                      value={peer.web_traffic || ""}
+                      onChange={(e) =>
+                        updatePeerField(index, "web_traffic", e.target.value)
+                      }
+                      className="w-full p-1 border border-gray-300 rounded"
+                    />
+                  </td>
+                  <td className="p-3 border border-gray-200">
+                    <input
+                      type="text"
+                      value={peer.logo || ""}
+                      onChange={(e) =>
+                        updatePeerField(index, "logo", e.target.value)
+                      }
+                      className="w-full p-1 border border-gray-300 rounded"
+                    />
+                  </td>
+                  <td className="p-3 text-center border border-gray-200">
+                    <button
+                      onClick={() => removePeer(index)}
+                      className="text-red-500 hover:text-red-700"
+                      disabled={index === 0 && displayPeers.length === 1}
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-
-        {/* Web Traffic vs Founded Year Section */}
-        <div className="border border-gray-200 rounded-sm overflow-hidden">
-          <div className="flex justify-between items-center p-3 border-b border-gray-200">
-            <h2 className="text-gray-700 text-xl font-medium">
-              Web Traffic Vs Founded Year
-            </h2>
-            {isEditing && (
-              <button
-                onClick={addTrafficCompetitor}
-                className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-sm flex items-center"
-              >
-                <PlusIcon className="h-4 w-4 mr-1" />
-                Add Competitor
-              </button>
-            )}
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Funding vs Founded Year Chart */}
+          <div className="border border-gray-200 rounded-sm overflow-hidden">
+            <div
+              className="p-3 border-b border-gray-200"
+              style={{ backgroundColor: "#f8fafc" }}
+            >
+              <h2 className="text-gray-800 text-xl font-medium">
+                Funding vs Founded Year
+              </h2>
+            </div>
+            <div className="h-[350px] p-4">
+              {displayPeers.length > 0 ? (
+                <Scatter
+                  data={fundingChartData}
+                  options={fundingChartOptions}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-500">No peer data available</p>
+                </div>
+              )}
+            </div>
           </div>
 
-          {isEditing ? (
-            <div className="p-4">
-              <h3 className="font-medium text-gray-700 mb-2">Company Data</h3>
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div>
-                  <label className="block text-sm text-gray-500 mb-1">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    value={editTrafficCompanyData.name || ""}
-                    onChange={(e) =>
-                      updateTrafficCompanyData("name", e.target.value)
-                    }
-                    className="w-full border border-gray-300 p-2 rounded"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-500 mb-1">
-                    Founded Year
-                  </label>
-                  <input
-                    type="text"
-                    value={editTrafficCompanyData.founded_year || ""}
-                    onChange={(e) =>
-                      updateTrafficCompanyData("founded_year", e.target.value)
-                    }
-                    className="w-full border border-gray-300 p-2 rounded"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-500 mb-1">
-                    Monthly Traffic
-                  </label>
-                  <input
-                    type="text"
-                    value={editTrafficCompanyData.monthly_traffic || 0}
-                    onChange={(e) =>
-                      updateTrafficCompanyData(
-                        "monthly_traffic",
-                        e.target.value
-                      )
-                    }
-                    className="w-full border border-gray-300 p-2 rounded"
-                  />
-                </div>
-              </div>
-
-              <h3 className="font-medium text-gray-700 mb-2">
-                Competitors Data
-              </h3>
-              {editTrafficCompetitorsData
-                .slice(0, 5)
-                .map((competitor, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-3 gap-4 mb-4 relative"
-                  >
-                    <div>
-                      <label className="block text-sm text-gray-500 mb-1">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        value={competitor.name || ""}
-                        onChange={(e) =>
-                          updateTrafficCompetitor(index, "name", e.target.value)
-                        }
-                        className="w-full border border-gray-300 p-2 rounded"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-500 mb-1">
-                        Founded Year
-                      </label>
-                      <input
-                        type="text"
-                        value={competitor.founded_year || ""}
-                        onChange={(e) =>
-                          updateTrafficCompetitor(
-                            index,
-                            "founded_year",
-                            e.target.value
-                          )
-                        }
-                        className="w-full border border-gray-300 p-2 rounded"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-500 mb-1">
-                        Monthly Traffic
-                      </label>
-                      <div className="flex items-center">
-                        <input
-                          type="text"
-                          value={competitor.monthly_traffic || 0}
-                          onChange={(e) =>
-                            updateTrafficCompetitor(
-                              index,
-                              "monthly_traffic",
-                              e.target.value
-                            )
-                          }
-                          className="w-full border border-gray-300 p-2 rounded"
-                        />
-                        <button
-                          onClick={() => removeTrafficCompetitor(index)}
-                          className="ml-2 text-red-500 hover:text-red-700"
-                        >
-                          <TrashIcon size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          {/* Web Traffic vs Founded Year Chart */}
+          <div className="border border-gray-200 rounded-sm overflow-hidden">
+            <div
+              className="p-3 border-b border-gray-200"
+              style={{ backgroundColor: "#f8fafc" }}
+            >
+              <h2 className="text-gray-800 text-xl font-medium">
+                Web Traffic vs Founded Year
+              </h2>
             </div>
-          ) : (
-            <div className="h-[300px] p-4">
-              <Scatter data={trafficChartData} options={chartOptions} />
+            <div className="h-[350px] p-4">
+              {displayPeers.length > 0 ? (
+                <Scatter
+                  data={trafficChartData}
+                  options={trafficChartOptions}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-500">No peer data available</p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
-      </div>
-
-      <div className="mt-8 text-gray-500 text-sm">{sourceText}</div>
-    </div>
+      )}
+    </SectionLayout>
   );
 }

@@ -221,7 +221,7 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
       </section>
       <section id="peer-developments-component" className="p-6">
         <PeerDevelopmentsPage
-          initialData={searchResults?.competitive_analysis}
+          initialData={searchResults?.competitive_analysis.peer_developments}
         />
       </section>
       <section id="competitor-analysis-component" className="p-6">

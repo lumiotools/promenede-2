@@ -221,14 +221,20 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
   }
 
   return (
-    <SectionLayout
-      title="Value Chain Analysis"
-      sourceText="Source: OpenAI"
-      showEditButton={false}
-    >
+    <div>
+      <h1 className="text-5xl font-medium text-[#445963] mb-6">Value Chain</h1>
+      <div className="border-t border-b py-4 mb-6">
+        <h2 className="text-xl font-medium text-[#445963]">
+          Industry :{" "}
+          <span className="text-[#156082]">
+            {data?.industryName || "Not specified"}
+          </span>
+        </h2>
+      </div>
+
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          {!editMode ? (
+        {!editMode ? (
+          <div className="flex items-center justify-between mb-4">
             <div className="space-x-2">
               <Button
                 onClick={handleEdit}
@@ -238,7 +244,9 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
                 <Edit className="mr-2 h-4 w-4" /> Edit Data
               </Button>
             </div>
-          ) : (
+          </div>
+        ) : (
+          <div className="flex items-center justify-between mb-4">
             <div className="space-x-2">
               <Button
                 onClick={handleCancel}
@@ -254,8 +262,8 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
                 <Save className="mr-2 h-4 w-4" /> Save
               </Button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {editMode ? (
           <EditValueChain
@@ -272,7 +280,11 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
           <ViewValueChain data={data} />
         )}
       </div>
-    </SectionLayout>
+
+      <div className="mt-6 text-sm text-gray-500">
+        Source: 1.PromenadeAI, 2.Crunchbase
+      </div>
+    </div>
   );
 }
 
@@ -412,141 +424,88 @@ function ViewValueChain({ data }: ViewValueChainProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="border-b pb-4">
-        <h2 className="text-xl font-medium text-[#445963]">
-          Industry:{" "}
-          <span className="text-[#156082]">
-            {data.industryName || "Not specified"}
-          </span>
-        </h2>
-      </div>
-
+    <div className="w-full">
       {data.stages && data.stages.length > 0 ? (
-        <div className="overflow-x-auto pb-4">
-          <div className="flex flex-nowrap gap-2 min-w-full">
+        <div className="w-full">
+          <div className="flex flex-row gap-1">
             {data.stages.map((stage, index) => (
-              <div key={index} className="w-[200px] flex-shrink-0 relative">
-                <div className="bg-[#002169] text-white p-2 rounded-t-md flex items-center justify-center relative">
-                  <h3 className="font-medium text-center text-sm">
-                    {stage.stage}
-                  </h3>
+              <div key={index} className="flex-1 relative">
+                <div className="bg-[#0a1f56] text-white p-3 rounded-t-md">
+                  <h3 className="font-medium text-center">{stage.stage}</h3>
                   {index < data.stages!.length - 1 && (
-                    <div className="absolute -right-2 top-0 bottom-0 w-4 overflow-hidden">
-                      <div className="h-full w-4 bg-[#002169] transform rotate-45 origin-top-left"></div>
+                    <div className="absolute -right-3 top-0 bottom-0 w-6 overflow-hidden">
+                      <div className="h-full w-6 bg-[#0a1f56] transform rotate-45 origin-top-left"></div>
                     </div>
                   )}
                 </div>
-                <div className="bg-[#eff2f3] p-3 rounded-b-md h-[200px] overflow-y-auto">
-                  <ul className="space-y-1 mb-3">
-                    {stage.activities.slice(0, 4).map((activity, actIndex) => (
+                <div className="bg-gray-100 p-4 rounded-b-md h-auto">
+                  <ul className="space-y-2 mb-4">
+                    {stage.activities.map((activity, actIndex) => (
                       <li key={actIndex} className="flex items-start">
-                        <span className="text-[#17b26a] mr-1 mt-0.5 flex-shrink-0">
-                          •
-                        </span>
-                        <span className="text-[#35454c] text-xs">
-                          {activity}
-                        </span>
+                        <span className="text-green-500 mr-2 mt-1">•</span>
+                        <span className="text-gray-700">{activity}</span>
                       </li>
                     ))}
-                    {stage.activities.length > 4 && (
-                      <li className="text-xs text-[#57727e] italic">
-                        +{stage.activities.length - 4} more activities
-                      </li>
-                    )}
                   </ul>
 
-                  {/* Display company logos or names */}
+                  {/* Display company logos */}
                   {((stage.companies && stage.companies.length > 0) ||
+                    (stage.company_logos && stage.company_logos.length > 0) ||
                     (stage.company_logos &&
                       stage.company_logos.length > 0)) && (
-                    <div className="border-t pt-2 mt-2">
-                      <div className="flex flex-wrap gap-1 justify-center">
-                        {/* Display companies */}
+                    <div className="border-t pt-3 mt-2">
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {/* Get logos from either property */}
                         {stage.companies &&
                           stage.companies.map((company, compIndex) => {
-                            // If there's a matching logo, use it
+                            // Try to get logo from either property
                             const logo =
                               stage.company_logos &&
                               compIndex < stage.company_logos.length
                                 ? stage.company_logos[compIndex]
+                                : stage.company_logos &&
+                                  compIndex < stage.company_logos.length
+                                ? stage.company_logos[compIndex]
                                 : null;
 
-                            return (
-                              <div
-                                key={`company-${compIndex}`}
-                                className="mr-1"
-                              >
-                                {logo && isUrl(logo) ? (
-                                  <div className="w-6 h-6 relative">
-                                    <Image
-                                      src={logo}
-                                      alt={company}
-                                      width={24}
-                                      height={24}
-                                      className="object-contain"
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="text-xs text-[#35454c] px-1">
-                                    {company}
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-
-                        {/* Display any extra logos without companies */}
-                        {stage.company_logos &&
-                          stage.companies &&
-                          stage.company_logos.length > stage.companies.length &&
-                          stage.company_logos
-                            .slice(stage.companies.length)
-                            .map((logo, logoIndex) => (
-                              <div key={`logo-${logoIndex}`} className="mr-1">
-                                {isUrl(logo) ? (
-                                  <div className="w-6 h-6 relative">
-                                    <Image
-                                      src={logo}
-                                      alt="Company logo"
-                                      width={24}
-                                      height={24}
-                                      className="object-contain"
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="text-xs text-[#35454c] px-1">
-                                    {logo}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-
-                        {/* Handle case where we have company_logos but no companies array */}
-                        {(!stage.companies || stage.companies.length === 0) &&
-                          stage.company_logos &&
-                          stage.company_logos.map((logo, logoIndex) => (
-                            <div
-                              key={`solo-logo-${logoIndex}`}
-                              className="mr-1"
-                            >
-                              {isUrl(logo) ? (
-                                <div className="w-6 h-6 relative">
+                            if (logo && isUrl(logo)) {
+                              return (
+                                <div
+                                  key={`company-${compIndex}`}
+                                  className="h-6"
+                                >
                                   <Image
                                     src={logo}
-                                    alt="Company logo"
-                                    width={24}
+                                    alt={company}
+                                    width={100}
                                     height={24}
-                                    className="object-contain"
+                                    className="h-6 w-auto object-contain"
                                   />
                                 </div>
-                              ) : (
-                                <div className="text-xs text-[#35454c] px-1">
-                                  {logo}
-                                </div>
-                              )}
-                            </div>
-                          ))}
+                              );
+                            }
+                            return null;
+                          })}
+
+                        {/* Display standalone logos if any */}
+                        {(!stage.companies || stage.companies.length === 0) &&
+                          stage.company_logos &&
+                          stage.company_logos.map((logo, logoIndex) =>
+                            isUrl(logo) ? (
+                              <div
+                                key={`solo-logo-${logoIndex}`}
+                                className="h-6"
+                              >
+                                <Image
+                                  src={logo}
+                                  alt="Company logo"
+                                  width={100}
+                                  height={24}
+                                  className="h-6 w-auto object-contain"
+                                />
+                              </div>
+                            ) : null
+                          )}
                       </div>
                     </div>
                   )}

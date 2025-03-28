@@ -4,15 +4,15 @@ import os
 import requests
 from functools import reduce
 from dotenv import load_dotenv
-from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_financial_comparables, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_productTimeline, get_openai_productsServices, get_openai_valueChain
-from src.utils.llm_summary.perplexity_info import generate_perplexity_KeyTechnologies, generate_perplexity_MarketLeadership, generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_financial_comparables, generate_perplexity_maStrategy, generate_perplexity_productTimeline, generate_perplexity_productsServices, generate_perplexity_value_chain
+from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_financial_comparables, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_peer_competitorAnalysis, get_openai_peer_developments, get_openai_productTimeline, get_openai_productsServices, get_openai_valueChain
+from src.utils.llm_summary.perplexity_info import generate_perplexity_KeyTechnologies, generate_perplexity_MarketLeadership, generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_financial_comparables, generate_perplexity_maStrategy, generate_perplexity_peer_developments, generate_perplexity_productTimeline, generate_perplexity_productsServices, generate_perplexity_value_chain
 from src.utils.llmInfo.llm import fetch_company_data
 from src.utils.crunchbase.company import get_organization_data
 from src.utils.secFilings.getCik import get_cik_by_company_name
 from src.utils.secFilings.analyse10K import analyze_10K_filing
 from src.utils.coresignal.company import get_company_details, get_company_id
 from src.utils.yahoo.shareholder import get_shareholder_info
-from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer, convert_null_to_none
+from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer, convert_null_to_none, get_top_companies_by_similarity
 
 from src.utils.llm_summary.employeer_reviews import get_employee_reviews_summary, get_employee_ratings_summary, get_areas_of_improvement
 from src.utils.llmInfo.competitive_analysis import get_competitive_analysis
@@ -662,6 +662,46 @@ async def get_company_data(request: CompanyRequest):
             response_data['competitive_analysis']['financial_comparables'] = openai_financialComparables.get('financial_comparables', {})
     except Exception as e:
         print(f"Error enriching financial comparables: {e}")
+
+    
+    try:
+        competitors=coresignal_data.get("competitors","")
+        topPeer=get_top_companies_by_similarity(competitors,3)
+        perplexity_peerDevelopment = safe_call(
+            generate_perplexity_peer_developments,
+            company_name,
+            topPeer,
+            default=""
+        )
+        
+        if perplexity_peerDevelopment:
+            openai_financialComparables = safe_call(
+                get_openai_peer_developments,
+                company_name,
+                perplexity_peerDevelopment,
+                default={"companies_info": {}}
+            )
+            response_data['competitive_analysis']['peer_developments'] = openai_financialComparables.get('companies_info', {})
+    except Exception as e:
+        print(f"Error enriching financial comparables: {e}")
+
+    #Handle competitive analysis
+    try:
+        competitors=coresignal_data.get("competitors","")
+        topPeer=get_top_companies_by_similarity(competitors,3)
+        print("top peer",topPeer)
+        competitiveAnalysisData = safe_call(
+            get_openai_peer_competitorAnalysis, 
+            company_name, 
+            topPeer,
+            default={"competitive_analysis":{}}
+        )
+        print("competitive analysis",competitiveAnalysisData)
+        response_data["competitive_analysis"]["competitive_analysis"] = competitiveAnalysisData.get("competitive_analysis",{})
+    except Exception as e:
+        print(f"Error getting competitive analysis: {e}")
+        response_data["competitive_analysis"]["competitive_analysis"] = ""
+
     
     return {"success": True, "company_name": company_name, "data": response_data}
 

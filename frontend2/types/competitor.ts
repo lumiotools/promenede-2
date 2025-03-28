@@ -46,14 +46,12 @@ export interface CompanyTrafficData {
 }
 
 export interface PeerDevelopments {
-  funding_vs_founded: {
-    company_data: CompanyData | null;
-    competitors_data: CompanyData[] | null;
-  } | null;
-  webtraffic_vs_founded: {
-    company_data: CompanyTrafficData | null;
-    competitors_data: CompanyTrafficData[] | null;
-  } | null;
+  name: string | null;
+  founded_year: number | string | null;
+  total_funding: number | string | null;
+  currency: string | null;
+  web_traffic: number | string | null;
+  logo: string | null;
 }
 
 export type CompetitiveAnalysisItem = {
@@ -69,6 +67,6 @@ export interface CompetitiveAnalysis {
   competitors: Competitor[] | null;
   competitors_websites: CompetitorWebsite[] | null;
   financial_comparables: FinancialComparable[] | null;
-  peer_developments: PeerDevelopments | null;
+  peer_developments: PeerDevelopments[] | null;
   competitive_analysis?: CompetitiveAnalysisItem[] | null;
 }

@@ -229,12 +229,62 @@ def generate_perplexity_value_chain(company_name):
     response = ask_perplexity(system_prompt, company_name)
     return response
 
+
+def generate_perplexity_value_chain(company_name):
+    time = datetime.datetime.now()
+    time = time.strftime('%Y-%m-%d')
+    
+    # System prompt for getting the company's value chain
+    system_prompt = f"""
+    Provide the value chain information for the company {company_name} over its business operations. Today's date is {time}.
+    
+    The value chain information should be returned in a strict JSON format with the following details:
+
+    1. **industryName**: The name of the industry the company operates in.
+    2. **stages**: A list of stages involved in the company's value chain. For each stage, provide:
+        - **stage**: The name of the value chain stage (e.g., Research and Development, Manufacturing, Marketing).
+        - **activities**: A list of activities involved in that stage. Include a minimum of 4 activities and a maximum of 6.
+        - **companies**: A list of companies (by name) involved in each stage. For example, tools used, suppliers, or partners. You should return 3 to 5 companies involved in each stage, not the company's own name, but the companies that contribute to that particular stage.
+
+    Please ensure that the descriptions are concise but informative, focusing on the most important stages and activities within the company's value chain.
+    """
+
+    print(f"Generating value chain information for {company_name}")
+    # Assuming `ask_perplexity` is a function that sends the prompt to the Perplexity API and returns the response.
+    response = ask_perplexity(system_prompt, company_name)
+    return response
+
+def generate_perplexity_peer_developments(company_name, competitor_names):
+    time = datetime.datetime.now()
+    time = time.strftime('%Y-%m-%d')
+
+    # System prompt for getting competitors' details
+    system_prompt = f"""
+    Provide the details for the company and competitors of the company {company_name}. Today's date is {time}.
+    
+    For each competitor in the list, please provide the following details in a strict JSON format:
+
+    1. **name**: The name of the competitor company.
+    2. **founded_year**: The year the competitor company was founded.
+    3. **total_funding**: The total funding raised by the competitor company (in USD or the relevant currency).
+    4. **web_traffic**: The estimated web traffic of the competitor company (monthly visits or other relevant metric).
+
+    Please ensure that the descriptions are concise but informative, focusing on the most important details for each competitor.
+    """
+
+    competitors_str = ', '.join([company_name] + competitor_names)   # Convert competitor list into a comma-separated string
+
+    print(f"Generating competitor information for {company_name} and competitors: {competitors_str}")
+    # Assuming `ask_perplexity` is a function that sends the prompt to the Perplexity API and returns the response.
+    response = ask_perplexity(system_prompt, competitors_str)
+    return response
+
 # Main function to test the company timeline generation
 def main():
-    company_name = "Nvidia"  # You can replace this with any company name you want to analyze.
+    company_name = "Paypal"  # You can replace this with any company name you want to analyze.
     
     # Get the timeline summary for the company
-    company_timeline = generate_perplexity_value_chain(company_name)
+    company_timeline = generate_perplexity_peer_developments(company_name,['stripe', 'square', 'wepay', '2checkout', 'paytm'])
     
     # Print the detailed timeline of the company
     print(f"Result for for {company_name}:")

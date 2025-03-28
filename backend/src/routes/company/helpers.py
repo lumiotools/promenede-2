@@ -940,6 +940,22 @@ def generate_technologies_answer(coresignal_data):
     
     return answer.rstrip("; ") + "."
 
+def get_top_companies_by_similarity(competitors, x):
+    # Filter out competitors with invalid or non-integer similarity scores
+    valid_competitors = [
+        competitor for competitor in competitors 
+        if isinstance(competitor.get('similarity_score'), int)
+    ]
+    
+    # Sort the valid competitors list by 'similarity_score' in descending order
+    sorted_competitors = sorted(valid_competitors, key=lambda x: x['similarity_score'], reverse=True)
+    
+    # Get the top 'x' competitors
+    top_competitors = sorted_competitors[:x]
+    
+    # Extract and return the company names of the top 'x' competitors
+    return [competitor['company_name'] for competitor in top_competitors]
+
 
 
 
