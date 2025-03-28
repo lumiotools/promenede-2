@@ -209,7 +209,7 @@ export function CompanyTimelineTable({
                   MM/YY
                 </th>
                 <th className="py-3 px-4 text-left font-medium border-r border-[#1a3573]">
-                  Partner
+                  Event
                 </th>
                 <th className="py-3 px-4 text-left font-medium">Detail</th>
                 {isEditing && (
