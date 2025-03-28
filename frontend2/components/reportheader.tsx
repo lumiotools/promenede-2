@@ -1,105 +1,122 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
-import { CalendarDays, Eye, Clock, FileSpreadsheet, Share2, Mail } from "lucide-react"
-import { format } from "date-fns"
-import type { CompanyData } from "@/types/apiResponse"
-import { ExportPdfButton } from "./export-pdf-button"
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ExportPDFButton } from "./export-pdf-button";
+import { ExportDialog } from "./export-dialog";
+import type { CompanyData } from "@/types/apiResponse";
+import { ExportExcelButton } from "./export-excel-button";
 
 interface ReportHeaderProps {
-  title: string
-  date?: Date
-  searchCriteria?: string
-  pagesViewed?: number
-  manHoursSaved?: number
-  initialData: CompanyData | null | undefined
+  title: string;
+  date: Date;
+  searchCriteria: string;
+  pagesViewed: number;
+  manHoursSaved: number;
+  initialData?: CompanyData | null;
 }
 
-const ReportHeader = ({
+export default function ReportHeader({
   title,
-  date = new Date(),
-  searchCriteria = "",
-  pagesViewed = 10000,
-  manHoursSaved = 20,
+  date,
+  searchCriteria,
+  pagesViewed,
+  manHoursSaved,
   initialData,
-}: ReportHeaderProps) => {
+}: ReportHeaderProps) {
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+
+  const sections = [
+    { id: "executive-summary", title: "Executive Summary" },
+    { id: "company-profile", title: "Company Profile" },
+    { id: "company-overview", title: "Company Overview" },
+    { id: "financial-summary", title: "Financial Summary" },
+    { id: "financial-detail", title: "Financial Details" },
+    { id: "web-traffic", title: "Web Traffic" },
+    { id: "company-timeline", title: "Company Timeline" },
+    { id: "company-timeline-table", title: "Company Timeline Table" },
+    { id: "product-services", title: "Products & Services" },
+    { id: "product-timeline-table", title: "Product Timeline" },
+    { id: "employee-trend-chart", title: "Employee Trend" },
+    { id: "employee-keymembers", title: "Key Members" },
+    { id: "employee-leadership", title: "Leadership" },
+    { id: "employee-review", title: "Employee Reviews" },
+    { id: "employee-review-distribution", title: "Review Distribution" },
+    { id: "employee-improvement-areas", title: "Improvement Areas" },
+    { id: "strategic-development-component", title: "Strategic Development" },
+    { id: "strategic-partnership-component", title: "Strategic Partnerships" },
+    { id: "market-leadership-component", title: "Market Leadership" },
+    { id: "technology-component", title: "Key Technology" },
+    { id: "strategy-component", title: "Strategy" },
+    { id: "ma-activity-component", title: "M&A Activity" },
+    { id: "market-size-component", title: "Market Size" },
+    { id: "value-chain-component", title: "Value Chain" },
+    { id: "market-map-component", title: "Market Map" },
+    { id: "competitor-landscape-component", title: "Competitive Landscape" },
+    { id: "financial-comparables-component", title: "Financial Comparables" },
+    { id: "peer-developments-component", title: "Peer Developments" },
+    { id: "competitor-analysis-component", title: "Competitor Analysis" },
+    { id: "regulation-component", title: "Regulations" },
+    { id: "opportunities-component", title: "Opportunities" },
+    { id: "risks-component", title: "Risks" },
+    { id: "qa-component", title: "Q&A" },
+  ];
+
+  const companyName =
+    initialData?.company_profile?.firmographic?.name || "Company";
+
   return (
-    <div className="pt-4 pb-4 px-6 border-b border-gray-200">
-      {/* Top User Info */}
-      <div className="flex justify-end gap-3 mb-4">
-        {/* Email Badge */}
-        <div className="flex items-center gap-2 bg-gray-100 text-gray-700 rounded-full px-3 py-1.5 text-sm">
-          <Mail className="h-4 w-4 text-gray-500" />
-          <span>customer@promenade-ai.com</span>
-        </div>
+    <Card className="rounded-none border-x-0 border-t-0 shadow-none">
+      <CardContent className="p-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-[#35454c]">{title}</h1>
+            <p className="text-[#57727e] mt-1">
+              {date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          </div>
 
-        {/* Credits Badge */}
-        <div className="flex items-center gap-2 bg-yellow-50 text-gray-800 rounded-full px-3 py-1.5 text-sm font-medium">
-          <div className="w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center text-white">●</div>
-          <span>8 Credits</span>
-        </div>
-      </div>
-
-      {/* Report Title */}
-      <h1 className="text-xl font-semibold text-gray-800 mb-3">{title}</h1>
-
-      {/* Info Bar */}
-      <div className="flex items-center justify-between">
-        {/* Left Section - Date & Search Criteria */}
-        <div className="flex items-center gap-6 text-gray-600">
-          {/* Date */}
           <div className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-gray-500" />
-            <span className="text-sm">As of {format(date, "dd MMM yyyy")}</span>
+            <ExportExcelButton
+              companyName={companyName}
+              data={initialData || undefined}
+            />
+            <ExportPDFButton onClick={() => setIsExportDialogOpen(true)} />
           </div>
-
-          {/* Search Criteria */}
-          {searchCriteria && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-500">Search Criteria:</span>
-              <span className="bg-gray-100 px-3 py-0.5 rounded-full font-medium text-gray-700">{searchCriteria}</span>
-            </div>
-          )}
         </div>
 
-        {/* Right Section - Stats & Buttons */}
-        <div className="flex items-center gap-3">
-          {/* Stats Container */}
-          <div className="flex items-center gap-3 border border-[#D0D5DD] rounded-lg px-4 py-1 text-gray-700">
-            {/* Pages Viewed */}
-            <div className="flex items-center gap-1.5">
-              <Eye className="h-4 w-4 text-green-600" />
-              <span className="text-sm">{pagesViewed.toLocaleString()} pages viewed</span>
-            </div>
-
-            {/* Separator */}
-            <span className="text-gray-300">|</span>
-
-            {/* Man Hours Saved */}
-            <div className="flex items-center gap-1.5">
-              <Clock className="h-4 w-4 text-blue-500" />
-              <span className="text-sm">{manHoursSaved} man-hrs saved</span>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <div className="bg-[#f0f4f6] rounded-lg p-4">
+            <p className="text-[#57727e] text-sm">Pages Viewed</p>
+            <p className="text-[#35454c] text-xl font-semibold mt-1">
+              {pagesViewed.toLocaleString()}
+            </p>
           </div>
-
-          {/* Export PDF Button */}
-          <ExportPdfButton companyName={initialData?.company_profile?.firmographic?.name ?? undefined} />
-
-          {/* Export Excel Button */}
-          <button className="flex items-center gap-2 text-sm bg-white border border-[#D0D5DD] px-3 py-1.5 rounded-md hover:bg-gray-100 transition">
-            <FileSpreadsheet className="h-4 w-4 text-green-600" />
-            <span className="text-[#344054]">Export</span>
-          </button>
-
-          {/* Share Button */}
-          <button className="flex items-center gap-2 text-sm bg-gray-700 text-white px-4 py-1.5 rounded-md hover:bg-gray-800 transition">
-            <Share2 className="h-4 w-4" />
-            <span>Share</span>
-          </button>
+          <div className="bg-[#f0f4f6] rounded-lg p-4">
+            <p className="text-[#57727e] text-sm">Man-hours Saved</p>
+            <p className="text-[#35454c] text-xl font-semibold mt-1">
+              {manHoursSaved} hours
+            </p>
+          </div>
+          <div className="bg-[#f0f4f6] rounded-lg p-4">
+            <p className="text-[#57727e] text-sm">Company</p>
+            <p className="text-[#35454c] text-xl font-semibold mt-1">
+              {companyName}
+            </p>
+          </div>
         </div>
-      </div>
-    </div>
-  )
+      </CardContent>
+
+      <ExportDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        sections={sections}
+        companyName={companyName}
+      />
+    </Card>
+  );
 }
-
-export default ReportHeader
-

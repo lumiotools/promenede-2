@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { FileText } from "lucide-react"
-import { ExportDialog } from "./export-dialog"
+import { useState } from "react";
+import { FileText } from "lucide-react";
+import { ExportDialog } from "./export-dialog";
 
 // Define the section mapping to match sidebar structure
 const sectionMapping = [
@@ -38,23 +38,29 @@ const sectionMapping = [
   { id: "opportunities-component", title: "Opportunities" },
   { id: "risks-component", title: "Risks" },
   { id: "qa-component", title: "Q&A" },
-]
+];
 
-export function ExportPdfButton({companyName}:{companyName?:string}) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+export function ExportPDFButton({ onClick }: { onClick?: () => void }) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <>
       <button
-        onClick={() => setIsDialogOpen(true)}
+        onClick={() => {
+          setIsDialogOpen(true);
+          onClick?.();
+        }}
         className="flex items-center gap-2 text-sm bg-white border border-[#D0D5DD] px-3 py-1.5 rounded-md hover:bg-gray-100 transition"
       >
         <FileText className="h-4 w-4 text-red-500" />
         <span className="text-[#344054]">Export</span>
       </button>
 
-      <ExportDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} sections={sectionMapping} companyName={companyName}/>
+      <ExportDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        sections={sectionMapping}
+      />
     </>
-  )
+  );
 }
-

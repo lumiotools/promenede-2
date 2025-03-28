@@ -9,21 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { SectionLayout } from "@/components/ui/section-layout";
-
-export interface SizeData {
-  industryName: string | null;
-  pastYearData: YearData | null;
-  yearBeforeData: YearData | null;
-  projectionFor2030: YearData | null;
-}
-
-export interface YearData {
-  marketSize: string | null;
-  cagr: string | null;
-  explanation: string | null;
-  keyIndustryTrends: string[] | null;
-  keyExcerpt: string | null;
-}
+import { SizeData, YearData } from "@/types/market";
 
 // Define a type that only includes the year data fields
 type YearDataField = "pastYearData" | "yearBeforeData" | "projectionFor2030";
