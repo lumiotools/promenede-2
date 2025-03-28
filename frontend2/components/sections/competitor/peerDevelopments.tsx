@@ -27,7 +27,7 @@ ChartJS.register(
 );
 
 type PeerDevelopmentsProps = {
-  initialData?: PeerDevelopments[];
+  initialData?: PeerDevelopments[] | null | undefined;
 };
 
 // Define strongly typed default values
