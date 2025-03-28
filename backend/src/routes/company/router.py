@@ -66,6 +66,7 @@ async def get_company_data(request: CompanyRequest):
     if coresignal_data and coresignal_data.get("company_name"):
         company_name = coresignal_data.get("company_name", company_name)
     
+    company_full_url=coresignal_data.get("website","")
     # Try to get Crunchbase data using the URL from CoreSignal if available
     try:
         crunchbase_url = coresignal_data.get("crunchbase_url", "")
@@ -215,7 +216,7 @@ async def get_company_data(request: CompanyRequest):
             "description_enriched": safe_get(coresignal_data, "description_enriched", default=""),
             "website_screenshot": safe_call(
                 lambda url: f"data:image/png;base64,{get_website_screenshot(url)}" if url else "",
-                company_url,
+                company_full_url,
                 default=""
             )
         },
