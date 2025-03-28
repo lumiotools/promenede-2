@@ -93,10 +93,6 @@ async def get_company_data(request: CompanyRequest):
         print(f"Error getting Yahoo data: {e}")
         yahooData = {}
     
-    # Only get SEC data as fallback
-    company_cik = None
-    sec_10k_data = {}
-    
     # Get LLM data with safe fallbacks
     try:
         llmData = fetch_company_data(company_name, 10000, "gpt-4o-mini")

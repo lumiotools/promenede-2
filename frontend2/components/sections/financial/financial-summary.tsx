@@ -84,6 +84,22 @@ export function FinancialSummary({ initialData }: FinancialSummaryProps) {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [sourceText, setSourceText] = useState<string>("Source: Coresignal");
+  const [maxDomainValue, setMaxDomainValue] = useState(1500);
+
+  // Calculate the highest value for dynamic scaling
+  const calculateMaxValue = (data: ChartData[]) => {
+    if (data.length === 0) return 1500; // Default fallback
+
+    const allValues = data.flatMap((item) => [
+      item.revenue,
+      item.cost,
+      item.profit,
+    ]);
+
+    const max = Math.max(...allValues);
+    // Add 20% buffer for better visualization
+    return Math.ceil(max * 1.2);
+  };
 
   // Update chart data when initialData changes (e.g., when API data loads)
   useEffect(() => {
@@ -91,6 +107,7 @@ export function FinancialSummary({ initialData }: FinancialSummaryProps) {
       const processedData = processData(initialData);
       setChartData(processedData);
       setEditingData(processedData);
+      setMaxDomainValue(calculateMaxValue(processedData));
       setIsLoading(false);
     }
   }, [initialData]);
@@ -102,6 +119,7 @@ export function FinancialSummary({ initialData }: FinancialSummaryProps) {
 
   const handleSaveClick = () => {
     setChartData(editingData);
+    setMaxDomainValue(calculateMaxValue(editingData));
     setIsEditing(false);
 
     // Update source text
@@ -132,6 +150,7 @@ export function FinancialSummary({ initialData }: FinancialSummaryProps) {
     const updatedChartData = [...chartData, newDataPoint];
     setChartData(updatedChartData);
     setEditingData(updatedChartData);
+    setMaxDomainValue(calculateMaxValue(updatedChartData));
     setNewDataPoint({
       year: (Number.parseInt(newDataPoint.year) + 1).toString(),
       revenue: 0,
@@ -324,7 +343,7 @@ export function FinancialSummary({ initialData }: FinancialSummaryProps) {
                       position: "insideLeft",
                       style: { textAnchor: "middle" },
                     }}
-                    domain={[0, 1500]}
+                    domain={[0, maxDomainValue]}
                   />
                   <Tooltip formatter={(value) => [`${value} B`, "Revenue"]} />
                   <Bar dataKey="revenue" fill="#001e69" />
@@ -378,7 +397,7 @@ export function FinancialSummary({ initialData }: FinancialSummaryProps) {
                       position: "insideLeft",
                       style: { textAnchor: "middle" },
                     }}
-                    domain={[0, 1500]}
+                    domain={[0, maxDomainValue]}
                   />
                   <Tooltip formatter={(value) => [`${value} B`, "Cost"]} />
                   <Bar dataKey="cost" fill="#001e69" />
@@ -432,7 +451,7 @@ export function FinancialSummary({ initialData }: FinancialSummaryProps) {
                       position: "insideLeft",
                       style: { textAnchor: "middle" },
                     }}
-                    domain={[0, 1500]}
+                    domain={[0, maxDomainValue]}
                   />
                   <Tooltip formatter={(value) => [`${value} B`, "Profit"]} />
                   <Bar dataKey="profit" fill="#001e69" />

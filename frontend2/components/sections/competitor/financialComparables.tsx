@@ -94,7 +94,7 @@ export default function FinancialComparables({
                   className="border-t border-gray-200 hover:bg-gray-50"
                 >
                   <td className="p-4 border border-gray-200">
-                    {formatDate(financial.date)}
+                    {financial.date}
                   </td>
                   <td className="p-4 border border-gray-200 text-right">
                     {financial.revenue}
