@@ -3,22 +3,11 @@
 import ExcelJS from "exceljs";
 import FileSaver from "file-saver";
 import type { CompanyData } from "@/types/apiResponse";
-import { FinancialComparable, PeerDevelopments } from "@/types/competitor";
-import {
-  MarketInfo,
-  MarketMap,
-  SizeData,
-  ValueChain,
-  YearData,
-} from "@/types/market";
-import { ProductLaunch, Service } from "@/types/company";
-import { QAItem } from "@/types/qa";
-import {
-  OpportunitiesRisks,
-  Opportunity,
-  OpportunityRisk,
-  Risk,
-} from "@/types/opportunitiesRisks";
+import type { FinancialComparable, PeerDevelopments } from "@/types/competitor";
+import type { MarketInfo, MarketMap, YearData } from "@/types/market";
+import type { ProductLaunch } from "@/types/company";
+import type { QAItem } from "@/types/qa";
+import type { Opportunity, Risk } from "@/types/opportunitiesRisks";
 
 // Helper function to sanitize sheet names (Excel has a 31 character limit and restrictions on special characters)
 const sanitizeSheetName = (name: string): string => {
@@ -78,7 +67,6 @@ const formatCellValue = (value: any): string | number | Date | null => {
   return value;
 };
 
-// Helper function to add data to a worksheet
 // Helper function to add data to a worksheet
 const addDataToWorksheet = (
   worksheet: ExcelJS.Worksheet,
@@ -294,190 +282,110 @@ const formatCompanyTimeline = (data?: CompanyData): Record<string, any>[] => {
 };
 
 // Format products and services
-const formatProductsServices = (data?: CompanyData): Service[] => {
+const formatProductsServices = (data?: CompanyData): Record<string, any>[] => {
   // If no data or no products_services or no services, return empty array
   if (!data?.products_services?.services) {
     return [];
   }
 
-  // Map services to the correct format that matches the Service type
+  // Map services to the correct format
   return data.products_services.services.map((service) => ({
-    name: service.name || "", // Ensure 'name' matches the Service type
-    description: service.description || "", // Ensure 'description' matches the Service type
+    Name: service.name || "",
+    Description: service.description || "",
   }));
 };
-// Format product timeline
-const formatProductTimeline = (
-  data?: CompanyData
-): {
-  products: Array<Record<string, any>>;
-} => {
-  // Initialize result with just products data
-  const result = {
-    products: [] as Array<Record<string, any>>, // Ensure products is always an array of ProductLaunch
-  };
 
+// Format product timeline
+const formatProductTimeline = (data?: CompanyData): Record<string, any>[] => {
   // Extract product launch data from company data
   const productLaunches: ProductLaunch[] =
-    data?.products_services?.launch_timeline || []; // Default to empty array if null or undefined
+    data?.products_services?.launch_timeline || [];
 
   // Handle case where there are no product launches
   if (productLaunches.length === 0) {
     console.warn("No product launch data found");
-
-    // Add empty data indicator if no launches
-    result.products.push({
-      product_name: "No data available",
-      description: "",
-      key_features: [], // Key features will be empty for placeholder
-      date: "",
-    });
-
-    return result;
+    return [
+      {
+        "Product Name": "No data available",
+        Description: "",
+        "Key Features": "",
+        Date: "",
+      },
+    ];
   }
 
   // Format each product launch for the result array
-  productLaunches.forEach((launch) => {
-    result.products.push({
-      product_name: launch.product_name || "Unnamed Product", // Fallback for missing product name
-      description: launch.description || "", // Fallback for missing description
-      key_features: launch.key_features ? launch.key_features.join(", ") : "", // Join key features as a single string for Excel
-      date: launch.date || "", // Fallback for missing date
-    });
-  });
-
-  return result;
+  return productLaunches.map((launch) => ({
+    "Product Name": launch.product_name || "Unnamed Product",
+    Description: launch.description || "",
+    "Key Features": launch.key_features ? launch.key_features.join(", ") : "",
+    Date: launch.date || "",
+  }));
 };
-const formatKeyTechnology = (
-  data?: CompanyData
-): {
-  technologies: Array<Record<string, any>>;
-} => {
-  // Initialize result with just technologies data
-  const result = {
-    technologies: [] as Array<Record<string, any>>,
-  };
 
+const formatKeyTechnology = (data?: CompanyData): Record<string, any>[] => {
   // Extract key technology data from company data
-  const techData = data?.key_technology;
+  const techData = data?.key_technology || [];
 
-  if (!techData || techData.length === 0) {
+  if (techData.length === 0) {
     console.warn("No key technology data found");
-
-    // Add empty data indicator if no key technology data is found
-    result.technologies.push({
-      Technology: "No data available",
-      Description: "",
-      Date: "",
-    });
-
-    return result;
+    return [{ Technology: "No data available", Description: "", Date: "" }];
   }
 
-  // Format each technology for Excel using only the fields in the interface
-  techData.forEach((tech) => {
-    result.technologies.push({
-      Technology: tech.technology || "Unnamed Technology", // Fallback to "Unnamed Technology" if null
-      Description: tech.description || "No description available", // Fallback to a default description if null
-      Date: tech.date || "", // Fallback to an empty string if date is null
-    });
-  });
-
-  return result;
+  // Format each technology for Excel
+  return techData.map((tech) => ({
+    Technology: tech.technology || "Unnamed Technology",
+    Description: tech.description || "No description available",
+    Date: tech.date || "",
+  }));
 };
 
-const formatMAActivity = (
-  data?: CompanyData
-): {
-  deals: Array<Record<string, any>>;
-} => {
-  // Initialize result with just deals data
-  const result = {
-    deals: [] as Array<Record<string, any>>,
-  };
-
+const formatMAActivity = (data?: CompanyData): Record<string, any>[] => {
   // Extract M&A activity data from company data
-  const maDeals = data?.ma_activity?.ma_deals;
+  const maDeals = data?.ma_activity?.ma_deals || [];
 
-  if (!maDeals || maDeals.length === 0) {
+  if (maDeals.length === 0) {
     console.warn("No M&A deals found");
-
-    // Add empty data indicator if no M&A deals are found
-    result.deals.push({
-      "Deal Name": "No data available",
-      Description: "",
-      "Deal Type": "",
-      "Deal Date": "",
-      "Deal Value": "",
-    });
-
-    return result;
+    return [
+      {
+        "Deal Name": "No data available",
+        Description: "",
+        "Deal Type": "",
+        "Deal Date": "",
+        "Deal Value": "",
+      },
+    ];
   }
 
   // Format each deal for Excel
-  maDeals.forEach((deal) => {
-    result.deals.push({
-      "Deal Name": deal.deal_name || "Unnamed Deal", // Fallback to "Unnamed Deal"
-      Description: deal.description || "", // Fallback to empty string if no description
-      "Deal Type": deal.deal_type || "", // Fallback to empty string if no deal type
-      "Deal Date": deal.deal_date || "", // Fallback to empty string if no deal date
-      "Deal Value": deal.deal_value || "Not specified", // Fallback to "Not specified"
-    });
-  });
-
-  return result;
+  return maDeals.map((deal) => ({
+    "Deal Name": deal.deal_name || "Unnamed Deal",
+    Description: deal.description || "",
+    "Deal Type": deal.deal_type || "",
+    "Deal Date": deal.deal_date || "",
+    "Deal Value": deal.deal_value || "Not specified",
+  }));
 };
 
 // Format market size
-const formatMarketSize = (
-  data?: CompanyData
-): {
-  overview: Array<Record<string, any>>;
-  marketData: Array<Record<string, any>>;
-  trends: Array<Record<string, any>>;
-} => {
-  // Initialize empty result structure
-  const result = {
-    overview: [] as Array<Record<string, any>>,
-    marketData: [] as Array<Record<string, any>>,
-    trends: [] as Array<Record<string, any>>,
-  };
-
+const formatMarketSize = (data?: CompanyData): Record<string, any>[] => {
   // Extract size data from the proper location in CompanyData
   const sizeData = data?.market_info?.size;
 
   // Check if we have any data
   if (!sizeData || typeof sizeData !== "object") {
     console.warn("No market size data found in the provided structure");
-
-    // Add empty data indicators if no size data is found
-    result.overview.push({
-      Property: "Data Status",
-      Value: "No market size data available",
-    });
-
-    result.marketData.push({
-      "Year Type": "No data available",
-      "Market Size": "",
-      CAGR: "",
-      "Key Excerpt": "",
-      Explanation: "",
-    });
-
-    result.trends.push({
-      "Year Type": "No data available",
-      Trend: "No trends available",
-    });
-
-    return result;
+    return [
+      { Category: "Data Status", Value: "No market size data available" },
+    ];
   }
 
-  // Log what data we found for debugging
-  console.log("Processing market size data:", sizeData.industryName);
+  // Initialize result array
+  const result: Record<string, any>[] = [];
 
   // 1. Overview data
-  result.overview.push({
-    Property: "Industry Name",
+  result.push({
+    Category: "Industry Name",
     Value: sizeData.industryName || "Not specified",
   });
 
@@ -487,21 +395,21 @@ const formatMarketSize = (
   if (sizeData.yearBeforeData) yearDataPoints++;
   if (sizeData.projectionFor2030) yearDataPoints++;
 
-  result.overview.push({
-    Property: "Years of Data Available",
-    Value: yearDataPoints,
+  result.push({
+    Category: "Years of Data Available",
+    Value: yearDataPoints.toString(),
   });
 
   if (sizeData.pastYearData?.marketSize) {
-    result.overview.push({
-      Property: "Latest Market Size",
+    result.push({
+      Category: "Latest Market Size",
       Value: sizeData.pastYearData.marketSize,
     });
   }
 
   if (sizeData.projectionFor2030?.marketSize) {
-    result.overview.push({
-      Property: "2030 Projected Market Size",
+    result.push({
+      Category: "2030 Projected Market Size",
       Value: sizeData.projectionFor2030.marketSize,
     });
   }
@@ -511,8 +419,8 @@ const formatMarketSize = (
     sizeData.pastYearData?.marketSize &&
     sizeData.projectionFor2030?.marketSize
   ) {
-    result.overview.push({
-      Property: "Projected Growth",
+    result.push({
+      Category: "Projected Growth",
       Value:
         "From " +
         sizeData.pastYearData.marketSize +
@@ -525,64 +433,45 @@ const formatMarketSize = (
   const addYearData = (yearType: string, yearData: YearData | null) => {
     if (!yearData) return;
 
-    result.marketData.push({
-      "Year Type": yearType,
-      "Market Size": yearData.marketSize || "Not specified",
-      CAGR: yearData.cagr || "Not specified",
-      "Key Excerpt": yearData.keyExcerpt || "None provided",
-      Explanation: yearData.explanation || "None provided",
+    result.push({
+      Category: `${yearType} - Market Size`,
+      Value: yearData.marketSize || "Not specified",
     });
+
+    result.push({
+      Category: `${yearType} - CAGR`,
+      Value: yearData.cagr || "Not specified",
+    });
+
+    result.push({
+      Category: `${yearType} - Key Excerpt`,
+      Value: yearData.keyExcerpt || "None provided",
+    });
+
+    result.push({
+      Category: `${yearType} - Explanation`,
+      Value: yearData.explanation || "None provided",
+    });
+
+    // Add trends for this year
+    if (yearData.keyIndustryTrends && yearData.keyIndustryTrends.length > 0) {
+      yearData.keyIndustryTrends.forEach((trend: string, index: number) => {
+        result.push({
+          Category: `${yearType} - Trend ${index + 1}`,
+          Value: trend,
+        });
+      });
+    } else {
+      result.push({
+        Category: `${yearType} - Trends`,
+        Value: "No trends available",
+      });
+    }
   };
 
   addYearData("Past Year", sizeData.pastYearData);
   addYearData("Year Before", sizeData.yearBeforeData);
   addYearData("Projection for 2030", sizeData.projectionFor2030);
-
-  // If we have no data at all, add a placeholder row
-  if (result.marketData.length === 0) {
-    result.marketData.push({
-      "Year Type": "No data available",
-      "Market Size": "",
-      CAGR: "",
-      "Key Excerpt": "",
-      Explanation: "",
-    });
-  }
-
-  // 3. Trends data - one row per trend per year
-  const addTrends = (yearType: string, yearData: YearData | null) => {
-    if (
-      !yearData ||
-      !yearData.keyIndustryTrends ||
-      yearData.keyIndustryTrends.length === 0
-    ) {
-      // Add a placeholder row for years with no trends
-      result.trends.push({
-        "Year Type": yearType,
-        Trend: "No trends available",
-      });
-      return;
-    }
-
-    yearData.keyIndustryTrends.forEach((trend: string) => {
-      result.trends.push({
-        "Year Type": yearType,
-        Trend: trend,
-      });
-    });
-  };
-
-  addTrends("Past Year", sizeData.pastYearData);
-  addTrends("Year Before", sizeData.yearBeforeData);
-  addTrends("Projection for 2030", sizeData.projectionFor2030);
-
-  // If we have no trends at all, add a placeholder row
-  if (result.trends.length === 0) {
-    result.trends.push({
-      "Year Type": "No data available",
-      Trend: "No trends available",
-    });
-  }
 
   return result;
 };
@@ -699,7 +588,7 @@ const formatCompetitorAnalysis = (
 ): Record<string, any>[] => {
   if (!data?.competitive_analysis) {
     // Try to access direct array if competitive_analysis is an array itself
-    if (Array.isArray(data?.competitive_analysis.competitive_analysis)) {
+    if (Array.isArray(data?.competitive_analysis?.competitive_analysis)) {
       return data.competitive_analysis.competitive_analysis.map((item) => ({
         Company: item.company_name || "",
         Field: item.field || "",
@@ -774,7 +663,7 @@ const formatOpportunities = (data?: CompanyData): Record<string, any>[] => {
 const formatRisks = (data?: CompanyData): Record<string, any>[] => {
   if (!data?.opportunities_risks?.risks) return []; // Return empty array if no risks data
 
-  const risks: Risk[] = data.opportunities_risks.risks; // Use Opportunity type here
+  const risks: Risk[] = data.opportunities_risks.risks; // Use Risk type here
 
   // Check if risks is an array
   if (Array.isArray(risks)) {
@@ -836,11 +725,26 @@ export const availableSections = [
     title: "Product Timeline",
     formatter: formatProductTimeline,
   },
-
-  { id: "technology", title: "Key Technology", formatter: formatKeyTechnology },
-  { id: "ma-activity", title: "M&A Activity", formatter: formatMAActivity },
-  { id: "market-size", title: "Market Size", formatter: formatMarketSize },
-  { id: "market-map", title: "Market Map", formatter: formatMarketMap },
+  {
+    id: "technology",
+    title: "Key Technology",
+    formatter: formatKeyTechnology,
+  },
+  {
+    id: "ma-activity",
+    title: "M&A Activity",
+    formatter: formatMAActivity,
+  },
+  {
+    id: "market-size",
+    title: "Market Size",
+    formatter: formatMarketSize,
+  },
+  {
+    id: "market-map",
+    title: "Market Map",
+    formatter: formatMarketMap,
+  },
   {
     id: "competitor-landscape",
     title: "Competitive Landscape",
@@ -861,14 +765,26 @@ export const availableSections = [
     title: "Competitor Analysis",
     formatter: formatCompetitorAnalysis,
   },
-  { id: "regulations", title: "Regulations", formatter: formatRegulations },
+  {
+    id: "regulations",
+    title: "Regulations",
+    formatter: formatRegulations,
+  },
   {
     id: "opportunities",
     title: "Opportunities",
     formatter: formatOpportunities,
   },
-  { id: "risks", title: "Risks", formatter: formatRisks },
-  { id: "qa", title: "Q&A", formatter: formatQA },
+  {
+    id: "risks",
+    title: "Risks",
+    formatter: formatRisks,
+  },
+  {
+    id: "qa",
+    title: "Q&A",
+    formatter: formatQA,
+  },
 ];
 
 // Main export function
