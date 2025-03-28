@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PencilIcon, SaveIcon, XIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { PlusIcon, TrashIcon } from "lucide-react";
 import type { OpportunitiesRisks, Risk } from "@/types/opportunitiesRisks";
+import { SectionLayout } from "@/components/ui/section-layout";
 
 type RisksProps = {
   initialData?: OpportunitiesRisks;
@@ -19,11 +20,6 @@ export default function RisksPage({ initialData = defaultState }: RisksProps) {
   const [data, setData] = useState<OpportunitiesRisks>(
     initialData || defaultState
   );
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<OpportunitiesRisks>(
-    initialData || defaultState
-  );
-  const [sourceText, setSourceText] = useState<string>("Source: Coresignal");
 
   useEffect(() => {
     // Ensure we have valid data with the correct structure
@@ -32,16 +28,7 @@ export default function RisksPage({ initialData = defaultState }: RisksProps) {
     setData(validData);
   }, [initialData]);
 
-  const startEditing = (): void => {
-    setIsEditing(true);
-    setEditData(JSON.parse(JSON.stringify(data)));
-  };
-
-  const cancelEditing = (): void => {
-    setIsEditing(false);
-  };
-
-  const saveChanges = (): void => {
+  const handleSave = (editedData: OpportunitiesRisks): void => {
     // Create UserAttachment entity
     const userAttachment = {
       name: "risks-component-update.tsx",
@@ -50,92 +37,64 @@ export default function RisksPage({ initialData = defaultState }: RisksProps) {
 
     console.log("Creating UserAttachment:", userAttachment);
 
-    setData(editData);
-    setIsEditing(false);
-
-    // Update the source text to include the user
-    setSourceText("Source: Coresignal, User Update");
+    setData(editedData);
   };
 
-  const updateRisk = (
-    index: number,
-    field: keyof Risk,
-    value: string
-  ): void => {
-    const newData = { ...editData };
-    // Ensure risks array exists
-    if (!newData.risks) {
-      newData.risks = [];
-    }
-    if (newData.risks[index]) {
-      newData.risks[index][field] = value;
+  // The render props function for SectionLayout
+  const renderRisksContent = ({
+    isEditing,
+    editData,
+    setEditData,
+  }: {
+    isEditing: boolean;
+    editData: OpportunitiesRisks;
+    setEditData: (data: OpportunitiesRisks) => void;
+  }) => {
+    // Check if risks data is empty or null
+    const isRisksEmpty = !editData.risks || editData.risks.length === 0;
+
+    const updateRisk = (
+      index: number,
+      field: keyof Risk,
+      value: string
+    ): void => {
+      const newData = { ...editData };
+      // Ensure risks array exists
+      if (!newData.risks) {
+        newData.risks = [];
+      }
+      if (newData.risks[index]) {
+        newData.risks[index][field] = value;
+        setEditData(newData);
+      }
+    };
+
+    const addRisk = (): void => {
+      const newData = { ...editData };
+      // Ensure risks array exists
+      if (!newData.risks) {
+        newData.risks = [];
+      }
+      newData.risks.push({
+        area: "New Risk Area",
+        detail: "New risk detail",
+        rationale: "New risk rationale",
+      });
       setEditData(newData);
-    }
-  };
+    };
 
-  const addRisk = (): void => {
-    const newData = { ...editData };
-    // Ensure risks array exists
-    if (!newData.risks) {
-      newData.risks = [];
-    }
-    newData.risks.push({
-      area: "New Risk Area",
-      detail: "New risk detail",
-      rationale: "New risk rationale",
-    });
-    setEditData(newData);
-  };
+    const removeRisk = (index: number): void => {
+      const newData = { ...editData };
+      // Ensure risks array exists
+      if (!newData.risks) {
+        newData.risks = [];
+        return;
+      }
+      newData.risks.splice(index, 1);
+      setEditData(newData);
+    };
 
-  const removeRisk = (index: number): void => {
-    const newData = { ...editData };
-    // Ensure risks array exists
-    if (!newData.risks) {
-      newData.risks = [];
-      return;
-    }
-    newData.risks.splice(index, 1);
-    setEditData(newData);
-  };
-
-  // Check if risks data is empty or null
-  const isRisksEmpty = !data.risks || data.risks.length === 0;
-
-  return (
-    <div
-      className="max-w-[1200px] mx-auto px-4 py-8 bg-white flex flex-col"
-      style={{ minHeight: "100%", aspectRatio: "16/9" }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-[#445963] text-2xl font-normal">Risk Areas</h1>
-        {!isEditing ? (
-          <Button
-            onClick={startEditing}
-            className="hidden bg-[#156082] hover:bg-[#092a38] text-white"
-          >
-            <PencilIcon className="mr-2 h-4 w-4" /> Edit
-          </Button>
-        ) : (
-          <div className="flex gap-2">
-            <Button
-              onClick={saveChanges}
-              className="bg-[#156082] hover:bg-[#092a38] text-white"
-            >
-              <SaveIcon className="mr-2 h-4 w-4" /> Save
-            </Button>
-            <Button
-              onClick={cancelEditing}
-              variant="outline"
-              className="border-[#ced7db] text-[#445963]"
-            >
-              <XIcon className="mr-2 h-4 w-4" /> Cancel
-            </Button>
-          </div>
-        )}
-      </div>
-      <div className="border-t border-[#ced7db] mb-12"></div>
-
-      {/* Content area that will grow/shrink as needed */}
+    return (
       <div className="flex-grow">
         {isRisksEmpty && !isEditing ? (
           <div className="text-center py-12 text-[#57727e] text-lg">
@@ -214,16 +173,16 @@ export default function RisksPage({ initialData = defaultState }: RisksProps) {
               </>
             ) : (
               <>
-                {data.risks &&
-                  data.risks.map((risk, index) => (
+                {editData.risks &&
+                  editData.risks.map((risk, index) => (
                     <div
                       key={index}
                       className="grid grid-cols-2 border-t border-[#ced7db]"
                     >
                       {index === 0 ||
-                      (data.risks &&
-                        data.risks[index - 1] &&
-                        data.risks[index - 1].area !== risk.area) ? (
+                      (editData.risks &&
+                        editData.risks[index - 1] &&
+                        editData.risks[index - 1].area !== risk.area) ? (
                         <div className="bg-[#002169] text-white p-4 flex items-center">
                           <h3 className="font-medium text-lg">
                             {risk.area || ""}
@@ -251,9 +210,18 @@ export default function RisksPage({ initialData = defaultState }: RisksProps) {
           </div>
         )}
       </div>
+    );
+  };
 
-      {/* Footer with source text, always at the bottom */}
-      <div className="mt-auto pt-8 text-[#57727e] text-sm">{sourceText}</div>
-    </div>
+  return (
+    <SectionLayout
+      title="Risk Areas"
+      onSave={handleSave}
+      initialData={data}
+      sourceText="Source: Coresignal"
+      className="lg:max-w-6xl lg:mx-auto"
+    >
+      {renderRisksContent}
+    </SectionLayout>
   );
 }

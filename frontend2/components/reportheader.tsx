@@ -66,57 +66,59 @@ export default function ReportHeader({
     initialData?.company_profile?.firmographic?.name || "Company";
 
   return (
-    <Card className="rounded-none border-x-0 border-t-0 shadow-none">
-      <CardContent className="p-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-[#35454c]">{title}</h1>
-            <p className="text-[#57727e] mt-1">
-              {date.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
+    <div className="w-full lg:max-w-6xl lg:mx-auto">
+      <Card className="rounded-none border-x-0 border-t-0 shadow-none">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-[#35454c]">{title}</h1>
+              <p className="text-[#57727e] mt-1">
+                {date.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <ExportExcelButton
+                companyName={companyName}
+                data={initialData || undefined}
+              />
+              <ExportPDFButton onClick={() => setIsExportDialogOpen(true)} />
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <ExportExcelButton
-              companyName={companyName}
-              data={initialData || undefined}
-            />
-            <ExportPDFButton onClick={() => setIsExportDialogOpen(true)} />
+          <div className="flex flex-col md:flex-row gap-4 mt-6">
+            <div className="bg-[#f0f4f6] rounded-lg p-4 flex-1">
+              <p className="text-[#57727e] text-sm">Pages Viewed</p>
+              <p className="text-[#35454c] text-xl font-semibold mt-1">
+                {pagesViewed.toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-[#f0f4f6] rounded-lg p-4 flex-1">
+              <p className="text-[#57727e] text-sm">Man-hours Saved</p>
+              <p className="text-[#35454c] text-xl font-semibold mt-1">
+                {manHoursSaved} hours
+              </p>
+            </div>
+            <div className="bg-[#f0f4f6] rounded-lg p-4 flex-1">
+              <p className="text-[#57727e] text-sm">Company</p>
+              <p className="text-[#35454c] text-xl font-semibold mt-1">
+                {companyName}
+              </p>
+            </div>
           </div>
-        </div>
+        </CardContent>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-          <div className="bg-[#f0f4f6] rounded-lg p-4">
-            <p className="text-[#57727e] text-sm">Pages Viewed</p>
-            <p className="text-[#35454c] text-xl font-semibold mt-1">
-              {pagesViewed.toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-[#f0f4f6] rounded-lg p-4">
-            <p className="text-[#57727e] text-sm">Man-hours Saved</p>
-            <p className="text-[#35454c] text-xl font-semibold mt-1">
-              {manHoursSaved} hours
-            </p>
-          </div>
-          <div className="bg-[#f0f4f6] rounded-lg p-4">
-            <p className="text-[#57727e] text-sm">Company</p>
-            <p className="text-[#35454c] text-xl font-semibold mt-1">
-              {companyName}
-            </p>
-          </div>
-        </div>
-      </CardContent>
-
-      <ExportDialog
-        isOpen={isExportDialogOpen}
-        onClose={() => setIsExportDialogOpen(false)}
-        sections={sections}
-        companyName={companyName}
-      />
-    </Card>
+        <ExportDialog
+          isOpen={isExportDialogOpen}
+          onClose={() => setIsExportDialogOpen(false)}
+          sections={sections}
+          companyName={companyName}
+        />
+      </Card>
+    </div>
   );
 }
