@@ -191,7 +191,7 @@ export function CompanyTimelineTable({
           ) : (
             <button
               onClick={startEditing}
-              className="text-[#8097a2] hover:text-[#475467]"
+              className="hidden text-[#8097a2] hover:text-[#475467]"
             >
               <Edit className="h-4 w-4" />
             </button>

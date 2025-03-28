@@ -224,7 +224,10 @@ export default function CompanyOverview({
                   </button>
                 </div>
               ) : (
-                <button onClick={startEditing} className="text-[#8097a2]">
+                <button
+                  onClick={startEditing}
+                  className="hidden text-[#8097a2]"
+                >
                   <Edit className="h-4 w-4" />
                 </button>
               )}

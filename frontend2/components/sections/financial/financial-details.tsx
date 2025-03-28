@@ -219,7 +219,7 @@ export function FinancialSummaryDetail({
         <Button
           onClick={handleAddRow}
           variant="outline"
-          className="flex items-center gap-1 border-[#002169] text-[#002169]"
+          className="hidden flex items-center gap-1 border-[#002169] text-[#002169]"
         >
           <Plus size={16} />
           Add Row
@@ -294,7 +294,7 @@ export function FinancialSummaryDetail({
                       onClick={() => handleEdit(metric.category)}
                       size="sm"
                       variant="ghost"
-                      className="h-8 w-8 p-0"
+                      className="hidden h-8 w-8 p-0"
                     >
                       <Edit size={16} className="text-[#002169]" />
                     </Button>

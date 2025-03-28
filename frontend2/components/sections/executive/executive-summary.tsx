@@ -587,372 +587,409 @@ export function ExecutiveSummaryPage({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
-                        <TableCell className="font-medium text-xs py-1 h-8">
-                          Operating Revenue
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {editMode === "financial_highlights" ? (
-                            <Input
-                              type="number"
-                              value={
-                                editFinancialHighlights.operating_revenue
-                                  ?.value ||
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.operating_revenue
-                                )?.value ||
-                                0
-                              }
-                              onChange={(e) =>
-                                handleFinancialDataChange(
-                                  "operating_revenue",
-                                  Number(e.target.value),
-                                  editFinancialHighlights.operating_revenue
-                                    ?.date ||
-                                    getLatestFinancialData(
-                                      data?.financial_highlights
-                                        ?.operating_revenue
-                                    )?.date ||
-                                    null
-                                )
-                              }
-                              className="w-full h-6 text-xs"
-                            />
-                          ) : (
-                            formatCurrency(
-                              getLatestFinancialData(
-                                data?.financial_highlights?.operating_revenue
-                              )?.value
-                            )
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {editMode === "financial_highlights" ? (
-                            <Input
-                              type="date"
-                              value={
-                                editFinancialHighlights.operating_revenue
-                                  ?.date ||
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.operating_revenue
-                                )?.date ||
-                                ""
-                              }
-                              onChange={(e) =>
-                                handleFinancialDataChange(
-                                  "operating_revenue",
-                                  editFinancialHighlights.operating_revenue
-                                    ?.value ||
+                      {!data?.financial_highlights?.operating_revenue &&
+                      !data?.financial_highlights?.operating_profit &&
+                      !data?.financial_highlights?.ebitda &&
+                      !data?.financial_highlights?.net_income &&
+                      !data?.financial_highlights?.per ? (
+                        <TableRow>
+                          <TableCell colSpan={3} className="text-center py-4">
+                            <p className="text-sm text-gray-500">
+                              No data available for Financial Highlights
+                            </p>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        <>
+                          <TableRow>
+                            <TableCell className="font-medium text-xs py-1 h-8">
+                              Operating Revenue
+                            </TableCell>
+                            <TableCell className="text-right text-xs py-1 h-8">
+                              {editMode === "financial_highlights" ? (
+                                <Input
+                                  type="number"
+                                  value={
+                                    editFinancialHighlights.operating_revenue
+                                      ?.value ||
                                     getLatestFinancialData(
                                       data?.financial_highlights
                                         ?.operating_revenue
                                     )?.value ||
-                                    0,
-                                  e.target.value
+                                    0
+                                  }
+                                  onChange={(e) =>
+                                    handleFinancialDataChange(
+                                      "operating_revenue",
+                                      Number(e.target.value),
+                                      editFinancialHighlights.operating_revenue
+                                        ?.date ||
+                                        getLatestFinancialData(
+                                          data?.financial_highlights
+                                            ?.operating_revenue
+                                        )?.date ||
+                                        null
+                                    )
+                                  }
+                                  className="w-full h-6 text-xs"
+                                />
+                              ) : (
+                                formatCurrency(
+                                  getLatestFinancialData(
+                                    data?.financial_highlights
+                                      ?.operating_revenue
+                                  )?.value
                                 )
-                              }
-                              className="w-full h-6 text-xs"
-                            />
-                          ) : (
-                            formatDate(
-                              getLatestFinancialData(
-                                data?.financial_highlights?.operating_revenue
-                              )?.date
-                            )
-                          )}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium text-xs py-1 h-8">
-                          Operating Profit
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {editMode === "financial_highlights" ? (
-                            <Input
-                              type="number"
-                              value={
-                                editFinancialHighlights.operating_profit
-                                  ?.value ||
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.operating_profit
-                                )?.value ||
-                                0
-                              }
-                              onChange={(e) =>
-                                handleFinancialDataChange(
-                                  "operating_profit",
-                                  Number(e.target.value),
-                                  editFinancialHighlights.operating_profit
-                                    ?.date ||
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right text-xs py-1 h-8">
+                              {editMode === "financial_highlights" ? (
+                                <Input
+                                  type="date"
+                                  value={
+                                    editFinancialHighlights.operating_revenue
+                                      ?.date ||
+                                    getLatestFinancialData(
+                                      data?.financial_highlights
+                                        ?.operating_revenue
+                                    )?.date ||
+                                    ""
+                                  }
+                                  onChange={(e) =>
+                                    handleFinancialDataChange(
+                                      "operating_revenue",
+                                      editFinancialHighlights.operating_revenue
+                                        ?.value ||
+                                        getLatestFinancialData(
+                                          data?.financial_highlights
+                                            ?.operating_revenue
+                                        )?.value ||
+                                        0,
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full h-6 text-xs"
+                                />
+                              ) : (
+                                formatDate(
+                                  getLatestFinancialData(
+                                    data?.financial_highlights
+                                      ?.operating_revenue
+                                  )?.date
+                                )
+                              )}
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell className="font-medium text-xs py-1 h-8">
+                              Operating Profit
+                            </TableCell>
+                            <TableCell className="text-right text-xs py-1 h-8">
+                              {editMode === "financial_highlights" ? (
+                                <Input
+                                  type="number"
+                                  value={
+                                    editFinancialHighlights.operating_profit
+                                      ?.value ||
+                                    getLatestFinancialData(
+                                      data?.financial_highlights
+                                        ?.operating_profit
+                                    )?.value ||
+                                    0
+                                  }
+                                  onChange={(e) =>
+                                    handleFinancialDataChange(
+                                      "operating_profit",
+                                      Number(e.target.value),
+                                      editFinancialHighlights.operating_profit
+                                        ?.date ||
+                                        getLatestFinancialData(
+                                          data?.financial_highlights
+                                            ?.operating_profit
+                                        )?.date ||
+                                        null
+                                    )
+                                  }
+                                  className="w-full h-6 text-xs"
+                                />
+                              ) : (
+                                formatCurrency(
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.operating_profit
+                                  )?.value
+                                )
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right text-xs py-1 h-8">
+                              {editMode === "financial_highlights" ? (
+                                <Input
+                                  type="date"
+                                  value={
+                                    editFinancialHighlights.operating_profit
+                                      ?.date ||
                                     getLatestFinancialData(
                                       data?.financial_highlights
                                         ?.operating_profit
                                     )?.date ||
-                                    null
+                                    ""
+                                  }
+                                  onChange={(e) =>
+                                    handleFinancialDataChange(
+                                      "operating_profit",
+                                      editFinancialHighlights.operating_profit
+                                        ?.value ||
+                                        getLatestFinancialData(
+                                          data?.financial_highlights
+                                            ?.operating_profit
+                                        )?.value ||
+                                        0,
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full h-6 text-xs"
+                                />
+                              ) : (
+                                formatDate(
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.operating_profit
+                                  )?.date
                                 )
-                              }
-                              className="w-full h-6 text-xs"
-                            />
-                          ) : (
-                            formatCurrency(
-                              getLatestFinancialData(
-                                data?.financial_highlights?.operating_profit
-                              )?.value
-                            )
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {editMode === "financial_highlights" ? (
-                            <Input
-                              type="date"
-                              value={
-                                editFinancialHighlights.operating_profit
-                                  ?.date ||
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.operating_profit
-                                )?.date ||
-                                ""
-                              }
-                              onChange={(e) =>
-                                handleFinancialDataChange(
-                                  "operating_profit",
-                                  editFinancialHighlights.operating_profit
-                                    ?.value ||
-                                    getLatestFinancialData(
-                                      data?.financial_highlights
-                                        ?.operating_profit
-                                    )?.value ||
-                                    0,
-                                  e.target.value
-                                )
-                              }
-                              className="w-full h-6 text-xs"
-                            />
-                          ) : (
-                            formatDate(
-                              getLatestFinancialData(
-                                data?.financial_highlights?.operating_profit
-                              )?.date
-                            )
-                          )}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium text-xs py-1 h-8">
-                          EBITDA
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {editMode === "financial_highlights" ? (
-                            <Input
-                              type="number"
-                              value={
-                                editFinancialHighlights.ebitda?.value ||
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.ebitda
-                                )?.value ||
-                                0
-                              }
-                              onChange={(e) =>
-                                handleFinancialDataChange(
-                                  "ebitda",
-                                  Number(e.target.value),
-                                  editFinancialHighlights.ebitda?.date ||
-                                    getLatestFinancialData(
-                                      data?.financial_highlights?.ebitda
-                                    )?.date ||
-                                    null
-                                )
-                              }
-                              className="w-full h-6 text-xs"
-                            />
-                          ) : (
-                            formatCurrency(
-                              getLatestFinancialData(
-                                data?.financial_highlights?.ebitda
-                              )?.value
-                            )
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {editMode === "financial_highlights" ? (
-                            <Input
-                              type="date"
-                              value={
-                                editFinancialHighlights.ebitda?.date ||
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.ebitda
-                                )?.date ||
-                                ""
-                              }
-                              onChange={(e) =>
-                                handleFinancialDataChange(
-                                  "ebitda",
-                                  editFinancialHighlights.ebitda?.value ||
+                              )}
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell className="font-medium text-xs py-1 h-8">
+                              EBITDA
+                            </TableCell>
+                            <TableCell className="text-right text-xs py-1 h-8">
+                              {editMode === "financial_highlights" ? (
+                                <Input
+                                  type="number"
+                                  value={
+                                    editFinancialHighlights.ebitda?.value ||
                                     getLatestFinancialData(
                                       data?.financial_highlights?.ebitda
                                     )?.value ||
-                                    0,
-                                  e.target.value
+                                    0
+                                  }
+                                  onChange={(e) =>
+                                    handleFinancialDataChange(
+                                      "ebitda",
+                                      Number(e.target.value),
+                                      editFinancialHighlights.ebitda?.date ||
+                                        getLatestFinancialData(
+                                          data?.financial_highlights?.ebitda
+                                        )?.date ||
+                                        null
+                                    )
+                                  }
+                                  className="w-full h-6 text-xs"
+                                />
+                              ) : (
+                                formatCurrency(
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.ebitda
+                                  )?.value
                                 )
-                              }
-                              className="w-full h-6 text-xs"
-                            />
-                          ) : (
-                            formatDate(
-                              getLatestFinancialData(
-                                data?.financial_highlights?.ebitda
-                              )?.date
-                            )
-                          )}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium text-xs py-1 h-8">
-                          Net Income
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {editMode === "financial_highlights" ? (
-                            <Input
-                              type="number"
-                              value={
-                                editFinancialHighlights.net_income?.value ||
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.net_income
-                                )?.value ||
-                                0
-                              }
-                              onChange={(e) =>
-                                handleFinancialDataChange(
-                                  "net_income",
-                                  Number(e.target.value),
-                                  editFinancialHighlights.net_income?.date ||
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right text-xs py-1 h-8">
+                              {editMode === "financial_highlights" ? (
+                                <Input
+                                  type="date"
+                                  value={
+                                    editFinancialHighlights.ebitda?.date ||
                                     getLatestFinancialData(
-                                      data?.financial_highlights?.net_income
+                                      data?.financial_highlights?.ebitda
                                     )?.date ||
-                                    null
+                                    ""
+                                  }
+                                  onChange={(e) =>
+                                    handleFinancialDataChange(
+                                      "ebitda",
+                                      editFinancialHighlights.ebitda?.value ||
+                                        getLatestFinancialData(
+                                          data?.financial_highlights?.ebitda
+                                        )?.value ||
+                                        0,
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full h-6 text-xs"
+                                />
+                              ) : (
+                                formatDate(
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.ebitda
+                                  )?.date
                                 )
-                              }
-                              className="w-full h-6 text-xs"
-                            />
-                          ) : (
-                            formatCurrency(
-                              getLatestFinancialData(
-                                data?.financial_highlights?.net_income
-                              )?.value
-                            )
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {editMode === "financial_highlights" ? (
-                            <Input
-                              type="date"
-                              value={
-                                editFinancialHighlights.net_income?.date ||
-                                getLatestFinancialData(
-                                  data?.financial_highlights?.net_income
-                                )?.date ||
-                                ""
-                              }
-                              onChange={(e) =>
-                                handleFinancialDataChange(
-                                  "net_income",
-                                  editFinancialHighlights.net_income?.value ||
+                              )}
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell className="font-medium text-xs py-1 h-8">
+                              Net Income
+                            </TableCell>
+                            <TableCell className="text-right text-xs py-1 h-8">
+                              {editMode === "financial_highlights" ? (
+                                <Input
+                                  type="number"
+                                  value={
+                                    editFinancialHighlights.net_income?.value ||
                                     getLatestFinancialData(
                                       data?.financial_highlights?.net_income
                                     )?.value ||
-                                    0,
-                                  e.target.value
+                                    0
+                                  }
+                                  onChange={(e) =>
+                                    handleFinancialDataChange(
+                                      "net_income",
+                                      Number(e.target.value),
+                                      editFinancialHighlights.net_income
+                                        ?.date ||
+                                        getLatestFinancialData(
+                                          data?.financial_highlights?.net_income
+                                        )?.date ||
+                                        null
+                                    )
+                                  }
+                                  className="w-full h-6 text-xs"
+                                />
+                              ) : (
+                                formatCurrency(
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.net_income
+                                  )?.value
                                 )
-                              }
-                              className="w-full h-6 text-xs"
-                            />
-                          ) : (
-                            formatDate(
-                              getLatestFinancialData(
-                                data?.financial_highlights?.net_income
-                              )?.date
-                            )
-                          )}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium text-xs py-1 h-8">
-                          P/E Ratio
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {editMode === "financial_highlights" ? (
-                            <Input
-                              type="number"
-                              value={
-                                editFinancialHighlights.per?.value ||
-                                data?.financial_highlights?.per?.value ||
-                                0
-                              }
-                              onChange={(e) =>
-                                handleFinancialDataChange(
-                                  "per",
-                                  Number(e.target.value),
-                                  data?.financial_highlights?.per?.date || null
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right text-xs py-1 h-8">
+                              {editMode === "financial_highlights" ? (
+                                <Input
+                                  type="date"
+                                  value={
+                                    editFinancialHighlights.net_income?.date ||
+                                    getLatestFinancialData(
+                                      data?.financial_highlights?.net_income
+                                    )?.date ||
+                                    ""
+                                  }
+                                  onChange={(e) =>
+                                    handleFinancialDataChange(
+                                      "net_income",
+                                      editFinancialHighlights.net_income
+                                        ?.value ||
+                                        getLatestFinancialData(
+                                          data?.financial_highlights?.net_income
+                                        )?.value ||
+                                        0,
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full h-6 text-xs"
+                                />
+                              ) : (
+                                formatDate(
+                                  getLatestFinancialData(
+                                    data?.financial_highlights?.net_income
+                                  )?.date
                                 )
-                              }
-                              className="w-full h-6 text-xs"
-                            />
-                          ) : (
-                            data?.financial_highlights?.per?.value?.toFixed(
-                              2
-                            ) || "N/A"
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {editMode === "financial_highlights" ? (
-                            <Input
-                              type="date"
-                              value={
-                                editFinancialHighlights.per?.date ||
-                                data?.financial_highlights?.per?.date ||
-                                ""
-                              }
-                              onChange={(e) =>
-                                handleFinancialDataChange(
-                                  "per",
-                                  editFinancialHighlights.per?.value ||
+                              )}
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell className="font-medium text-xs py-1 h-8">
+                              P/E Ratio
+                            </TableCell>
+                            <TableCell className="text-right text-xs py-1 h-8">
+                              {editMode === "financial_highlights" ? (
+                                <Input
+                                  type="number"
+                                  value={
+                                    editFinancialHighlights.per?.value ||
                                     data?.financial_highlights?.per?.value ||
-                                    0,
-                                  e.target.value
+                                    0
+                                  }
+                                  onChange={(e) =>
+                                    handleFinancialDataChange(
+                                      "per",
+                                      Number(e.target.value),
+                                      data?.financial_highlights?.per?.date ||
+                                        null
+                                    )
+                                  }
+                                  className="w-full h-6 text-xs"
+                                />
+                              ) : (
+                                data?.financial_highlights?.per?.value?.toFixed(
+                                  2
+                                ) || "N/A"
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right text-xs py-1 h-8">
+                              {editMode === "financial_highlights" ? (
+                                <Input
+                                  type="date"
+                                  value={
+                                    editFinancialHighlights.per?.date ||
+                                    data?.financial_highlights?.per?.date ||
+                                    ""
+                                  }
+                                  onChange={(e) =>
+                                    handleFinancialDataChange(
+                                      "per",
+                                      editFinancialHighlights.per?.value ||
+                                        data?.financial_highlights?.per
+                                          ?.value ||
+                                        0,
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full h-6 text-xs"
+                                />
+                              ) : (
+                                formatDate(
+                                  data?.financial_highlights?.per?.date
                                 )
-                              }
-                              className="w-full h-6 text-xs"
-                            />
-                          ) : (
-                            formatDate(data?.financial_highlights?.per?.date)
+                              )}
+                            </TableCell>
+                          </TableRow>
+                          {data?.financial_highlights?.per?.eps && (
+                            <TableRow>
+                              <TableCell className="font-medium text-xs py-1 h-8">
+                                EPS
+                              </TableCell>
+                              <TableCell className="text-right text-xs py-1 h-8">
+                                {data?.financial_highlights?.per?.eps?.toFixed(
+                                  2
+                                ) || "N/A"}
+                              </TableCell>
+                              <TableCell className="text-right text-xs py-1 h-8">
+                                {formatDate(
+                                  data?.financial_highlights?.per?.date
+                                )}
+                              </TableCell>
+                            </TableRow>
                           )}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium text-xs py-1 h-8">
-                          EPS
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {data?.financial_highlights?.per?.eps?.toFixed(2) ||
-                            "N/A"}
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {formatDate(data?.financial_highlights?.per?.date)}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium text-xs py-1 h-8">
-                          Closing Price
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {formatCurrency(
-                            data?.financial_highlights?.per?.closing_price
+                          {data?.financial_highlights?.per?.closing_price && (
+                            <TableRow>
+                              <TableCell className="font-medium text-xs py-1 h-8">
+                                Closing Price
+                              </TableCell>
+                              <TableCell className="text-right text-xs py-1 h-8">
+                                {formatCurrency(
+                                  data?.financial_highlights?.per?.closing_price
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right text-xs py-1 h-8">
+                                {formatDate(
+                                  data?.financial_highlights?.per?.date
+                                )}
+                              </TableCell>
+                            </TableRow>
                           )}
-                        </TableCell>
-                        <TableCell className="text-right text-xs py-1 h-8">
-                          {formatDate(data?.financial_highlights?.per?.date)}
-                        </TableCell>
-                      </TableRow>
+                        </>
+                      )}
                     </TableBody>
                   </Table>
                 </div>
@@ -1032,61 +1069,71 @@ export function ExecutiveSummaryPage({
                   </div>
                 </CardHeader>
                 <CardContent className="p-3">
-                  <div className="h-[150px] flex items-end justify-between gap-2">
-                    {data?.valuation?.value && (
-                      <div className="flex flex-col items-center">
-                        <div
-                          className="bg-[#002169] w-12"
-                          style={{
-                            height: `${Math.min(
-                              120,
-                              (data.valuation.value / 1000000000) * 120
-                            )}px`,
-                          }}
-                        ></div>
-                        <p className="text-[10px] mt-1 text-center">
-                          Valuation
-                        </p>
-                      </div>
-                    )}
-                    {data?.equity_funding_total?.value && (
-                      <div className="flex flex-col items-center">
-                        <div
-                          className="bg-[#156082] w-12"
-                          style={{
-                            height: `${Math.min(
-                              120,
-                              (data.equity_funding_total.value / 1000000000) *
-                                120
-                            )}px`,
-                          }}
-                        ></div>
-                        <p className="text-[10px] mt-1 text-center">
-                          Equity
-                          <br />
-                          Funding
-                        </p>
-                      </div>
-                    )}
-                    {data?.funding_total?.value && (
-                      <div className="flex flex-col items-center">
-                        <div
-                          className="bg-[#57727e] w-12"
-                          style={{
-                            height: `${Math.min(
-                              120,
-                              (data.funding_total.value / 1000000000) * 120
-                            )}px`,
-                          }}
-                        ></div>
-                        <p className="text-[10px] mt-1 text-center">
-                          Total
-                          <br />
-                          Funding
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  {!data?.valuation?.value &&
+                  !data?.equity_funding_total?.value &&
+                  !data?.funding_total?.value ? (
+                    <div className="h-[150px] flex items-center justify-center">
+                      <p className="text-sm text-gray-500">
+                        No data available for Financial Data
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="h-[150px] flex items-end justify-between gap-2">
+                      {data?.valuation?.value ? (
+                        <div className="flex flex-col items-center">
+                          <div
+                            className="bg-[#002169] w-12"
+                            style={{
+                              height: `${Math.min(
+                                120,
+                                (data.valuation.value / 1000000000) * 120
+                              )}px`,
+                            }}
+                          ></div>
+                          <p className="text-[10px] mt-1 text-center">
+                            Valuation
+                          </p>
+                        </div>
+                      ) : null}
+                      {data?.equity_funding_total?.value ? (
+                        <div className="flex flex-col items-center">
+                          <div
+                            className="bg-[#156082] w-12"
+                            style={{
+                              height: `${Math.min(
+                                120,
+                                (data.equity_funding_total.value / 1000000000) *
+                                  120
+                              )}px`,
+                            }}
+                          ></div>
+                          <p className="text-[10px] mt-1 text-center">
+                            Equity
+                            <br />
+                            Funding
+                          </p>
+                        </div>
+                      ) : null}
+                      {data?.funding_total?.value ? (
+                        <div className="flex flex-col items-center">
+                          <div
+                            className="bg-[#57727e] w-12"
+                            style={{
+                              height: `${Math.min(
+                                120,
+                                (data.funding_total.value / 1000000000) * 120
+                              )}px`,
+                            }}
+                          ></div>
+                          <p className="text-[10px] mt-1 text-center">
+                            Total
+                            <br />
+                            Funding
+                          </p>
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

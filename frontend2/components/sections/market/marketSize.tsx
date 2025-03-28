@@ -168,7 +168,7 @@ export default function MarketSizePage({ initialData }: MarketSizePageProps) {
               <Button
                 onClick={handleEdit}
                 variant="outline"
-                className="border-[#156082] text-[#156082]"
+                className="hidden border-[#156082] text-[#156082]"
               >
                 <Edit className="mr-2 h-4 w-4" /> Edit Data
               </Button>

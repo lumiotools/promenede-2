@@ -159,7 +159,7 @@ export function LeadershipExecutivesPage({
       {({ isEditing, editData, setEditData }) => (
         <div className="h-full overflow-auto">
           {/* Add Executive Button */}
-          <div className="flex justify-end mb-2">
+          <div className="hidden flex justify-end mb-2">
             <Dialog>
               <DialogTrigger asChild>
                 <Button

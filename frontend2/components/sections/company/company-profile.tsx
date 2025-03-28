@@ -258,6 +258,22 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
     }
   };
 
+  // Check if data exists for each section
+  const hasFirmographicData =
+    firmographic.legal_name ||
+    firmographic.incorporation_date ||
+    firmographic.hq_address ||
+    firmographic.employees_count ||
+    (firmographic.products_services &&
+      firmographic.products_services.length > 0);
+
+  const hasFinancialData =
+    lastThreeFiscalYears.length > 0 ||
+    annualGrowthRates.length > 0 ||
+    keyFinancials.per?.value;
+
+  const hasShareholderData = institutionalHolders.length > 0;
+
   return (
     <SectionLayout
       title="Company Profile"
@@ -273,7 +289,7 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                 Firmographic
               </h2>
               {isEditing.firmographic ? (
-                <div className="flex gap-2">
+                <div className="hidden flex gap-2">
                   <button
                     onClick={() => saveChanges("firmographic")}
                     className="text-green-600 hover:text-green-800 flex items-center gap-1"
@@ -292,191 +308,205 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
               ) : (
                 <button
                   onClick={() => startEditing("firmographic")}
-                  className="text-[#8097a2] hover:text-[#475467]"
+                  className="hidden text-[#8097a2] hover:text-[#475467]"
                 >
                   <Edit className="h-3 w-3" />
                 </button>
               )}
             </div>
 
-            <table className="w-full border-collapse text-xs">
-              <tbody>
-                <tr>
-                  <td className="bg-[#002169] text-white py-1 px-2 w-[120px] border-t border-[#e5e7eb]">
-                    Company Name
-                  </td>
-                  <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
-                    {isEditing.firmographic ? (
-                      <input
-                        type="text"
-                        className="w-full p-1 border border-gray-300 rounded text-xs"
-                        value={editData?.firmographic?.legal_name || ""}
-                        onChange={(e) =>
-                          updateFirmographicField("legal_name", e.target.value)
-                        }
-                      />
-                    ) : (
-                      firmographic.legal_name || "N/A"
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
-                    Incorporation
-                  </td>
-                  <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
-                    {isEditing.firmographic ? (
-                      <input
-                        type="text"
-                        className="w-full p-1 border border-gray-300 rounded text-xs"
-                        value={editData?.firmographic?.incorporation_date || ""}
-                        onChange={(e) =>
-                          updateFirmographicField(
-                            "incorporation_date",
-                            e.target.value
-                          )
-                        }
-                      />
-                    ) : (
-                      formatDate(firmographic.incorporation_date)
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
-                    HQ Address
-                  </td>
-                  <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
-                    {isEditing.firmographic ? (
-                      <input
-                        type="text"
-                        className="w-full p-1 border border-gray-300 rounded text-xs"
-                        value={editData?.firmographic?.hq_address || ""}
-                        onChange={(e) =>
-                          updateFirmographicField("hq_address", e.target.value)
-                        }
-                      />
-                    ) : (
-                      firmographic.hq_address || "N/A"
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
-                    CEO
-                  </td>
-                  <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
-                    {isEditing.firmographic ? (
-                      <input
-                        type="text"
-                        className="w-full p-1 border border-gray-300 rounded text-xs"
-                        placeholder="Enter CEO name"
-                      />
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
-                    Revenue
-                  </td>
-                  <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
-                    {isEditing.firmographic ? (
-                      <div className="flex items-center gap-2">
+            {!hasFirmographicData ? (
+              <div className="p-4 text-center text-sm text-gray-500">
+                No data available for Firmographic
+              </div>
+            ) : (
+              <table className="w-full border-collapse text-xs">
+                <tbody>
+                  <tr>
+                    <td className="bg-[#002169] text-white py-1 px-2 w-[120px] border-t border-[#e5e7eb]">
+                      Company Name
+                    </td>
+                    <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
+                      {isEditing.firmographic ? (
+                        <input
+                          type="text"
+                          className="w-full p-1 border border-gray-300 rounded text-xs"
+                          value={editData?.firmographic?.legal_name || ""}
+                          onChange={(e) =>
+                            updateFirmographicField(
+                              "legal_name",
+                              e.target.value
+                            )
+                          }
+                        />
+                      ) : (
+                        firmographic.legal_name || "N/A"
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
+                      Incorporation
+                    </td>
+                    <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
+                      {isEditing.firmographic ? (
+                        <input
+                          type="text"
+                          className="w-full p-1 border border-gray-300 rounded text-xs"
+                          value={
+                            editData?.firmographic?.incorporation_date || ""
+                          }
+                          onChange={(e) =>
+                            updateFirmographicField(
+                              "incorporation_date",
+                              e.target.value
+                            )
+                          }
+                        />
+                      ) : (
+                        formatDate(firmographic.incorporation_date)
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
+                      HQ Address
+                    </td>
+                    <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
+                      {isEditing.firmographic ? (
+                        <input
+                          type="text"
+                          className="w-full p-1 border border-gray-300 rounded text-xs"
+                          value={editData?.firmographic?.hq_address || ""}
+                          onChange={(e) =>
+                            updateFirmographicField(
+                              "hq_address",
+                              e.target.value
+                            )
+                          }
+                        />
+                      ) : (
+                        firmographic.hq_address || "N/A"
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
+                      CEO
+                    </td>
+                    <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
+                      {isEditing.firmographic ? (
+                        <input
+                          type="text"
+                          className="w-full p-1 border border-gray-300 rounded text-xs"
+                          placeholder="Enter CEO name"
+                        />
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
+                      Revenue
+                    </td>
+                    <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
+                      {isEditing.firmographic ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            className="w-full p-1 border border-gray-300 rounded text-xs"
+                            value={
+                              fiscalYears.length > 0 &&
+                              fiscalYears[0].revenue !== null
+                                ? fiscalYears[0].revenue
+                                : 0
+                            }
+                            disabled
+                          />
+                          <span className="text-xs text-gray-500">
+                            (Edit in Financials)
+                          </span>
+                        </div>
+                      ) : fiscalYears.length > 0 ? (
+                        `${formatCurrency(fiscalYears[0].revenue)} (${
+                          fiscalYears[0].period_display_end_date || "N/A"
+                        })`
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
+                      FTE#
+                    </td>
+                    <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
+                      {isEditing.firmographic ? (
                         <input
                           type="number"
                           className="w-full p-1 border border-gray-300 rounded text-xs"
-                          value={
-                            fiscalYears.length > 0 &&
-                            fiscalYears[0].revenue !== null
-                              ? fiscalYears[0].revenue
-                              : 0
+                          value={editData?.firmographic?.employees_count || 0}
+                          onChange={(e) =>
+                            updateFirmographicField(
+                              "employees_count",
+                              Number.parseInt(e.target.value)
+                            )
                           }
-                          disabled
                         />
-                        <span className="text-xs text-gray-500">
-                          (Edit in Financials)
-                        </span>
-                      </div>
-                    ) : fiscalYears.length > 0 ? (
-                      `${formatCurrency(fiscalYears[0].revenue)} (${
-                        fiscalYears[0].period_display_end_date || "N/A"
-                      })`
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
-                    FTE#
-                  </td>
-                  <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
-                    {isEditing.firmographic ? (
-                      <input
-                        type="number"
-                        className="w-full p-1 border border-gray-300 rounded text-xs"
-                        value={editData?.firmographic?.employees_count || 0}
-                        onChange={(e) =>
-                          updateFirmographicField(
-                            "employees_count",
-                            Number.parseInt(e.target.value)
-                          )
-                        }
-                      />
-                    ) : (
-                      (firmographic.employees_count || 0).toLocaleString()
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
-                    Products/Services
-                  </td>
-                  <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
-                    {isEditing.firmographic ? (
-                      <textarea
-                        className="w-full p-1 border border-gray-300 rounded text-xs"
-                        value={
-                          editData?.firmographic?.products_services
-                            ?.filter((ps) => ps && ps.value !== null)
-                            .map((ps) => ps.value)
-                            .join(", ") || ""
-                        }
-                        onChange={(e) => {
-                          const values = e.target.value
-                            .split(",")
-                            .map((v) => v.trim());
-                          const newProducts: ProductService[] = values.map(
-                            (value, i) => ({
-                              uuid:
-                                editData?.firmographic?.products_services?.[i]
-                                  ?.uuid || `new-${i}`,
-                              value,
-                              image_id: null,
-                              permalink: null,
-                              entity_def_id: null,
-                            })
-                          );
-                          const newEditData = { ...editData };
-                          if (newEditData?.firmographic) {
-                            newEditData.firmographic.products_services =
-                              newProducts;
-                            setEditData(newEditData);
+                      ) : (
+                        (firmographic.employees_count || 0).toLocaleString()
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="bg-[#002169] text-white py-1 px-2 border-t border-[#e5e7eb]">
+                      Products/Services
+                    </td>
+                    <td className="py-1 px-2 border-t border-[#e5e7eb] text-black">
+                      {isEditing.firmographic ? (
+                        <textarea
+                          className="w-full p-1 border border-gray-300 rounded text-xs"
+                          value={
+                            editData?.firmographic?.products_services
+                              ?.filter((ps) => ps && ps.value !== null)
+                              .map((ps) => ps.value)
+                              .join(", ") || ""
                           }
-                        }}
-                      />
-                    ) : (
-                      (firmographic.products_services || [])
-                        .filter((ps) => ps && ps.value !== null)
-                        .map((ps) => ps?.value)
-                        .join(", ") || "N/A"
-                    )}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                          onChange={(e) => {
+                            const values = e.target.value
+                              .split(",")
+                              .map((v) => v.trim());
+                            const newProducts: ProductService[] = values.map(
+                              (value, i) => ({
+                                uuid:
+                                  editData?.firmographic?.products_services?.[i]
+                                    ?.uuid || `new-${i}`,
+                                value,
+                                image_id: null,
+                                permalink: null,
+                                entity_def_id: null,
+                              })
+                            );
+                            const newEditData = { ...editData };
+                            if (newEditData?.firmographic) {
+                              newEditData.firmographic.products_services =
+                                newProducts;
+                              setEditData(newEditData);
+                            }
+                          }}
+                        />
+                      ) : (
+                        (firmographic.products_services || [])
+                          .filter((ps) => ps && ps.value !== null)
+                          .map((ps) => ps?.value)
+                          .join(", ") || "N/A"
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
           </div>
 
           {/* Key Financials */}
@@ -486,7 +516,7 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                 Key Financials
               </h2>
               {isEditing.financials ? (
-                <div className="flex gap-2">
+                <div className="hidden flex gap-2">
                   <button
                     onClick={() => saveChanges("financials")}
                     className="text-green-600 hover:text-green-800 flex items-center gap-1"
@@ -505,242 +535,248 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
               ) : (
                 <button
                   onClick={() => startEditing("financials")}
-                  className="text-[#8097a2] hover:text-[#475467]"
+                  className="hidden text-[#8097a2] hover:text-[#475467]"
                 >
                   <Edit className="h-3 w-3" />
                 </button>
               )}
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-xs">
-                <thead>
-                  <tr className="bg-[#002169] text-white">
-                    <th className="py-1 px-2 text-left font-medium">
-                      (&apos;000)
-                    </th>
-                    {/* Use fiscal year labels or default to FY22, FY23, FY24 if no data */}
-                    {lastThreeFiscalYears.length > 0 ? (
-                      lastThreeFiscalYears.map((year, index) => (
-                        <th
-                          key={index}
-                          className="py-1 px-2 text-center font-medium"
-                        >
-                          {getFiscalYearLabel(year)}
-                        </th>
-                      ))
-                    ) : (
-                      <>
-                        <th className="py-1 px-2 text-center font-medium">
-                          FY22
-                        </th>
-                        <th className="py-1 px-2 text-center font-medium">
-                          FY23
-                        </th>
-                        <th className="py-1 px-2 text-center font-medium">
-                          FY24
-                        </th>
-                      </>
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
-                      Operating Revenue
-                    </td>
-                    {lastThreeFiscalYears.length > 0 ? (
-                      lastThreeFiscalYears.map((year, index) => (
-                        <td
-                          key={index}
-                          className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
-                        >
-                          {formatCurrency(year?.revenue)}
-                        </td>
-                      ))
-                    ) : (
-                      <>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                  <tr>
-                    <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
-                      Operating Profit
-                    </td>
-                    {lastThreeFiscalYears.length > 0 ? (
-                      lastThreeFiscalYears.map((year, index) => (
-                        <td
-                          key={index}
-                          className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
-                        >
-                          {formatCurrency(year?.ebit)}
-                        </td>
-                      ))
-                    ) : (
-                      <>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                  <tr>
-                    <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
-                      EBITDA
-                    </td>
-                    {lastThreeFiscalYears.length > 0 ? (
-                      lastThreeFiscalYears.map((year, index) => (
-                        <td
-                          key={index}
-                          className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
-                        >
-                          {year?.ebitda ? formatCurrency(year.ebitda) : "N/A"}
-                        </td>
-                      ))
-                    ) : (
-                      <>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                  <tr>
-                    <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
-                      PAT
-                    </td>
-                    {lastThreeFiscalYears.length > 0 ? (
-                      lastThreeFiscalYears.map((year, index) => (
-                        <td
-                          key={index}
-                          className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
-                        >
-                          {formatCurrency(year?.net_income)}
-                        </td>
-                      ))
-                    ) : (
-                      <>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                  <tr>
-                    <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
-                      Revenue Growth
-                    </td>
-                    {annualGrowthRates.length > 0 ? (
-                      annualGrowthRates.slice(0, 3).map((growth, index) => (
-                        <td
-                          key={index}
-                          className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
-                        >
-                          {growth?.value
-                            ? `${growth.value.toFixed(1)}%`
-                            : "N/A"}
-                        </td>
-                      ))
-                    ) : (
-                      <>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                  <tr>
-                    <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
-                      PER
-                    </td>
-                    {lastThreeFiscalYears.length > 0 ? (
-                      lastThreeFiscalYears.map((_, index) => (
-                        <td
-                          key={index}
-                          className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
-                        >
-                          {keyFinancials.per?.value
-                            ? keyFinancials.per.value.toFixed(2)
-                            : "N/A"}
-                        </td>
-                      ))
-                    ) : (
-                      <>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                  <tr>
-                    <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
-                      # of Users
-                    </td>
-                    {lastThreeFiscalYears.length > 0 ? (
-                      lastThreeFiscalYears.map((_, index) => (
-                        <td
-                          key={index}
-                          className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
-                        >
-                          N/A
-                        </td>
-                      ))
-                    ) : (
-                      <>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                        <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
-                          N/A
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            {!hasFinancialData ? (
+              <div className="p-4 text-center text-sm text-gray-500">
+                No data available for Key Financials
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#002169] text-white">
+                      <th className="py-1 px-2 text-left font-medium">
+                        (&apos;000)
+                      </th>
+                      {/* Use fiscal year labels or default to FY22, FY23, FY24 if no data */}
+                      {lastThreeFiscalYears.length > 0 ? (
+                        lastThreeFiscalYears.map((year, index) => (
+                          <th
+                            key={index}
+                            className="py-1 px-2 text-center font-medium"
+                          >
+                            {getFiscalYearLabel(year)}
+                          </th>
+                        ))
+                      ) : (
+                        <>
+                          <th className="py-1 px-2 text-center font-medium">
+                            FY22
+                          </th>
+                          <th className="py-1 px-2 text-center font-medium">
+                            FY23
+                          </th>
+                          <th className="py-1 px-2 text-center font-medium">
+                            FY24
+                          </th>
+                        </>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
+                        Operating Revenue
+                      </td>
+                      {lastThreeFiscalYears.length > 0 ? (
+                        lastThreeFiscalYears.map((year, index) => (
+                          <td
+                            key={index}
+                            className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
+                          >
+                            {formatCurrency(year?.revenue)}
+                          </td>
+                        ))
+                      ) : (
+                        <>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                    <tr>
+                      <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
+                        Operating Profit
+                      </td>
+                      {lastThreeFiscalYears.length > 0 ? (
+                        lastThreeFiscalYears.map((year, index) => (
+                          <td
+                            key={index}
+                            className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
+                          >
+                            {formatCurrency(year?.ebit)}
+                          </td>
+                        ))
+                      ) : (
+                        <>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                    <tr>
+                      <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
+                        EBITDA
+                      </td>
+                      {lastThreeFiscalYears.length > 0 ? (
+                        lastThreeFiscalYears.map((year, index) => (
+                          <td
+                            key={index}
+                            className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
+                          >
+                            {year?.ebitda ? formatCurrency(year.ebitda) : "N/A"}
+                          </td>
+                        ))
+                      ) : (
+                        <>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                    <tr>
+                      <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
+                        PAT
+                      </td>
+                      {lastThreeFiscalYears.length > 0 ? (
+                        lastThreeFiscalYears.map((year, index) => (
+                          <td
+                            key={index}
+                            className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
+                          >
+                            {formatCurrency(year?.net_income)}
+                          </td>
+                        ))
+                      ) : (
+                        <>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                    <tr>
+                      <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
+                        Revenue Growth
+                      </td>
+                      {annualGrowthRates.length > 0 ? (
+                        annualGrowthRates.slice(0, 3).map((growth, index) => (
+                          <td
+                            key={index}
+                            className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
+                          >
+                            {growth?.value
+                              ? `${growth.value.toFixed(1)}%`
+                              : "N/A"}
+                          </td>
+                        ))
+                      ) : (
+                        <>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                    <tr>
+                      <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
+                        PER
+                      </td>
+                      {lastThreeFiscalYears.length > 0 ? (
+                        lastThreeFiscalYears.map((_, index) => (
+                          <td
+                            key={index}
+                            className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
+                          >
+                            {keyFinancials.per?.value
+                              ? keyFinancials.per.value.toFixed(2)
+                              : "N/A"}
+                          </td>
+                        ))
+                      ) : (
+                        <>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                    <tr>
+                      <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
+                        # of Users
+                      </td>
+                      {lastThreeFiscalYears.length > 0 ? (
+                        lastThreeFiscalYears.map((_, index) => (
+                          <td
+                            key={index}
+                            className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
+                          >
+                            N/A
+                          </td>
+                        ))
+                      ) : (
+                        <>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                          <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black">
+                            N/A
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
 
@@ -749,7 +785,7 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
           <div className="flex items-center justify-between p-2 bg-gray-50">
             <h2 className="text-sm font-medium text-[#475467]">Shareholders</h2>
             {isEditing.shareholders ? (
-              <div className="flex gap-2">
+              <div className="hidden flex gap-2">
                 <button
                   onClick={() => saveChanges("shareholders")}
                   className="text-green-600 hover:text-green-800 flex items-center gap-1"
@@ -768,132 +804,138 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
             ) : (
               <button
                 onClick={() => startEditing("shareholders")}
-                className="text-[#8097a2] hover:text-[#475467]"
+                className="hidden text-[#8097a2] hover:text-[#475467]"
               >
                 <Edit className="h-3 w-3" />
               </button>
             )}
           </div>
 
-          <table className="w-full border-collapse text-xs">
-            <thead>
-              <tr className="bg-[#002169] text-white">
-                <th className="py-1 px-2 text-left font-medium">Name</th>
-                <th className="py-1 px-2 text-right font-medium">
-                  # of Shares
-                </th>
-                <th className="py-1 px-2 text-right font-medium">%</th>
-                <th className="py-1 px-2 text-center font-medium">Types</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Limit to top 5 shareholders */}
-              {(isEditing.shareholders &&
-              editData?.shareholder_data?.institutional_holders
-                ? editData.shareholder_data.institutional_holders.slice(0, 5)
-                : institutionalHolders.slice(0, 5)
-              ).map((holder, index) => (
-                <tr key={index}>
-                  <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-black">
-                    {isEditing.shareholders ? (
-                      <input
-                        type="text"
-                        className="w-full p-1 border border-gray-300 rounded text-xs"
-                        value={holder.Holder || ""}
-                        onChange={(e) =>
-                          updateInstitutionalHolderField(
-                            index,
-                            "Holder",
-                            e.target.value
-                          )
-                        }
-                      />
-                    ) : (
-                      holder.Holder || "N/A"
-                    )}
-                  </td>
-                  <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-right text-black">
-                    {isEditing.shareholders ? (
-                      <input
-                        type="number"
-                        className="w-full p-1 border border-gray-300 rounded text-right text-xs"
-                        value={holder.Shares || 0}
-                        onChange={(e) =>
-                          updateInstitutionalHolderField(
-                            index,
-                            "Shares",
-                            Number(e.target.value) || 0
-                          )
-                        }
-                      />
-                    ) : (
-                      (holder.Shares || 0).toLocaleString()
-                    )}
-                  </td>
-                  <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-right text-black">
-                    {isEditing.shareholders ? (
-                      <input
-                        type="number"
-                        step="0.01"
-                        className="w-full p-1 border border-gray-300 rounded text-right text-xs"
-                        value={holder.pctHeld || 0}
-                        onChange={(e) =>
-                          updateInstitutionalHolderField(
-                            index,
-                            "pctHeld",
-                            Number(e.target.value) || 0
-                          )
-                        }
-                      />
-                    ) : (
-                      `${holder.pctHeld?.toFixed(2) || 0}%`
-                    )}
-                  </td>
-                  <td className="py-1 px-2 border-t border-[#e5e7eb] text-center text-black">
-                    {isEditing.shareholders ? (
-                      <input
-                        type="text"
-                        className="w-full p-1 border border-gray-300 rounded text-center text-xs"
-                        placeholder="Type"
-                      />
-                    ) : (
-                      "Institutional"
-                    )}
-                  </td>
+          {!hasShareholderData ? (
+            <div className="p-4 text-center text-sm text-gray-500">
+              No data available for Shareholders
+            </div>
+          ) : (
+            <table className="w-full border-collapse text-xs">
+              <thead>
+                <tr className="bg-[#002169] text-white">
+                  <th className="py-1 px-2 text-left font-medium">Name</th>
+                  <th className="py-1 px-2 text-right font-medium">
+                    # of Shares
+                  </th>
+                  <th className="py-1 px-2 text-right font-medium">%</th>
+                  <th className="py-1 px-2 text-center font-medium">Types</th>
                 </tr>
-              ))}
-              <tr>
-                <td className="py-1 px-2 font-medium border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-black">
-                  Total
-                </td>
-                <td className="py-1 px-2 border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-right text-black">
-                  {isEditing.shareholders &&
-                  editData?.shareholder_data?.institutional_holders
-                    ? editData.shareholder_data.institutional_holders
-                        .slice(0, 5)
-                        .reduce((sum, h) => sum + (h.Shares || 0), 0)
-                        .toLocaleString()
-                    : institutionalHolders
-                        .slice(0, 5)
-                        .reduce((sum, h) => sum + (h.Shares || 0), 0)
-                        .toLocaleString()}
-                </td>
-                <td className="py-1 px-2 border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-right text-black">
-                  {isEditing.shareholders &&
-                  editData?.shareholder_data?.institutional_holders
-                    ? editData.shareholder_data.institutional_holders
-                        .slice(0, 5)
-                        .reduce((sum, h) => sum + (h.pctHeld || 0), 0)
-                        .toFixed(2) + "%"
-                    : institutionalHolders
-                        .slice(0, 5)
-                        .reduce((sum, h) => sum + (h.pctHeld || 0), 0)
-                        .toFixed(2) + "%"}
-                </td>
-                <td className="py-1 px-2 border-t-2 border-t-[#002169] text-center text-black"></td>
-              </tr>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {/* Limit to top 5 shareholders */}
+                {(isEditing.shareholders &&
+                editData?.shareholder_data?.institutional_holders
+                  ? editData.shareholder_data.institutional_holders.slice(0, 5)
+                  : institutionalHolders.slice(0, 5)
+                ).map((holder, index) => (
+                  <tr key={index}>
+                    <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-black">
+                      {isEditing.shareholders ? (
+                        <input
+                          type="text"
+                          className="w-full p-1 border border-gray-300 rounded text-xs"
+                          value={holder.Holder || ""}
+                          onChange={(e) =>
+                            updateInstitutionalHolderField(
+                              index,
+                              "Holder",
+                              e.target.value
+                            )
+                          }
+                        />
+                      ) : (
+                        holder.Holder || "N/A"
+                      )}
+                    </td>
+                    <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-right text-black">
+                      {isEditing.shareholders ? (
+                        <input
+                          type="number"
+                          className="w-full p-1 border border-gray-300 rounded text-right text-xs"
+                          value={holder.Shares || 0}
+                          onChange={(e) =>
+                            updateInstitutionalHolderField(
+                              index,
+                              "Shares",
+                              Number(e.target.value) || 0
+                            )
+                          }
+                        />
+                      ) : (
+                        (holder.Shares || 0).toLocaleString()
+                      )}
+                    </td>
+                    <td className="py-1 px-2 border-t border-r border-[#e5e7eb] text-right text-black">
+                      {isEditing.shareholders ? (
+                        <input
+                          type="number"
+                          step="0.01"
+                          className="w-full p-1 border border-gray-300 rounded text-right text-xs"
+                          value={holder.pctHeld || 0}
+                          onChange={(e) =>
+                            updateInstitutionalHolderField(
+                              index,
+                              "pctHeld",
+                              Number(e.target.value) || 0
+                            )
+                          }
+                        />
+                      ) : (
+                        `${holder.pctHeld?.toFixed(2) || 0}%`
+                      )}
+                    </td>
+                    <td className="py-1 px-2 border-t border-[#e5e7eb] text-center text-black">
+                      {isEditing.shareholders ? (
+                        <input
+                          type="text"
+                          className="w-full p-1 border border-gray-300 rounded text-center text-xs"
+                          placeholder="Type"
+                        />
+                      ) : (
+                        "Institutional"
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                <tr>
+                  <td className="py-1 px-2 font-medium border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-black">
+                    Total
+                  </td>
+                  <td className="py-1 px-2 border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-right text-black">
+                    {isEditing.shareholders &&
+                    editData?.shareholder_data?.institutional_holders
+                      ? editData.shareholder_data.institutional_holders
+                          .slice(0, 5)
+                          .reduce((sum, h) => sum + (h.Shares || 0), 0)
+                          .toLocaleString()
+                      : institutionalHolders
+                          .slice(0, 5)
+                          .reduce((sum, h) => sum + (h.Shares || 0), 0)
+                          .toLocaleString()}
+                  </td>
+                  <td className="py-1 px-2 border-t-2 border-r border-t-[#002169] border-r-[#e5e7eb] text-right text-black">
+                    {isEditing.shareholders &&
+                    editData?.shareholder_data?.institutional_holders
+                      ? editData.shareholder_data.institutional_holders
+                          .slice(0, 5)
+                          .reduce((sum, h) => sum + (h.pctHeld || 0), 0)
+                          .toFixed(2) + "%"
+                      : institutionalHolders
+                          .slice(0, 5)
+                          .reduce((sum, h) => sum + (h.pctHeld || 0), 0)
+                          .toFixed(2) + "%"}
+                  </td>
+                  <td className="py-1 px-2 border-t-2 border-t-[#002169] text-center text-black"></td>
+                </tr>
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </SectionLayout>

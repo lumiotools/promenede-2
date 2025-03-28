@@ -262,11 +262,34 @@ export default function StrategicDevelopmentTimeline({
 
         {/* Timeline */}
         <div className="relative">
-          {/* Horizontal timeline line */}
-          <div className="absolute left-0 right-0 h-0.5 bg-gray-300 top-16"></div>
+          {/* Years above the line */}
+          <div className="flex justify-between mb-4">
+            {sortedYears.length > 0 ? (
+              sortedYears.map((year) => (
+                <div key={year} className="text-center w-full md:w-1/3 px-4">
+                  <h3 className="text-xl font-medium text-gray-800">{year}</h3>
+                  {isEditing && (
+                    <button
+                      onClick={() => removeYear(year)}
+                      className="text-red-500 hover:text-red-700 text-sm mt-1"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="w-full text-center py-2 text-gray-500">
+                No years available
+              </div>
+            )}
+          </div>
 
-          {/* Years */}
-          <div className="pt-16 pb-8">
+          {/* Horizontal timeline line */}
+          <div className="h-0.5 bg-gray-300 w-full mb-4"></div>
+
+          {/* Content below the line */}
+          <div className="pt-4 pb-8">
             <div className="flex flex-col md:flex-row justify-between">
               {sortedYears.length > 0 ? (
                 sortedYears.map((year, index) => (
@@ -275,22 +298,7 @@ export default function StrategicDevelopmentTimeline({
                     className="relative flex flex-col items-center w-full md:w-1/3 px-4 mb-8 md:mb-0"
                   >
                     {/* Timeline dot */}
-                    <div className="absolute top-0 -mt-4 w-4 h-4 bg-blue-600 rounded-full border-2 border-white z-10"></div>
-
-                    {/* Year */}
-                    <div className="mb-6 text-center">
-                      <h3 className="text-xl font-medium text-gray-800">
-                        {year}
-                      </h3>
-                      {isEditing && (
-                        <button
-                          onClick={() => removeYear(year)}
-                          className="text-red-500 hover:text-red-700 text-sm mt-1"
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </div>
+                    <div className="absolute top-0 -mt-8 w-4 h-4 bg-blue-600 rounded-full border-2 border-white z-10"></div>
 
                     {/* Year content */}
                     <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm w-full">
@@ -416,16 +424,7 @@ export default function StrategicDevelopmentTimeline({
                                       {initiative.description ||
                                         "No description available"}
                                     </p>
-                                    {initiative.referenceLink && (
-                                      <a
-                                        href={initiative.referenceLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 hover:text-blue-800 text-sm mt-1 block"
-                                      >
-                                        Reference Link
-                                      </a>
-                                    )}
+                                    {/* Reference link removed as requested */}
                                   </>
                                 )}
                               </div>

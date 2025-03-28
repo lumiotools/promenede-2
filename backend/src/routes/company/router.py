@@ -160,7 +160,8 @@ async def get_company_data(request: CompanyRequest):
             "valuation": safe_get(crunchbase_data, "cards", "fields", "valuation", default=""),
             "equity_funding_total": safe_get(crunchbase_data, "cards", "fields", "equity_funding_total", default=""),
             "funding_total": safe_get(crunchbase_data, "cards", "fields", "funding_total", default=""),
-            "description": safe_get(crunchbase_data, "cards", "fields", "short_description", default=""),
+            #"description": safe_get(crunchbase_data, "cards", "fields", "short_description", default=""),
+            "description": "",
             "financial_highlights": {
                 "operating_revenue": safe_call(extract_financial_data, coresignal_data, "revenue", default={}),
                 "operating_profit": safe_call(extract_financial_data, coresignal_data, "ebit", default={}),
@@ -186,7 +187,8 @@ async def get_company_data(request: CompanyRequest):
                 "revenue_range": safe_get(coresignal_data, "revenue_annual_range", default={}),
                 "employees_count": safe_get(coresignal_data, "employees_count", default=0),
                 "products_services": safe_get(crunchbase_data, "cards", "fields", "categories", default=""),
-                "description": safe_get(coresignal_data, "description", default="")
+                # "description": safe_get(coresignal_data, "description", default="")
+                "description": ""
             },
             
             # b. Key Financials
@@ -672,15 +674,15 @@ async def get_company_data(request: CompanyRequest):
         )
         
         if perplexity_peerDevelopment:
-            openai_financialComparables = safe_call(
+            openai_peerDevelopments = safe_call(
                 get_openai_peer_developments,
                 company_name,
                 perplexity_peerDevelopment,
                 default={"companies_info": {}}
             )
-            response_data['competitive_analysis']['peer_developments'] = openai_financialComparables.get('companies_info', {})
+            response_data['competitive_analysis']['peer_developments'] = openai_peerDevelopments.get('companies_info', {})
     except Exception as e:
-        print(f"Error enriching financial comparables: {e}")
+        print(f"Error enriching peer developments: {e}")
 
     #Handle competitive analysis
     try:
@@ -698,6 +700,9 @@ async def get_company_data(request: CompanyRequest):
     except Exception as e:
         print(f"Error getting competitive analysis: {e}")
         response_data["competitive_analysis"]["competitive_analysis"] = ""
+
+    response_data["strategy"]['businessModel'] = response_data["company_overview"]['business_model']
+
 
     
     return {"success": True, "company_name": company_name, "data": response_data}

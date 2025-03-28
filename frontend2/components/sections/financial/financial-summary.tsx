@@ -190,14 +190,14 @@ export function FinancialSummary({ initialData }: FinancialSummaryProps) {
               <Button
                 variant="outline"
                 onClick={handleEditClick}
-                className="border-[#ced7db] text-[#445963]"
+                className="hidden border-[#ced7db] text-[#445963]"
               >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </Button>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#001e69] hover:bg-[#001e69]/90">
+                  <Button className="hidden bg-[#001e69] hover:bg-[#001e69]/90">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Year
                   </Button>
@@ -279,14 +279,14 @@ export function FinancialSummary({ initialData }: FinancialSummaryProps) {
               <Button
                 variant="outline"
                 onClick={handleCancelClick}
-                className="border-[#ced7db] text-[#445963]"
+                className="hidden border-[#ced7db] text-[#445963]"
               >
                 <X className="h-4 w-4 mr-2" />
                 Cancel
               </Button>
               <Button
                 onClick={handleSaveClick}
-                className="bg-[#001e69] hover:bg-[#001e69]/90"
+                className="hidden bg-[#001e69] hover:bg-[#001e69]/90"
               >
                 <Save className="h-4 w-4 mr-2" />
                 Save

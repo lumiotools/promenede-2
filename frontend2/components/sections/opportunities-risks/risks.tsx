@@ -111,7 +111,7 @@ export default function RisksPage({ initialData = defaultState }: RisksProps) {
         {!isEditing ? (
           <Button
             onClick={startEditing}
-            className="bg-[#156082] hover:bg-[#092a38] text-white"
+            className="hidden bg-[#156082] hover:bg-[#092a38] text-white"
           >
             <PencilIcon className="mr-2 h-4 w-4" /> Edit
           </Button>

@@ -300,11 +300,11 @@ def get_openai_financial_comparables(company_name, business_data):
 
     For each financial comparable, please provide the following details in a strict JSON format:
 
-    1. **Date**: The date the information is for (in yyyy-Month-Day format).
-    2. **Revenue**: The revenue for the company in USD or the relevant currency.
-    3. **Last Valuation**: The last valuation of the company in USD or the relevant currency.
-    4. **Last Funding**: The date of the last funding round and the amount raised (if available).
-    5. **Description**: A brief description of the company's financial performance for that date.
+    1. **date**: The date the information is for (in yyyy-Month-Day format).
+    2. **revenue**: The revenue for the company in USD or the relevant currency.
+    3. **last_valuation**: The last valuation of the company in USD or the relevant currency.
+    4. **last_funding**: The date of the last funding round and the amount raised (if available).
+    5. **description**: A brief description of the company's financial performance for that date.
 
     Please ensure that you return the most relevant financial information from the last 5 years, with the most recent information first, sorted in descending order by date. Ensure that the format strictly follows the instructions and the information is relevant to the last 5 years only.
 

@@ -133,7 +133,7 @@ const MAStrategyPage: React.FC<MaActivityProps> = ({
         {!isEditing ? (
           <button
             onClick={startEditing}
-            className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
+            className="hidden bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center"
           >
             <PencilIcon className="h-4 w-4 mr-2" />
             Edit
