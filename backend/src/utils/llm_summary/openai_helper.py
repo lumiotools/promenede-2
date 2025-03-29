@@ -484,9 +484,9 @@ Please ensure the descriptions are concise but informative.
     
     # Get the response from the model and parse it
     content =json.loads(response.choices[0].message.content)
-    # processedData=add_logo_to_companies(content)
-    print("peer developments",content)
-    return content
+    processedData=add_logo_to_companies(content)
+    print("peer developments",processedData)
+    return processedData
 
 def add_logo_url_to_competitive_analysis(competitive_analysis_data):
     # Function to fetch the logo for each company using the get_company_logo helper function

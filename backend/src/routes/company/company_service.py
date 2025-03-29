@@ -12,7 +12,7 @@ from src.utils.website_screenshot.screenshot import get_website_screenshot
 from src.routes.company.llmhelpers import enrich_data_parallel
 
 # Maximum number of concurrent workers for thread pools
-max_workers = 5
+max_workers = 10
 
 async def fetch_company_data(company_name, company_url):
     """
@@ -30,7 +30,7 @@ async def fetch_company_data(company_name, company_url):
         print("enrichment id", company_enrichment_id)
         if company_enrichment_id:
             coresignal_data = get_company_details(company_enrichment_id) or {}
-            coresignal_data = convert_null_to_none(coresignal_data)
+            # coresignal_data = convert_null_to_none(coresignal_data)
     except Exception as e:
         print(f"Error getting CoreSignal data: {e}")
         coresignal_data = {}
