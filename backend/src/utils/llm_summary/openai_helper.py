@@ -585,9 +585,51 @@ The output should be concise and well-structured using markdown with bullet poin
     # Extract and return the response
     return response.choices[0].message.content
 
+def get_openai_companyDetail(company_name):
+    # print("hit")
+    time=datetime.datetime.now()
+    time=time.strftime('%Y-%m-%d')
+    system_prompt = f"""
+    You are an AI assistant tasked with providing key details about the company "{company_name}".
+    Today's date is {time}.
+
+    **Objective**:
+    - Provide the **CEO's name** of the company.
+    - Provide the **incorporation date** of the company.
+
+    **Strictly Follow This JSON Format for output**:
+    ```json
+    {{
+       "company_detail": [
+           {{
+               "incorporation": "string", // Date of incorporation (e.g., 'YYYY-MM-DD')
+               "ceo": "string" // Full name of the current CEO
+           }}
+       ]
+    }}
+    ```
+
+    **Notes**:
+    - Make sure the output strictly follows the provided JSON format.
+    - Use the available data in the `business_data` to retrieve the CEO name and incorporation date.
+    """
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed
+        response_format={ "type": "json_object" },
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": company_name}
+        ]
+    )
+    
+    # Get the response from the model and parse it
+    content =json.loads(response.choices[0].message.content)
+    return content
+
+
 # Main function to test
 def main():
-    company_name = "Apple"
+    company_name = "Nike"
     business_data = """
         "executive_summary": {
             "industry": "Computers and Electronics Manufacturing",
@@ -701,10 +743,13 @@ def main():
 """
     
     # Get business summary from OpenAI
-    summary = get_openai_executive_summary(company_name, business_data)
+    # summary = get_openai_peer_competitorAnalysis(company_name, ['adidas', 'anta', 'asics'])
+    summary=get_openai_companyDetail(company_name)
     
     print("Result:")
-    print(summary)
+    # Assuming summary is the dictionary you are working with
+    print(summary['company_detail'][0].get("ceo", ""))
+
 
 # Run the test
 if __name__ == "__main__":

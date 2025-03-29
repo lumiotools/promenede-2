@@ -5,7 +5,7 @@ import requests
 from functools import reduce
 from dotenv import load_dotenv
 from src.utils.brandfetch.brandLogo import get_company_logo
-from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_executive_summary, get_openai_financial_comparables, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_peer_competitorAnalysis, get_openai_peer_developments, get_openai_productTimeline, get_openai_productsServices, get_openai_valueChain
+from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyDetail, get_openai_companyTimeline, get_openai_executive_summary, get_openai_financial_comparables, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_peer_competitorAnalysis, get_openai_peer_developments, get_openai_productTimeline, get_openai_productsServices, get_openai_valueChain
 from src.utils.llm_summary.perplexity_info import generate_perplexity_KeyTechnologies, generate_perplexity_MarketLeadership, generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_financial_comparables, generate_perplexity_maStrategy, generate_perplexity_peer_developments, generate_perplexity_productTimeline, generate_perplexity_productsServices, generate_perplexity_value_chain
 from src.utils.llmInfo.llm import fetch_company_data
 from src.utils.crunchbase.company import get_organization_data
@@ -715,6 +715,13 @@ async def get_company_data(request: CompanyRequest):
     except Exception as e:
         print(f"Error getting competitive analysis: {e}")
         response_data["competitive_analysis"]["competitive_analysis"] = ""
+
+    try:
+        company_detail=get_openai_companyDetail(company_name)
+        response_data["company_profile"]["ceo"] = company_detail['company_detail'][0].get("ceo", "")
+        response_data["company_profile"]["incorporation_date"] = company_detail['company_detail'][0].get("incorporation", "")
+    except Exception as e:
+        print(f"Error getting competitive analysis: {e}")
     
     return {"success": True, "company_name": company_name, "data": response_data}
 
