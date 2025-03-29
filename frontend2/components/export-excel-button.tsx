@@ -32,7 +32,7 @@ export function ExportExcelButton({
         onClick={() => setIsExcelDialogOpen(true)}
       >
         <FileSpreadsheet className="h-4 w-4" />
-        <span className="hidden sm:inline">Excel</span>
+        <span className="hidden sm:inline">Excel Export</span>
       </Button>
 
       <ExportExcelDialog

@@ -1,57 +1,57 @@
 export interface ExecutiveSummary {
-  industry?: string | null
-  topic_tags?: string[] | null
+  executive_summary: string | null;
+  industry?: string | null;
+  topic_tags?: string[] | null;
   valuation?: {
-    value?: number | null
-    currency?: string | null
-    value_usd?: number | null
-  } | null
+    value?: number | null;
+    currency?: string | null;
+    value_usd?: number | null;
+  } | null;
   equity_funding_total?: {
-    value?: number | null
-    currency?: string | null
-    value_usd?: number | null
-  } | null
+    value?: number | null;
+    currency?: string | null;
+    value_usd?: number | null;
+  } | null;
   funding_total?: {
-    value?: number | null
-    currency?: string | null
-    value_usd?: number | null
-  } | null
-  description?: string | null
+    value?: number | null;
+    currency?: string | null;
+    value_usd?: number | null;
+  } | null;
+  description?: string | null;
   financial_highlights?: {
     operating_revenue?:
       | {
-          value?: number | null
-          currency?: string | null
-          date?: string | null
+          value?: number | null;
+          currency?: string | null;
+          date?: string | null;
         }[]
-      | null
+      | null;
     operating_profit?:
       | {
-          value?: number | null
-          currency?: string | null
-          date?: string | null
+          value?: number | null;
+          currency?: string | null;
+          date?: string | null;
         }[]
-      | null
+      | null;
     ebitda?:
       | {
-          value?: number | null
-          currency?: string | null
-          date?: string | null
+          value?: number | null;
+          currency?: string | null;
+          date?: string | null;
         }[]
-      | null
+      | null;
     net_income?:
       | {
-          value?: number | null
-          currency?: string | null
-          date?: string | null
+          value?: number | null;
+          currency?: string | null;
+          date?: string | null;
         }[]
-      | null
+      | null;
     per?: {
-      value?: number | null
-      closing_price?: number | null
-      eps?: number | null
-      date?: string | null
-    } | null
-  } | null
+      value?: number | null;
+      closing_price?: number | null;
+      eps?: number | null;
+      date?: string | null;
+    } | null;
+  } | null;
 }
-

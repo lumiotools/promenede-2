@@ -68,14 +68,7 @@ export function Sections({ searchResults, onUpdateData }: SectionsProps) {
 
   return (
     <div className="flex flex-col w-full">
-      <ReportHeader
-        title="Company Report"
-        date={new Date()}
-        searchCriteria=""
-        pagesViewed={10000}
-        manHoursSaved={20}
-        initialData={searchResults}
-      />
+      <ReportHeader date={new Date()} initialData={searchResults} />
       <section id="executive-summary" className="p-6">
         <ExecutiveSummaryPage
           initialData={searchResults?.executive_summary}

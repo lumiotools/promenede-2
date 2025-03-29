@@ -556,16 +556,152 @@ The **description** should explain what the competitor is doing better in each f
     processedData=add_logo_url_to_competitive_analysis(content)
     return processedData
 
+
+
+def get_openai_executive_summary(company_name, business_data):
+    # Construct the system prompt
+    system_prompt = f"""
+You are an AI assistant tasked with generating a concise executive summary for the company "{company_name}" in markdown format string. The summary should be focused on providing key information in a compact format, without extra introductory headers or summaries. Please ensure the content is formatted for a limited vertical space (16:9 aspect ratio) but more horizontal space. The summary should include:
+
+- **Company Overview**: Briefly describe the company's core products and services.
+- **Revenue Streams**: List the main sources of revenue (e.g., hardware, software, services).
+- **Key Financials**: Include relevant financial metrics 
+- **Growth Opportunities**: Mention any areas where the company has potential for growth.
+- **Challenges**: Highlight key challenges the company is facing.
+
+The output should be concise and well-structured using markdown with bullet points, ensuring clarity and readability. Keep it short enough to fit a 16:9 aspect ratio display. Donot give any heading and summary. Keep it more descriptive and less points
+"""
+
+
+    # Send request to OpenAI for the executive summary
+    response = client.chat.completions.create(
+        model="gpt-4o-mini", 
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": json.dumps(business_data, indent=2)}
+        ]
+    )
+
+    # Extract and return the response
+    return response.choices[0].message.content
+
 # Main function to test
 def main():
-    company_name = "Paypal"
+    company_name = "Apple"
     business_data = """
+        "executive_summary": {
+            "industry": "Computers and Electronics Manufacturing",
+            "topic_tags": [
+                "electronics",
+                "computers electronics and technology > consumer electronics (in united states)",
+                "innovative product development",
+                "world-class operations",
+                "retail",
+                "telephone support",
+                "apple",
+                "iphone",
+                "mac",
+                "ipad",
+                "apple watch",
+                "manufacturing-industrial",
+                "technology",
+                "application-software",
+                "consumer-electronics",
+                "consumer-software",
+                "wearables",
+                "artificial intelligence (ai)",
+                "consumer electronics",
+                "hardware",
+                "mobile devices",
+                "operating systems"
+            ],
+            "valuation": "",
+            "equity_funding_total": "",
+            "funding_total": "",
+            "description": "",
+            "financial_highlights": {
+                "operating_revenue": [
+                    {
+                        "value": 391035000000.0,
+                        "currency": "USD",
+                        "date": "2024-09-28"
+                    },
+                    {
+                        "value": 85777000000.0,
+                        "currency": "USD",
+                        "date": "2024-06-29"
+                    },
+                    {
+                        "value": 90753000000.0,
+                        "currency": "USD",
+                        "date": "2024-03-30"
+                    }
+                ],
+                "operating_profit": [
+                    {
+                        "value": 180683000000.0,
+                        "currency": "USD",
+                        "date": "2024-09-28"
+                    },
+                    {
+                        "value": 39678000000.0,
+                        "currency": "USD",
+                        "date": "2024-06-29"
+                    },
+                    {
+                        "value": 42271000000.0,
+                        "currency": "USD",
+                        "date": "2024-03-30"
+                    }
+                ],
+                "ebitda": [
+                    {
+                        "value": 123216000000.0,
+                        "currency": "USD",
+                        "date": "2024-09-28"
+                    },
+                    {
+                        "value": 25352000000.0,
+                        "currency": "USD",
+                        "date": "2024-06-29"
+                    },
+                    {
+                        "value": 27900000000.0,
+                        "currency": "USD",
+                        "date": "2024-03-30"
+                    }
+                ],
+                "net_income": [
+                    {
+                        "value": 93736000000.0,
+                        "currency": "USD",
+                        "date": "2024-09-28"
+                    },
+                    {
+                        "value": 21448000000.0,
+                        "currency": "USD",
+                        "date": "2024-06-29"
+                    },
+                    {
+                        "value": 23636000000.0,
+                        "currency": "USD",
+                        "date": "2024-03-30"
+                    }
+                ],
+                "per": {
+                    "value": 38.43256548831337,
+                    "closing_price": 233.6699981689453,
+                    "eps": 6.08,
+                    "date": "2024-10-29"
+                }
+            }
+        },
 
 
 """
     
     # Get business summary from OpenAI
-    summary = get_openai_peer_competitorAnalysis(company_name, ['stripe', 'square', 'wepay'])
+    summary = get_openai_executive_summary(company_name, business_data)
     
     print("Result:")
     print(summary)

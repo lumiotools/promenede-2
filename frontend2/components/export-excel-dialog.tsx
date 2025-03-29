@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,10 +9,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { CompanyData } from "@/types/apiResponse";
 import { exportToExcel } from "./export-to-excel";
+import { FileIcon } from "lucide-react";
 
 interface Section {
   id: string;
@@ -34,8 +34,18 @@ export function ExportExcelDialog({
   companyName,
   data,
 }: ExportExcelDialogProps) {
-  const [selectedSections, setSelectedSections] = useState<string[]>([]);
+  // Initialize with all sections selected
+  const [selectedSections, setSelectedSections] = useState<string[]>(
+    sections.map((section) => section.id)
+  );
   const [isExporting, setIsExporting] = useState(false);
+
+  // Reset selected sections when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedSections(sections.map((section) => section.id));
+    }
+  }, [isOpen, sections]);
 
   const handleSelectAll = () => {
     if (selectedSections.length === sections.length) {
@@ -67,45 +77,66 @@ export function ExportExcelDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Export to Excel</DialogTitle>
+      <DialogContent className="sm:max-w-md bg-gray-50 p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-2">
+          <DialogTitle className="text-2xl font-normal text-gray-700">
+            Export Frames
+          </DialogTitle>
         </DialogHeader>
-        <div className="py-4">
-          <div className="flex items-center space-x-2 mb-4">
-            <Checkbox
-              id="select-all"
-              checked={selectedSections.length === sections.length}
-              onCheckedChange={handleSelectAll}
-            />
-            <Label htmlFor="select-all" className="font-medium">
-              Select All
-            </Label>
-          </div>
-          <ScrollArea className="h-[300px] pr-4">
-            <div className="space-y-3">
+
+        <div className="border-t border-gray-200 my-2"></div>
+
+        <ScrollArea className="max-h-[60vh] px-6">
+          <div className="py-4 space-y-4">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="select-all"
+                className="h-5 w-5 rounded-sm border-blue-500 data-[state=checked]:bg-blue-500 data-[state=checked]:text-white"
+                checked={selectedSections.length === sections.length}
+                onCheckedChange={handleSelectAll}
+              />
+              <label
+                htmlFor="select-all"
+                className="text-lg text-gray-600 font-medium"
+              >
+                Select All
+              </label>
+            </div>
+
+            <div className="space-y-4 pt-2">
               {sections.map((section) => (
-                <div key={section.id} className="flex items-center space-x-2">
+                <div key={section.id} className="flex items-center space-x-3">
                   <Checkbox
                     id={section.id}
+                    className="h-5 w-5 rounded-sm border-blue-500 data-[state=checked]:bg-blue-500 data-[state=checked]:text-white"
                     checked={selectedSections.includes(section.id)}
                     onCheckedChange={() => handleSectionToggle(section.id)}
                   />
-                  <Label htmlFor={section.id}>{section.title}</Label>
+                  <label htmlFor={section.id} className="text-lg text-gray-600">
+                    {section.title}
+                  </label>
                 </div>
               ))}
             </div>
-          </ScrollArea>
-        </div>
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={onClose}>
+          </div>
+        </ScrollArea>
+
+        <div className="p-4 flex justify-between mt-auto border-t border-gray-200">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="bg-white border-gray-300 hover:bg-gray-100 text-gray-700 rounded-md px-6 py-2 h-auto"
+          >
             Cancel
           </Button>
+
           <Button
             onClick={handleExport}
             disabled={selectedSections.length === 0 || isExporting}
+            className="bg-blue-500 hover:bg-blue-600 text-white rounded-md px-6 py-2 h-auto flex items-center gap-2"
           >
-            {isExporting ? "Exporting..." : "Export"}
+            <FileIcon className="w-5 h-5" />
+            Export
           </Button>
         </div>
       </DialogContent>

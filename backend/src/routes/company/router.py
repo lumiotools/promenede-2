@@ -4,7 +4,8 @@ import os
 import requests
 from functools import reduce
 from dotenv import load_dotenv
-from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_financial_comparables, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_peer_competitorAnalysis, get_openai_peer_developments, get_openai_productTimeline, get_openai_productsServices, get_openai_valueChain
+from src.utils.brandfetch.brandLogo import get_company_logo
+from src.utils.llm_summary.openai_helper import get_openai_business, get_openai_companyTimeline, get_openai_executive_summary, get_openai_financial_comparables, get_openai_keyTechnology, get_openai_maStrategy, get_openai_marketLeadership, get_openai_peer_competitorAnalysis, get_openai_peer_developments, get_openai_productTimeline, get_openai_productsServices, get_openai_valueChain
 from src.utils.llm_summary.perplexity_info import generate_perplexity_KeyTechnologies, generate_perplexity_MarketLeadership, generate_perplexity_businessDetail, generate_perplexity_companyTimeline, generate_perplexity_financial_comparables, generate_perplexity_maStrategy, generate_perplexity_peer_developments, generate_perplexity_productTimeline, generate_perplexity_productsServices, generate_perplexity_value_chain
 from src.utils.llmInfo.llm import fetch_company_data
 from src.utils.crunchbase.company import get_organization_data
@@ -12,7 +13,7 @@ from src.utils.secFilings.getCik import get_cik_by_company_name
 from src.utils.secFilings.analyse10K import analyze_10K_filing
 from src.utils.coresignal.company import get_company_details, get_company_id
 from src.utils.yahoo.shareholder import get_shareholder_info
-from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer, convert_null_to_none, get_top_companies_by_similarity
+from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer, convert_null_to_none, get_ticker, get_top_companies_by_similarity
 
 from src.utils.llm_summary.employeer_reviews import get_employee_reviews_summary, get_employee_ratings_summary, get_areas_of_improvement
 from src.utils.llmInfo.competitive_analysis import get_competitive_analysis
@@ -68,23 +69,24 @@ async def get_company_data(request: CompanyRequest):
     
     company_full_url=coresignal_data.get("website","")
     # Try to get Crunchbase data using the URL from CoreSignal if available
-    try:
-        crunchbase_url = coresignal_data.get("crunchbase_url", "")
-        if crunchbase_url:
-            crunchbase_company_name = crunchbase_url.split("/")[-1]
-            print("crunchbase url", crunchbase_url, " Company name", crunchbase_company_name)
-            crunchbase_data = get_organization_data(crunchbase_company_name) or {"cards": {"fields": {}}}
-        else:
-            # Fallback to original company name
-            crunchbase_data = get_organization_data(company_name) or {"cards": {"fields": {}}}
-        print("crunchbase data", crunchbase_data)
-    except Exception as e:
-        print(f"Error getting Crunchbase data: {e}")
-        crunchbase_data = {"cards": {"fields": {}}}
+    crunchbase_data = {"cards": {"fields": {}}}
+    # try:
+    #     crunchbase_url = coresignal_data.get("crunchbase_url", "")
+    #     if crunchbase_url:
+    #         crunchbase_company_name = crunchbase_url.split("/")[-1]
+    #         print("crunchbase url", crunchbase_url, " Company name", crunchbase_company_name)
+    #         crunchbase_data = get_organization_data(crunchbase_company_name) or {"cards": {"fields": {}}}
+    #     else:
+    #         # Fallback to original company name
+    #         crunchbase_data = get_organization_data(company_name) or {"cards": {"fields": {}}}
+    #     print("crunchbase data", crunchbase_data)
+    # except Exception as e:
+    #     print(f"Error getting Crunchbase data: {e}")
+    #     crunchbase_data = {"cards": {"fields": {}}}
     
     # Try to get Yahoo data
     try:
-        stock_name = crunchbase_data.get("cards", {}).get("fields", {}).get("stock_symbol", {}).get("value", "")
+        stock_name = get_ticker(crunchbase_data,coresignal_data)
         print("stock name", stock_name)
         if stock_name:
             yahooData = get_shareholder_info(stock_name) or {}
@@ -92,6 +94,7 @@ async def get_company_data(request: CompanyRequest):
     except Exception as e:
         print(f"Error getting Yahoo data: {e}")
         yahooData = {}
+    company_image_url=get_company_logo(company_name)
     
     # Get LLM data with safe fallbacks
     try:
@@ -164,8 +167,8 @@ async def get_company_data(request: CompanyRequest):
             "description": "",
             "financial_highlights": {
                 "operating_revenue": safe_call(extract_financial_data, coresignal_data, "revenue", default={}),
-                "operating_profit": safe_call(extract_financial_data, coresignal_data, "ebit", default={}),
-                "ebitda": safe_call(extract_financial_data, coresignal_data, "ebitda", default={}),
+                "operating_profit": safe_call(extract_financial_data, coresignal_data, "gross_profit", default={}),
+                "ebitda": safe_call(extract_financial_data, coresignal_data, "ebit", default={}),
                 "net_income": safe_call(extract_financial_data, coresignal_data, "net_income", default={}),
                 "per": safe_call(calculate_per, coresignal_data, default={}),
             }
@@ -355,8 +358,8 @@ async def get_company_data(request: CompanyRequest):
         
         # URLs for the frontend
         "urls": {
-            "company_url": safe_get(coresignal_data, "website", default=""),
-            "image_url": safe_get(crunchbase_data, "cards", "fields", "image_url", default=""),
+            "company_url": company_full_url,
+            "image_url": company_image_url,
             "linkedin_url": safe_get(coresignal_data, "professional_network_url", default=""),
             "facebook_url": safe_get(coresignal_data, "facebook_url", default=[]),
             "twitter_url": safe_get(coresignal_data, "twitter_url", default=""),
@@ -703,7 +706,12 @@ async def get_company_data(request: CompanyRequest):
 
     response_data["strategy"]['businessModel'] = response_data["company_overview"]['business_model']
 
-
+    try:
+        executive_summary=get_openai_executive_summary(company_name, response_data["executive_summary"])
+        response_data["executive_summary"]["executive_summary"] = executive_summary
+    except Exception as e:
+        print(f"Error getting competitive analysis: {e}")
+        response_data["competitive_analysis"]["competitive_analysis"] = ""
     
     return {"success": True, "company_name": company_name, "data": response_data}
 

@@ -956,6 +956,22 @@ def get_top_companies_by_similarity(competitors, x):
     # Extract and return the company names of the top 'x' competitors
     return [competitor['company_name'] for competitor in top_competitors]
 
+def get_ticker(crunchbase_data, coresignal_data):
+    # Try to get ticker from crunchbase data
+    ticker = crunchbase_data.get("cards", {}).get("fields", {}).get("stock_symbol", {}).get("value", "")
+    
+    # If the ticker from crunchbase is empty, fallback to coresignal data
+    if not ticker:
+        # Ensure stock_ticker is a list in coresignal_data
+        stock_ticker = coresignal_data.get("stock_ticker", [])
+        for item in stock_ticker:
+            ticker = item.get("ticker", "").strip()  # Get ticker, strip any whitespace
+            if ticker:  # If ticker is not empty, break out of loop
+                break
+    
+    return ticker
+
+
 
 
 

@@ -8,6 +8,7 @@ import type { CompanyData } from "@/types/apiResponse";
 export default function Home() {
   const [searchResults, setSearchResults] = useState<CompanyData>({
     executive_summary: {
+      executive_summary: null,
       industry: null,
       topic_tags: null,
       valuation: null,
@@ -129,16 +130,7 @@ export default function Home() {
       competitors: [],
       competitors_websites: [],
       financial_comparables: [],
-      peer_developments: {
-        funding_vs_founded: {
-          company_data: null,
-          competitors_data: [],
-        },
-        webtraffic_vs_founded: {
-          company_data: null,
-          competitors_data: [],
-        },
-      },
+      peer_developments: null,
       competitive_analysis: [],
     },
     regulations: [],
