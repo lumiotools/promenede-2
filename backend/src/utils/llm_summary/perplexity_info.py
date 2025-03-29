@@ -277,6 +277,7 @@ def generate_perplexity_peer_developments(company_name, competitor_names):
     print(f"Generating competitor information for {company_name} and competitors: {competitors_str}")
     # Assuming `ask_perplexity` is a function that sends the prompt to the Perplexity API and returns the response.
     response = ask_perplexity(system_prompt, competitors_str)
+    print("perplexity peer response",response)
     return response
 
 # Main function to test the company timeline generation

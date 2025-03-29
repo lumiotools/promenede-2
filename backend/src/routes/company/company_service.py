@@ -135,7 +135,7 @@ async def fetch_company_data(company_name, company_url):
     # Enrich the data in parallel
     response_data = enrich_data_parallel(response_data, company_name, coresignal_data, max_workers)
     
-    return {"success": True, "company_name": company_name, "data": response_data}
+    return {"success": True, "company_name": company_name, "data": response_data,"coresignal_data":coresignal_data,"crunchbase_data":crunchbase_data}
 
 def process_key_members(leadership_executives, company_name):
     """

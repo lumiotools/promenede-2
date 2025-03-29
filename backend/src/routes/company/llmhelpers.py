@@ -208,6 +208,7 @@ def enrich_data_parallel(response_data: Dict, company_name: str, coresignal_data
     
     # Add tasks that require special handling
     competitors = coresignal_data.get("competitors", "")
+    print("competitors",competitors)
     if competitors:
         try:
             top_peer = get_top_companies_by_similarity(competitors, 3)
