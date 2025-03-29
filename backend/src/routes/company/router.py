@@ -718,8 +718,8 @@ async def get_company_data(request: CompanyRequest):
 
     try:
         company_detail=get_openai_companyDetail(company_name)
-        response_data["company_profile"]["ceo"] = company_detail['company_detail'][0].get("ceo", "")
-        response_data["company_profile"]["incorporation_date"] = company_detail['company_detail'][0].get("incorporation", "")
+        response_data["company_profile"]["firmographic"]["ceo"] = company_detail['company_detail'][0].get("ceo", "")
+        response_data["company_profile"]["firmographic"]["incorporation_date"] = company_detail['company_detail'][0].get("incorporation", "")
     except Exception as e:
         print(f"Error getting competitive analysis: {e}")
     
