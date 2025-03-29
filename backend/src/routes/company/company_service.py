@@ -12,7 +12,7 @@ from src.utils.website_screenshot.screenshot import get_website_screenshot
 from src.routes.company.llmhelpers import enrich_data_parallel
 
 # Maximum number of concurrent workers for thread pools
-max_workers = 10
+max_workers = 5
 
 async def fetch_company_data(company_name, company_url):
     """
