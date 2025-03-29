@@ -1,3 +1,6 @@
+import re
+from collections import defaultdict
+
 # Helper functions
 def convert_null_to_none(data):
     """
@@ -971,6 +974,59 @@ def get_ticker(crunchbase_data, coresignal_data):
     
     return ticker
 
+def get_ceo_names(coresignal_data):
+    # Extract key executives from coresignal_data
+    key_executives = coresignal_data.get("key_executives", [])
+    
+    # List to store names of executives with "CEO" title
+    ceo_names = []
+    
+    # Loop through each executive and check if the position title is "CEO"
+    for executive in key_executives:
+        title = executive.get("member_position_title", "").lower()
+        
+        # If the position title is exactly "ceo", add the name to the list
+        if title == "ceo":
+            ceo_names.append(executive.get("member_full_name"))
+    
+    # Return the names as a comma-separated string, or an empty string if no CEOs were found
+    return ", ".join(ceo_names) if ceo_names else ""
+
+def clean_tag(tag):
+    # Remove special characters, convert to lowercase and split into keywords
+    return re.sub(r'[^a-zA-Z0-9 ]', '', tag).lower()
+def get_unique_tags_from_coresignal(coresignal_data):
+    # Extract categories_and_keywords from coresignal_data
+    categories_and_keywords = coresignal_data.get("categories_and_keywords", [])
+    
+    # Dictionary to store cleaned tags and their original versions
+    grouped_tags = defaultdict(list)
+    
+    # Loop through all tags and group similar ones based on keywords
+    for tag in categories_and_keywords:
+        cleaned_tag = clean_tag(tag)
+
+        # Skip tags that are too long
+        if len(cleaned_tag) > 30:
+            continue
+        
+        # Use the cleaned tag as the key for grouping similar tags
+        added = False
+        for key in list(grouped_tags.keys()):
+            if key in cleaned_tag or cleaned_tag in key:  # Check if one tag is a substring of another
+                grouped_tags[key].append(tag)
+                added = True
+                break
+        
+        # If no group was found, create a new group
+        if not added:
+            grouped_tags[cleaned_tag].append(tag)
+
+    # Collect the first tag from each group to ensure uniqueness
+    unique_tags = [tags[0] for tags in grouped_tags.values()]
+    
+    # Limit the result to 5 unique tags
+    return ", ".join(unique_tags[:5])
 
 
 

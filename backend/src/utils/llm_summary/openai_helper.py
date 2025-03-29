@@ -23,10 +23,10 @@ def get_openai_business(company_name, business_data):
 You are given the following company fundamentals and business data for the company: {company_name}.
 
 Please provide a comprehensive summary covering the following areas:
-1. **Business Description**: A brief description of the company, including its history, mission, and vision.
-2. **Business Model**: A clear and concise explanation of how the company generates revenue, its core operations, and the key strategies it follows.
-3. **Products and Brands**: A list of the major products and brands the company offers.
-4. **Customers**: A description of the company's target customers, key demographics, and market segments.
+1. **Business Description**: A brief description of the company, including its history, mission, and vision. Provide any relevant information about its founding, key milestones, and overall purpose in the market.
+2. **Business Model**: A clear and concise explanation of how the company generates revenue, its core operations, key strategies, and the channels it uses to deliver its products or services. Focus on specific business sectors, investment areas (such as R&D or technological innovation), and any unique features that set the company apart from competitors. If applicable, mention any sustainability or corporate social responsibility initiatives.
+3. **Products and Brands**: A list of the major products, services, and brands the company offers. Organize them by division or category if possible, highlighting any product lines targeted toward specific customer segments.
+4. **Customers**:A description of the company's target customers, including key customer segments, demographics, and industries or professional groups that primarily use the company's products or services. If available, include specific customer personas or notable key customers.
 
 Strictly follow the below JSON format for the response:
 

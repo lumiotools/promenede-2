@@ -23,6 +23,7 @@ export interface Firmographic {
   hq_state: string | null;
   hq_country: string | null;
   industry: string | null;
+  ceo: string | null;
   type: string | null;
   revenue_range: {
     source_4_annual_revenue_range: RevenueRange | null;
@@ -31,6 +32,7 @@ export interface Firmographic {
   employees_count: number | null;
   products_services: ProductService[] | null;
   description: string | null;
+  tags: string | null;
 }
 
 export interface IncomeStatement {

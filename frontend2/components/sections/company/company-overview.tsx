@@ -58,6 +58,7 @@ export default function CompanyOverview({
       business_model: "",
       products_brands: [],
       customers: [],
+      description_enriched: "",
     };
   };
 
@@ -118,7 +119,7 @@ export default function CompanyOverview({
     >
       {({ isEditing, editData, setEditData }) => (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Left Column - Company Image */}
+          {/* Left Column - Company Image and Description */}
           <div>
             {initialData?.website_screenshot ? (
               <img
@@ -134,6 +135,34 @@ export default function CompanyOverview({
                 alt="Company Overview"
                 className="w-full h-auto rounded-md border border-[#e5e7eb]"
               />
+            )}
+
+            {/* Description Enriched Section */}
+            {isEditing ? (
+              <div className="mt-4">
+                <h3 className="hidden text-sm font-medium text-[#475467] mb-2">
+                  Company Description
+                </h3>
+                <textarea
+                  className="border p-2 w-full rounded-md min-h-24 resize-y"
+                  value={editData?.description_enriched || ""}
+                  onChange={(e) =>
+                    updateField("description_enriched", e.target.value)
+                  }
+                  placeholder="Enter company description"
+                />
+              </div>
+            ) : (
+              data?.description_enriched && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-[#475467] mb-2">
+                    Company Description
+                  </h3>
+                  <p className="text-sm text-[#445963] whitespace-pre-wrap">
+                    {data.description_enriched}
+                  </p>
+                </div>
+              )
             )}
 
             {/* Company URL and Social Links */}
@@ -268,7 +297,7 @@ export default function CompanyOverview({
                         {editData?.products_brands &&
                         editData.products_brands.length > 0 ? (
                           editData.products_brands.map(
-                            (product: string[], index: number) => (
+                            (product: string, index: number) => (
                               <div
                                 key={index}
                                 className="flex items-center gap-2"
@@ -342,7 +371,7 @@ export default function CompanyOverview({
                 {/* Row 3: Services */}
                 <tr>
                   <td className="w-1/5 bg-[#002169] text-white p-4">
-                    <span className="text-sm font-medium">Services</span>
+                    <span className="text-sm font-medium">Customers</span>
                   </td>
                   <td className="w-4/5 p-4">
                     {isEditing ? (

@@ -13,7 +13,7 @@ from src.utils.secFilings.getCik import get_cik_by_company_name
 from src.utils.secFilings.analyse10K import analyze_10K_filing
 from src.utils.coresignal.company import get_company_details, get_company_id
 from src.utils.yahoo.shareholder import get_shareholder_info
-from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer, convert_null_to_none, get_ticker, get_top_companies_by_similarity
+from src.routes.company.helpers import extract_financial_data, calculate_per, calculate_revenue_growth, get_ceo_names, get_employee_review_trend, get_acquisitions, extract_company_timeline, extract_product_details, extract_product_timeline, extract_strategic_development, extract_company_strategy, extract_customer_success, extract_value_chain, extract_market_map, extract_competitive_landscape, extract_financial_comparables, combine_funding_and_founding, combine_webtraffic_and_founding, extract_company_name_from_website, extract_regulation_info, extract_opportunities, extract_risks, extract_common_questions, generate_competitors_answer, generate_technologies_answer, convert_null_to_none, get_ticker, get_top_companies_by_similarity, get_unique_tags_from_coresignal
 
 from src.utils.llm_summary.employeer_reviews import get_employee_reviews_summary, get_employee_ratings_summary, get_areas_of_improvement
 from src.utils.llmInfo.competitive_analysis import get_competitive_analysis
@@ -191,7 +191,9 @@ async def get_company_data(request: CompanyRequest):
                 "employees_count": safe_get(coresignal_data, "employees_count", default=0),
                 "products_services": safe_get(crunchbase_data, "cards", "fields", "categories", default=""),
                 # "description": safe_get(coresignal_data, "description", default="")
-                "description": ""
+                "description": "",
+                "ceo":safe_call(get_ceo_names,coresignal_data,default=""),
+                "tags":safe_call(get_unique_tags_from_coresignal,coresignal_data,default="")
             },
             
             # b. Key Financials
@@ -214,7 +216,7 @@ async def get_company_data(request: CompanyRequest):
             "business_model": "B2B" if safe_get(coresignal_data, "is_b2b") == 1 else "B2C",
             "products_brands": safe_get(crunchbase_data, "cards", "fields", "categories", default=""),
             "customers": safe_get(coresignal_data, "categories_and_keywords", default=[]),
-            "description_enriched": safe_get(coresignal_data, "description_enriched", default=""),
+            "description_enriched": "",
             "website_screenshot": safe_call(
                 lambda url: f"data:image/png;base64,{get_website_screenshot(url)}" if url else "",
                 company_full_url,
@@ -507,6 +509,7 @@ async def get_company_data(request: CompanyRequest):
             )
             
             response_data["executive_summary"]['description'] = openai_business.get("business_description", "")
+            response_data["company_overview"]['description_enriched'] = openai_business.get("business_description", "")
             response_data["company_overview"]['business_model'] = openai_business.get("business_model", "")
             response_data["company_overview"]['products_brands'] = openai_business.get("products_brands", "")
             response_data["company_overview"]['customers'] = openai_business.get("customers", "")
