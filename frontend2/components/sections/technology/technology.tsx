@@ -86,7 +86,7 @@ export default function TechnologyComponent({ initialData }: TechnologyProps) {
                         {tech.description || "No description available"}
                       </td>
                       <td className="py-3 px-4 border-t border-gray-200 text-sm">
-                        {formatDate(tech.date)}
+                        {tech.date}
                       </td>
                     </tr>
                   ))
