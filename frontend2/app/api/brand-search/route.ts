@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Brand search API error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch brand data" },
+      { error: "Something went wrong. Please try again" },
       { status: 500 }
     );
   }

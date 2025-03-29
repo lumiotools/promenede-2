@@ -22,11 +22,6 @@ def fetch_company_data_parallel(company_name, max_tokens=10000, model="gpt-4o-mi
     current_date = datetime.datetime.now().strftime("%Y-%m-%d")
     
     # Define system prompts for each data type
-    launch_timeline_prompt = (
-        "You are an AI assistant that provides information about companies in JSON format. "
-        "Return product launch timeline for the given company as JSON."
-    )
-    
     strategic_development_prompt = (
         "You are an AI assistant that provides information about companies in JSON format. "
         "Return strategic development information for the given company as JSON."
@@ -40,11 +35,6 @@ def fetch_company_data_parallel(company_name, max_tokens=10000, model="gpt-4o-mi
     market_size_prompt = (
         "You are an AI assistant that provides information about companies in JSON format. "
         "Return market size information for the given company's industry as JSON."
-    )
-    
-    value_chain_prompt = (
-        "You are an AI assistant that provides information about companies in JSON format. "
-        "Return value chain information for the given company as JSON."
     )
     
     leadership_executives_prompt = (
@@ -63,13 +53,6 @@ def fetch_company_data_parallel(company_name, max_tokens=10000, model="gpt-4o-mi
     )
     
     # Create content for each request with expected output structure
-    launch_timeline_content = (
-        f"Company Name: {company_name}\nCurrent Date: {current_date}\n"
-        "Please provide the company's product launch timeline as JSON. "
-        "Return an array of objects with the following structure: "
-        "[{\"productName\": string, \"description\": string, \"referenceLink\": string,\"date\": string}]"
-    )
-    
     strategic_development_content = (
         f"Company Name: {company_name}\nCurrent Date: {current_date}\n"
         "Please provide the company's strategic development information as JSON. "
@@ -96,25 +79,6 @@ def fetch_company_data_parallel(company_name, max_tokens=10000, model="gpt-4o-mi
         "\"projectionFor2030\": {\"marketSize\": string, \"cagr\": string, \"explanation\": string, "
         "\"keyIndustryTrends\": [string], \"keyExcerpt\": string}}"
     )
-    
-    value_chain_content = (
-    f"Company Name: {company_name}\nCurrent Date: {current_date}\n"
-    "Please provide the company's value chain information as JSON. "
-    "Return an object with the following structure: "
-    "{\"industryName\": string, "
-    "\"stages\": [{"
-    "\"stage\": string, "
-    "\"activities\": [string], // List containing minimum 4 activities and maximum 6 activities for each stage. "
-    "\"companyLogos\": [string] // Store the URLs of logos of companies/tools involved in each stage, not the company's logo itself. "
-    "For example, if a stage involves tools store the logos of these tools here, not the company logo of {company_name} or the main company. "
-    "Each logo should correspond to the tools or other companies used in that stage."
-    "To store a logo of tool or company use the toolurl/favicon.ico or companyurl/favicon.ico format. "
-    "For example, if the tool is Slack, store the logo as https://slack.com/favicon.ico. "
-    "Minimum 3 logos required, maximum 5. "
-    "}]}"
-)
-
-
     
     leadership_executives_content = (
         f"Company Name: {company_name}\nCurrent Date: {current_date}\n"
@@ -143,11 +107,9 @@ def fetch_company_data_parallel(company_name, max_tokens=10000, model="gpt-4o-mi
     
     # Define tasks for parallel execution
     tasks = [
-        (launch_timeline_prompt, launch_timeline_content, max_tokens, model, "launch_timeline"),
         (strategic_development_prompt, strategic_development_content, max_tokens, model, "strategic_development"),
         (strategic_alliances_prompt, strategic_alliances_content, max_tokens, model, "strategic_alliances"),
         (market_size_prompt, market_size_content, max_tokens, model, "market_size"),
-        (value_chain_prompt, value_chain_content, max_tokens, model, "value_chain"),
         (leadership_executives_prompt, leadership_executives_content, max_tokens, model, "leadership_executives"),
         (company_strategy_prompt, company_strategy_content, max_tokens, model, "company_strategy"),
         (regulations_prompt, regulations_content, max_tokens, model, "regulations")

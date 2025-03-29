@@ -1028,8 +1028,23 @@ def get_unique_tags_from_coresignal(coresignal_data):
     # Limit the result to 5 unique tags
     return ", ".join(unique_tags[:5])
 
-
-
+def safe_get(data, *keys, default=None):
+    """Safely navigate nested dictionaries and return default if any key is missing"""
+    current = data
+    for key in keys:
+        if not isinstance(current, dict):
+            return default
+        current = current.get(key, {})
+    return current if current != {} else default
+    
+def safe_call(func, *args, default=None, **kwargs):
+    """Safely call a function and return default if it raises an exception"""
+    try:
+        result = func(*args, **kwargs)
+        return result if result is not None else default
+    except Exception as e:
+        print(f"Error calling {func.__name__}: {e}")
+        return default
 
 
 
