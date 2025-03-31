@@ -234,11 +234,14 @@ export default function WebTrafficComponent({ initialData }: WebTrafficProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Monthly Visits Chart - Replaced with Recharts */}
+            {/* Monthly Visits Chart - Fixed to prevent label overlapping */}
             <div className="bg-[#eff2f3] rounded-lg p-4">
-              <h3 className="text-base font-semibold text-[#092a38] mb-4">
-                Monthly Visits Trend
-              </h3>
+              <div className="mb-4">
+                <h3 className="text-base font-semibold text-[#092a38] mb-1">
+                  Monthly Visits Trend
+                </h3>
+                <p className="text-xs text-[#445963]">Visits (millions)</p>
+              </div>
               {data.visits_by_month && data.visits_by_month.length > 0 ? (
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -247,7 +250,7 @@ export default function WebTrafficComponent({ initialData }: WebTrafficProps) {
                       margin={{
                         top: 20,
                         right: 30,
-                        left: 45,
+                        left: 40, // Adjusted margin to fit the y-axis values without label
                         bottom: 10,
                       }}
                     >
@@ -262,12 +265,7 @@ export default function WebTrafficComponent({ initialData }: WebTrafficProps) {
                       />
                       <YAxis
                         tickFormatter={formatYAxis}
-                        label={{
-                          value: "Visits",
-                          angle: -90,
-                          position: "insideLeft",
-                          offset: 15,
-                        }}
+                        // Removed the label entirely to prevent overlap
                       />
                       <Tooltip
                         formatter={(value) => [
