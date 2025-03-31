@@ -13,23 +13,28 @@ from fastapi.exceptions import RequestValidationError
 from src.routes.company.router import router as companyRouter
 app = FastAPI()
 
-# Configure CORS
+# Configure CORS with explicit origins
+origins = [
+    "http://localhost:3000",
+    "https://localhost:3000",
+    "https://promenede-2.vercel.app",
+    "https://promenede-2.onrender.com"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://localhost:3000", "*"],
-    allow_credentials=False,
+    allow_origins=origins,
+    allow_credentials=True,  # Set to True if you need to support cookies
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 # Include routers
-app.include_router(companyRouter,prefix="/company")
-
+app.include_router(companyRouter, prefix="/company")
 
 
 # Test routes - donot expose them
-
-
 @app.get("/")
 async def root():
     return {"message": "Server is up and running!"}
