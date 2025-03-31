@@ -173,12 +173,16 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
     });
   };
 
+  // Generate a title that includes the industry name if available
+  const getTitle = () => {
+    return "Value Chain Analysis";
+  };
+
   if (loading) {
     return (
       <SectionLayout
         title="Value Chain Analysis"
-        sourceText="Source: OpenAI"
-        showEditButton={false}
+        sourceText="Source: PromenadeAI, Crunchbase"
       >
         <div className="space-y-4">
           <Skeleton className="h-8 w-1/3" />
@@ -194,8 +198,7 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
     return (
       <SectionLayout
         title="Value Chain Analysis"
-        sourceText="Source: OpenAI"
-        showEditButton={false}
+        sourceText="Source: PromenadeAI, Crunchbase"
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -221,70 +224,70 @@ export default function ValueChainPage({ initialData }: ValueChainPageProps) {
   }
 
   return (
-    <div>
-      <h1 className="text-5xl font-medium text-[#445963] mb-6">Value Chain</h1>
-      <div className="border-t border-b py-4 mb-6">
-        <h2 className="text-xl font-medium text-[#445963]">
-          Industry :{" "}
-          <span className="text-[#156082]">
-            {data?.industryName || "Not specified"}
-          </span>
-        </h2>
-      </div>
+    <SectionLayout
+      title="Value Chain Analysis"
+      sourceText="Source: PromenadeAI, Crunchbase"
+    >
+      <div>
+        <div className="border-t border-b py-4 mb-6">
+          <h2 className="text-xl font-medium text-[#445963]">
+            Industry:{" "}
+            <span className="text-[#156082]">
+              {data?.industryName || "Not specified"}
+            </span>
+          </h2>
+        </div>
 
-      <div className="space-y-4">
-        {!editMode ? (
-          <div className="flex items-center justify-between mb-4">
-            <div className="space-x-2">
-              <Button
-                onClick={handleEdit}
-                variant="outline"
-                className="hidden border-[#156082] text-[#156082]"
-              >
-                <Edit className="mr-2 h-4 w-4" /> Edit Data
-              </Button>
+        <div className="space-y-4">
+          {!editMode ? (
+            <div className="hidden flex items-center justify-between mb-4">
+              <div className="space-x-2">
+                <Button
+                  onClick={handleEdit}
+                  variant="outline"
+                  className="border-[#156082] text-[#156082]"
+                >
+                  <Edit className="mr-2 h-4 w-4" /> Edit Data
+                </Button>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between mb-4">
-            <div className="space-x-2">
-              <Button
-                onClick={handleCancel}
-                variant="outline"
-                className="border-red-500 text-red-500"
-              >
-                <X className="mr-2 h-4 w-4" /> Cancel
-              </Button>
-              <Button
-                onClick={handleSave}
-                className="bg-[#156082] hover:bg-[#092a38]"
-              >
-                <Save className="mr-2 h-4 w-4" /> Save
-              </Button>
+          ) : (
+            <div className="flex items-center justify-between mb-4">
+              <div className="space-x-2">
+                <Button
+                  onClick={handleCancel}
+                  variant="outline"
+                  className="border-red-500 text-red-500"
+                >
+                  <X className="mr-2 h-4 w-4" /> Cancel
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  className="bg-[#156082] hover:bg-[#092a38]"
+                >
+                  <Save className="mr-2 h-4 w-4" /> Save
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {editMode ? (
-          <EditValueChain
-            data={editData}
-            updateIndustryName={updateIndustryName}
-            updateStage={updateStage}
-            updateActivities={updateActivities}
-            updateCompanies={updateCompanies}
-            updateCompanyLogos={updateCompanyLogos}
-            addStage={addStage}
-            removeStage={removeStage}
-          />
-        ) : (
-          <ViewValueChain data={data} />
-        )}
+          {editMode ? (
+            <EditValueChain
+              data={editData}
+              updateIndustryName={updateIndustryName}
+              updateStage={updateStage}
+              updateActivities={updateActivities}
+              updateCompanies={updateCompanies}
+              updateCompanyLogos={updateCompanyLogos}
+              addStage={addStage}
+              removeStage={removeStage}
+            />
+          ) : (
+            <ViewValueChain data={data} />
+          )}
+        </div>
       </div>
-
-      <div className="mt-6 text-sm text-gray-500">
-        Source: 1.PromenadeAI, 2.Crunchbase
-      </div>
-    </div>
+    </SectionLayout>
   );
 }
 
@@ -450,7 +453,6 @@ function ViewValueChain({ data }: ViewValueChainProps) {
 
                   {/* Display company logos */}
                   {((stage.companies && stage.companies.length > 0) ||
-                    (stage.company_logos && stage.company_logos.length > 0) ||
                     (stage.company_logos &&
                       stage.company_logos.length > 0)) && (
                     <div className="border-t pt-3 mt-2">
@@ -462,9 +464,6 @@ function ViewValueChain({ data }: ViewValueChainProps) {
                             const logo =
                               stage.company_logos &&
                               compIndex < stage.company_logos.length
-                                ? stage.company_logos[compIndex]
-                                : stage.company_logos &&
-                                  compIndex < stage.company_logos.length
                                 ? stage.company_logos[compIndex]
                                 : null;
 
