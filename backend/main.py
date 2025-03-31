@@ -11,33 +11,46 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from src.routes.company.router import router as companyRouter
+
 app = FastAPI()
 
-# Configure CORS with explicit origins
+# Configure CORS with more permissive settings
 origins = [
     "http://localhost:3000",
     "https://localhost:3000",
     "https://promenede-2.vercel.app",
-    "https://promenede-2.onrender.com"
+    "https://www.promenede-2.vercel.app",
+    "https://promenede-2.onrender.com",
+    "https://www.promenede-2.onrender.com",
+    # It's safer to use specific origins, but you can use "*" for testing
+    # "*"
 ]
 
+# Add CORS middleware BEFORE including routers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,  # Set to True if you need to support cookies
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"]
+    allow_origin_regex=r"https://(.*\.)?promenede-2\.vercel\.app",  # Allows all subdomains
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+    expose_headers=["*"],
+    max_age=86400  # Cache preflight requests for 24 hours
 )
 
 # Include routers
 app.include_router(companyRouter, prefix="/company")
 
-
-# Test routes - donot expose them
+# Test routes - do not expose them in production
 @app.get("/")
 async def root():
     return {"message": "Server is up and running!"}
+
+# Add a CORS test endpoint
+@app.options("/cors-test")
+@app.get("/cors-test")
+async def cors_test():
+    return {"message": "CORS is working!"}
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
