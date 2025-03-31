@@ -69,28 +69,43 @@ Ensure that markdown line breaks are properly implemented using double newlines 
 def get_openai_companyTimeline(company_name, business_data):
     time=datetime.datetime.now()
     system_prompt = f"""
-You are given the following company timeline for the company: {company_name}.
-Todays'time is {time}
+You are given the following company timeline for {company_name}.
+Today's date is {time}
 
-Provide the 6 most recent and latest events, milestones, or product launches that have occurred in the company's history.
-For each event, provide the following details in a strict JSON format:
+Extract the 10-12 most recent events, milestones, or product launches from the company's history. Focus on significant developments from the past 5 years.
 
-1. **Date**: The date or year of the event.
-2. **Event**: A brief title or name of the event.
-3. **Description**: A short description of the event and its impact on the company.
-
-Strictly follow the below JSON format for the response:
+Return ONLY a valid JSON object with the following structure:
 
 ```json
 {{
-       "company_timeline":{{
-           "date": "string", 
-           "event": "string", 
-           "description": "string", 
-       }}
-
+  "company_timeline": [
+    {{
+      "date": "MM/YYYY",
+      "event": "Event Title",
+      "description": "Concise description of the event and its significance."
+    }},
+    {{
+      "date": "MM/YYYY",
+      "event": "Event Title",
+      "description": "Concise description of the event and its significance."
+    }},
+    ...
+  ]
 }}
-Please ensure the descriptions are concise but informative. """
+```
+
+Requirements:
+1. Format all dates in US standard (MM/YYYY) format
+2. List events in reverse chronological order (newest first)
+3. Ensure each event is unique and significant 
+4. Include only factual, verifiable events (no speculative information)
+5. Keep descriptions under 200 characters while being informative
+6. Ensure the JSON is properly formatted with no syntax errors
+7. Return between 10-12 timeline entries, prioritizing the most significant and recent events
+8. Sort in Descending Order
+
+DO NOT include any explanatory text outside the JSON structure.
+"""
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed

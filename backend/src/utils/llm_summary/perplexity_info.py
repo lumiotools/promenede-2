@@ -29,18 +29,47 @@ def generate_perplexity_companyTimeline(company_name):
     focusing on recent milestones, product launches, partnerships, and future plans.
     """
     # Updated system prompt to get the latest company timeline
-    system_prompt = f"""Provide a detailed timeline for the company {company_name}, focusing on the latest developments in the past few years. 
-    Today's time is {time}
-    Include the following aspects and also mention the proper dates with years and months:
-        1. Recent Milestones: Key milestones in the last 3 years with months (e.g., product launches, market expansions, revenue growth).
-        2. Partnerships/Acquisitions: Any major acquisitions or partnerships in recent years and their impact on the business.
-        3. Company Growth: Information about the company's growth in the last few years in terms of market share, revenue, or employee count.
-        4. Recent Innovations: Any recent innovations in products, services, or technology.
-        5. Future Outlook: A look at the company's strategy or plans for the next few years (e.g., new products, markets, technology developments, sustainability efforts).
-        6. Other Timeline: Cover some of the other notable timeline of the company in the recent 3 years
-        Be detailed and focus primarily on the last 3 years, with an outlook for the future. """
+    system_prompt = f"""Provide a detailed timeline for {company_name}, focusing on the latest developments in the past few years. 
+Today's date is {time}
 
-    print(f"Generating latest company timeline for {company_name}")
+Create a comprehensive timeline with 10-12 unique and significant events from the past 3 years. All dates must follow US standard format (MM/YYYY).
+
+Include a balanced mix of the following categories, with proper dates:
+
+1. Major Product Launches or Updates: New products, services, or significant updates to existing offerings.
+
+2. Business Expansion: Market entries, new office openings, or geographic expansion initiatives.
+
+3. Financial Milestones: Significant funding rounds, revenue achievements, or stock performance events.
+
+4. Acquisitions & Partnerships: Strategic acquisitions, mergers, or key partnership announcements.
+
+5. Leadership Changes: CEO transitions, board appointments, or other executive leadership changes.
+
+6. Innovation & Research: Technological breakthroughs, patents, or R&D achievements.
+
+7. Corporate Social Responsibility: Sustainability initiatives, charitable efforts, or social impact programs.
+
+8. Industry Recognition: Major awards, rankings, or third-party recognition.
+
+9. Operational Changes: Restructuring, new business models, or significant operational improvements.
+
+10. Workforce Developments: Significant hiring milestones, workplace policies, or culture initiatives.
+
+11. Regulatory & Compliance: Key regulatory developments, compliance achievements, or legal milestones.
+
+12. Future Strategy: Announced future plans, roadmaps, or strategic direction shifts.
+
+For each timeline point, include:
+- Exact date in MM/YYYY format
+- A concise but informative headline
+- 1-2 sentences providing context and significance of the event
+- When appropriate, include quantitative data (growth percentages, dollar amounts, user numbers)
+
+Focus primarily on verifiable events from the past 5 years, with 1-2 points about announced future plans or upcoming initiatives.
+"""
+
+    print(f"Generating 10-12 unique timeline points for {company_name}")
     # Assuming `ask_perplexity` is a function that sends the prompt to the Perplexity API and returns the response.
     response = ask_perplexity(system_prompt, company_name)
     return response
