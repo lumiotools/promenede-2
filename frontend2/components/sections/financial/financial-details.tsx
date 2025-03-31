@@ -28,6 +28,26 @@ const formatPercentage = (value: number | null): string => {
   return `${(value * 100).toFixed(2)}%`;
 };
 
+// Helper function to format period display dates
+const formatPeriodDisplayDate = (statement: IncomeStatement): string => {
+  if (!statement.period_display_end_date) return "N/A";
+
+  // Extract year from the period_end_date
+  const year = statement.period_end_date
+    ? new Date(statement.period_end_date).getFullYear().toString().slice(-2)
+    : "";
+
+  if (statement.period_type === "fiscal_year") {
+    return `FY${year}`;
+  } else if (statement.period_type?.startsWith("q")) {
+    // Extract quarter number
+    const quarter = statement.period_type.charAt(1);
+    return `Q${quarter}-${year}`;
+  }
+
+  return statement.period_display_end_date;
+};
+
 export function FinancialSummaryDetail({
   initialData,
 }: FinancialSummaryDetailProps) {
@@ -35,7 +55,7 @@ export function FinancialSummaryDetail({
     null
   );
   const [loading, setLoading] = useState<boolean>(true);
-  const [periods, setPeriods] = useState<IncomeStatement[]>([]);
+  const [periodsToShow, setPeriodsToShow] = useState<IncomeStatement[]>([]);
   const [sourceText, setSourceText] = useState<string>(
     "Source: Coresignal, Crunchbase"
   );
@@ -48,29 +68,49 @@ export function FinancialSummaryDetail({
         if (initialData) {
           setFinancialData(initialData);
 
-          // Filter and sort the income statements
-          // Filter by quarterly reports and exclude fiscal_year
-          // Sort by date (newest first)
           if (initialData.income_statements) {
-            const quarterlyStatements = initialData.income_statements
-              .filter(
-                (statement) =>
-                  statement.period_type?.startsWith("q") &&
-                  statement.period_type !== "fiscal_year"
-              )
+            // Get all fiscal years
+            const fiscalYears = initialData.income_statements
+              .filter((statement) => statement.period_type === "fiscal_year")
               .sort((a, b) => {
-                // Sort by date (newest first)
                 const dateA = a.period_end_date
                   ? new Date(a.period_end_date)
                   : new Date(0);
                 const dateB = b.period_end_date
                   ? new Date(b.period_end_date)
                   : new Date(0);
-                return dateB.getTime() - dateA.getTime();
+                return dateA.getTime() - dateB.getTime();
+              });
+
+            // Get quarterly statements (excluding fiscal years)
+            const quarterlyStatements = initialData.income_statements
+              .filter((statement) => statement.period_type?.startsWith("q"))
+              .sort((a, b) => {
+                const dateA = a.period_end_date
+                  ? new Date(a.period_end_date)
+                  : new Date(0);
+                const dateB = b.period_end_date
+                  ? new Date(b.period_end_date)
+                  : new Date(0);
+                return dateA.getTime() - dateB.getTime();
               })
               .slice(0, 6); // Get the 6 most recent quarters
 
-            setPeriods(quarterlyStatements);
+            // Combine both arrays with quarterly statements first, then fiscal years
+            const allPeriods = [...quarterlyStatements, ...fiscalYears];
+
+            // Sort the combined array from oldest to newest
+            allPeriods.sort((a, b) => {
+              const dateA = a.period_end_date
+                ? new Date(a.period_end_date)
+                : new Date(0);
+              const dateB = b.period_end_date
+                ? new Date(b.period_end_date)
+                : new Date(0);
+              return dateA.getTime() - dateB.getTime();
+            });
+
+            setPeriodsToShow(allPeriods);
           }
         }
       } catch (error) {
@@ -158,19 +198,29 @@ export function FinancialSummaryDetail({
     },
   ];
 
+  // Get the latest quarter for highlights (excluding fiscal year)
+  const latestQuarter = periodsToShow
+    .filter((p) => p.period_type?.startsWith("q"))
+    .sort((a, b) => {
+      const dateA = a.period_end_date
+        ? new Date(a.period_end_date)
+        : new Date(0);
+      const dateB = b.period_end_date
+        ? new Date(b.period_end_date)
+        : new Date(0);
+      return dateB.getTime() - dateA.getTime();
+    })[0];
+
   return (
-    <SectionLayout
-      title="Financial Summary"
-      sourceText={"Source: Coresignal, Crunchbase"}
-    >
+    <SectionLayout title="Financial Summary" sourceText={sourceText}>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-[#002169] text-white">
               <th className="p-2 text-left font-medium text-sm">Metrics</th>
-              {periods.map((period, index) => (
+              {periodsToShow.map((period, index) => (
                 <th key={index} className="p-2 text-right font-medium text-sm">
-                  {period.period_display_end_date || `Period ${index + 1}`}
+                  {formatPeriodDisplayDate(period)}
                 </th>
               ))}
             </tr>
@@ -184,7 +234,7 @@ export function FinancialSummaryDetail({
                 <td className="p-2 font-medium text-sm text-[#35454c]">
                   {metric.name}
                 </td>
-                {periods.map((period, colIndex) => (
+                {periodsToShow.map((period, colIndex) => (
                   <td
                     key={`${metric.name}-${colIndex}`}
                     className="p-2 text-right text-sm"
@@ -198,29 +248,29 @@ export function FinancialSummaryDetail({
         </table>
       </div>
 
-      {periods.length > 0 && (
+      {latestQuarter && (
         <div className="mt-4 p-4 bg-[#eff2f3] rounded-md">
           <h3 className="font-medium text-[#35454c] text-lg mb-1 ">
-            Latest Quarter Highlights
+            Latest Quarter Highlights ({formatPeriodDisplayDate(latestQuarter)})
           </h3>
           <div className="grid grid-cols-3 gap-2">
             <div>
               <p className="text-base text-[#445963]">Revenue</p>
               <p className="font-medium text-base text-[#002169]">
-                {formatCurrency(periods[0].revenue)}
+                {formatCurrency(latestQuarter.revenue)}
               </p>
             </div>
             <div>
               <p className="text-base text-[#445963]">Net Income</p>
               <p className="font-medium text-base text-[#002169]">
-                {formatCurrency(periods[0].net_income)}
+                {formatCurrency(latestQuarter.net_income)}
               </p>
             </div>
             <div>
               <p className="text-base text-[#445963]">EPS</p>
               <p className="font-medium text-base text-[#002169]">
-                {periods[0].earnings_per_share
-                  ? `${periods[0].earnings_per_share.toFixed(2)}`
+                {latestQuarter.earnings_per_share
+                  ? `${latestQuarter.earnings_per_share.toFixed(2)}`
                   : "N/A"}
               </p>
             </div>

@@ -1,33 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import {
-  Edit,
-  Save,
-  X,
-  Globe,
-  Facebook,
-  Twitter,
-  Instagram,
-  Youtube,
-} from "lucide-react";
+import { Edit, Save, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type {
-  CompanyOverviewItem,
-  CompanyUrls,
-  ProductService,
-} from "@/types/company";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 import { SectionLayout } from "@/components/ui/section-layout";
+
+// Updated interface according to the new type definition
+export interface CompanyOverviewItem {
+  business_model: string | null;
+  products_brands: string | null;
+  customers: string | null;
+  description_enriched?: string | null;
+  website_screenshot?: string | null;
+}
 
 type CompanyOverViewProps = {
   initialData?: CompanyOverviewItem;
-  urls?: CompanyUrls | null;
 };
 
-export default function CompanyOverview({
-  initialData,
-  urls,
-}: CompanyOverViewProps) {
+export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
   // Initialize state with initialData if provided, otherwise use defaultData
   const [data, setData] = useState<CompanyOverviewItem | undefined>(
     initialData
@@ -55,10 +49,10 @@ export default function CompanyOverview({
 
   const createEmptyData = (): CompanyOverviewItem => {
     return {
-      business_model: "",
-      products_brands: [],
-      customers: [],
-      description_enriched: "",
+      business_model: null,
+      products_brands: null,
+      customers: null,
+      description_enriched: null,
     };
   };
 
@@ -74,32 +68,20 @@ export default function CompanyOverview({
 
       // Update source text
       if (!sourceText.includes("User Update")) {
-        setSourceText("SCrunchbase, Perplexity,User Update");
+        setSourceText("Source: Crunchbase, Perplexity, User Update");
       }
     }
   };
 
-  // Fixed: replaced 'any' with a specific type based on field value types
+  // Update field with new value
   const updateField = (
     field: keyof CompanyOverviewItem,
-    value: string | string[]
+    value: string | null
   ): void => {
     if (editData) {
       setEditData({
         ...editData,
         [field]: value,
-      });
-    }
-  };
-
-  const updateproducts_brands = (index: number, value: string): void => {
-    if (editData && editData.products_brands) {
-      const updatedProducts = [...editData.products_brands];
-      // Since products_brands is a string[] array, just replace the string at the index
-      updatedProducts[index] = value;
-      setEditData({
-        ...editData,
-        products_brands: updatedProducts,
       });
     }
   };
@@ -112,15 +94,15 @@ export default function CompanyOverview({
         if (editData) {
           setData(editData);
           if (!sourceText.includes("User Update")) {
-            setSourceText("Source: Crunchbase, Perplexity, 3.User Update");
+            setSourceText("Source: Crunchbase, Perplexity, User Update");
           }
         }
       }}
     >
       {({ isEditing, editData, setEditData }) => (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Left Column - Company Image and Description */}
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
+          {/* Left Column - Company Image and Description - Reduced width */}
+          <div className="md:col-span-4">
             {initialData?.website_screenshot ? (
               <img
                 src={`data:image/png;base64,${
@@ -128,12 +110,14 @@ export default function CompanyOverview({
                 }`}
                 alt="Company Website"
                 className="w-full h-auto rounded-md border border-[#e5e7eb]"
+                style={{ maxHeight: "200px", objectFit: "cover" }}
               />
             ) : (
               <img
                 src="/companyoverview.png"
                 alt="Company Overview"
                 className="w-full h-auto rounded-md border border-[#e5e7eb]"
+                style={{ maxHeight: "200px", objectFit: "cover" }}
               />
             )}
 
@@ -165,74 +149,11 @@ export default function CompanyOverview({
               )
             )}
 
-            {/* Company URL and Social Links */}
-            {urls && (
-              <div className="mt-4 flex flex-wrap items-center gap-4">
-                {urls.company_url && (
-                  <a
-                    href={urls.company_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[#445963] hover:text-[#002169] transition-colors"
-                  >
-                    <Globe className="h-4 w-4" />
-                    <span className="text-sm">
-                      {urls.company_url.replace(/(^\w+:|^)\/\//, "")}
-                    </span>
-                  </a>
-                )}
-
-                <div className="flex gap-3">
-                  {urls.facebook_url && urls.facebook_url.length > 0 && (
-                    <a
-                      href={urls.facebook_url[0]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#445963] hover:text-[#002169] transition-colors"
-                    >
-                      <Facebook className="h-4 w-4" />
-                    </a>
-                  )}
-
-                  {urls.twitter_url && urls.twitter_url.length > 0 && (
-                    <a
-                      href={urls.twitter_url[0]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#445963] hover:text-[#002169] transition-colors"
-                    >
-                      <Twitter className="h-4 w-4" />
-                    </a>
-                  )}
-
-                  {urls.instagram_url && urls.instagram_url.length > 0 && (
-                    <a
-                      href={urls.instagram_url[0]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#445963] hover:text-[#002169] transition-colors"
-                    >
-                      <Instagram className="h-4 w-4" />
-                    </a>
-                  )}
-
-                  {urls.youtube_url && urls.youtube_url.length > 0 && (
-                    <a
-                      href={urls.youtube_url[0]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#445963] hover:text-[#002169] transition-colors"
-                    >
-                      <Youtube className="h-4 w-4" />
-                    </a>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* URLs section removed */}
           </div>
 
-          {/* Right Column - Overview Table - Improved */}
-          <div className="border border-[#e5e7eb] rounded-md overflow-hidden">
+          {/* Right Column - Overview Table - Wider */}
+          <div className="md:col-span-8 border border-[#e5e7eb] rounded-md overflow-hidden">
             <div className="flex items-center justify-between p-4">
               <h2 className="text-base font-medium text-[#475467]">Overview</h2>
               {isEditing ? (
@@ -262,14 +183,14 @@ export default function CompanyOverview({
               )}
             </div>
 
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse text-sm">
               <tbody>
                 {/* Row 1: Business Model */}
                 <tr>
-                  <td className="w-1/5 bg-[#002169] text-white p-4 border-b border-[#1a3573]">
+                  <td className="w-1/8 bg-[#002169] text-white p-3 border-b border-[#1a3573]">
                     <span className="text-sm font-medium">Business Model</span>
                   </td>
-                  <td className="w-4/5 p-4 border-b border-[#e5e7eb]">
+                  <td className="w-7/8 p-3 border-b border-[#e5e7eb]">
                     {isEditing ? (
                       <textarea
                         className="border p-2 w-full rounded-md min-h-24 resize-y"
@@ -286,80 +207,33 @@ export default function CompanyOverview({
                   </td>
                 </tr>
 
-                {/* Row 2: Products/Brands */}
+                {/* Row 2: Products/Brands - Using ReactMarkdown */}
                 <tr>
-                  <td className="w-1/5 bg-[#002169] text-white p-4 border-b border-[#1a3573]">
+                  <td className="w-1/8 bg-[#002169] text-white p-3 border-b border-[#1a3573]">
                     <span className="text-sm font-medium">Products/Brands</span>
                   </td>
-                  <td className="w-4/5 p-4 border-b border-[#e5e7eb]">
+                  <td className="w-7/8 p-3 border-b border-[#e5e7eb]">
                     {isEditing ? (
                       <div className="space-y-2">
-                        {editData?.products_brands &&
-                        editData.products_brands.length > 0 ? (
-                          editData.products_brands.map(
-                            (product: string, index: number) => (
-                              <div
-                                key={index}
-                                className="flex items-center gap-2"
-                              >
-                                <input
-                                  className="border p-2 w-full rounded-md mb-1"
-                                  value={product || ""}
-                                  onChange={(e) =>
-                                    updateproducts_brands(index, e.target.value)
-                                  }
-                                />
-                                {index > 0 && (
-                                  <button
-                                    className="text-red-500 hover:text-red-700"
-                                    onClick={() => {
-                                      if (
-                                        editData &&
-                                        editData.products_brands
-                                      ) {
-                                        const newProducts = [
-                                          ...editData.products_brands,
-                                        ];
-                                        newProducts.splice(index, 1);
-                                        updateField(
-                                          "products_brands",
-                                          newProducts
-                                        );
-                                      }
-                                    }}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </button>
-                                )}
-                              </div>
-                            )
-                          )
-                        ) : (
-                          <p className="text-sm text-gray-500">
-                            No products/brands available
-                          </p>
-                        )}
-
-                        <button
-                          className="mt-2 text-sm text-blue-600 hover:text-blue-800"
-                          onClick={() => {
-                            if (editData) {
-                              const newProducts = [
-                                ...(editData.products_brands || []),
-                                "",
-                              ];
-                              updateField("products_brands", newProducts);
-                            }
-                          }}
-                        >
-                          + Add Product/Brand
-                        </button>
+                        <textarea
+                          className="border p-2 w-full rounded-md min-h-24 resize-y"
+                          value={editData?.products_brands || ""}
+                          onChange={(e) =>
+                            updateField("products_brands", e.target.value)
+                          }
+                          placeholder="Enter products/brands using markdown format"
+                        />
+                        <p className="text-xs text-gray-500">
+                          Use markdown format for rich text (e.g., **bold**,
+                          *italic*, - bullets)
+                        </p>
                       </div>
-                    ) : data?.products_brands &&
-                      data.products_brands.length > 0 ? (
-                      <p className="text-sm">
-                        {data.products_brands.join(", ")}
-                      </p>
+                    ) : data?.products_brands ? (
+                      <div className="prose prose-sm max-w-none">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {data.products_brands}
+                        </ReactMarkdown>
+                      </div>
                     ) : (
                       <p className="text-sm text-gray-500">
                         No products/brands available
@@ -368,36 +242,36 @@ export default function CompanyOverview({
                   </td>
                 </tr>
 
-                {/* Row 3: Services */}
+                {/* Row 3: Customers - Using ReactMarkdown */}
                 <tr>
-                  <td className="w-1/5 bg-[#002169] text-white p-4">
+                  <td className="w-1/8 bg-[#002169] text-white p-3">
                     <span className="text-sm font-medium">Customers</span>
                   </td>
-                  <td className="w-4/5 p-4">
+                  <td className="w-7/8 p-3">
                     {isEditing ? (
                       <div className="space-y-2">
                         <textarea
                           className="border p-2 w-full rounded-md min-h-24 resize-y"
-                          value={editData?.customers?.join(", ") || ""}
-                          placeholder="Enter customers separated by commas"
+                          value={editData?.customers || ""}
+                          placeholder="Enter customers using markdown format"
                           onChange={(e) =>
-                            updateField(
-                              "customers",
-                              e.target.value
-                                .split(", ")
-                                .filter((item) => item.trim() !== "")
-                            )
+                            updateField("customers", e.target.value)
                           }
                         />
                         <p className="text-xs text-gray-500">
-                          Separate customers with commas
+                          Use markdown format for rich text (e.g., **bold**,
+                          *italic*, - bullets)
                         </p>
                       </div>
+                    ) : data?.customers ? (
+                      <div className="prose prose-sm max-w-none">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {data.customers}
+                        </ReactMarkdown>
+                      </div>
                     ) : (
-                      <p className="text-sm whitespace-pre-wrap">
-                        {data?.customers && data.customers.length > 0
-                          ? data.customers.join(", ")
-                          : "N/A"}
+                      <p className="text-sm text-gray-500">
+                        No customers available
                       </p>
                     )}
                   </td>

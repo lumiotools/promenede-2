@@ -100,8 +100,8 @@ export interface KeyFinancials {
 
 export interface CompanyOverviewItem {
   business_model: string | null;
-  products_brands: string[] | null;
-  customers: string[] | null;
+  products_brands: string | null;
+  customers: string | null;
   description_enriched?: string | null;
   website_screenshot?: string | null;
 }

@@ -229,10 +229,12 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                             fiscalYearStatements[
                               fiscalYearStatements.length - 1
                             ].revenue
-                          )} (${
+                          )} (FY${
                             fiscalYearStatements[
                               fiscalYearStatements.length - 1
-                            ].period_display_end_date || "N/A"
+                            ].period_display_end_date
+                              ?.match(/\d{4}/)?.[0]
+                              .slice(-2) || "N/A"
                           })`
                         : "N/A"}
                     </td>
@@ -286,7 +288,7 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                   <thead>
                     <tr className="bg-[#002169] text-white">
                       <th className="py-1 px-2 text-left font-medium">
-                        (&apos;000)
+                        Metrics
                       </th>
                       {/* Display up to 3 most recent fiscal years */}
                       {fiscalYearStatements
@@ -296,7 +298,11 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                             key={index}
                             className="py-1 px-2 text-center font-medium"
                           >
-                            {statement.period_display_end_date || "N/A"}
+                            {statement.period_display_end_date
+                              ? `FY${statement.period_display_end_date
+                                  .match(/\d{4}/)?.[0]
+                                  .slice(-2)}`
+                              : "N/A"}
                           </th>
                         ))}
                     </tr>
@@ -319,7 +325,7 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                     </tr>
                     <tr>
                       <td className="py-1 px-2 border-t text-black border-r border-[#e5e7eb]">
-                        Operating Profit
+                        Net Income
                       </td>
                       {fiscalYearStatements
                         .slice(-3)
@@ -328,7 +334,7 @@ export default function CompanyProfile({ initialData }: CompanyProfileProps) {
                             key={index}
                             className="py-1 px-2 border-t border-r border-[#e5e7eb] text-center text-black"
                           >
-                            {formatCurrency(statement.ebit)}
+                            {formatCurrency(statement.net_income)}
                           </td>
                         ))}
                     </tr>

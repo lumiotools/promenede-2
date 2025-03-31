@@ -23,24 +23,35 @@ def get_openai_business(company_name, business_data):
 You are given the following company fundamentals and business data for the company: {company_name}.
 
 Please provide a comprehensive summary covering the following areas:
-1. **Business Description**: A brief description of the company, including its history, mission, and vision. Provide any relevant information about its founding, key milestones, and overall purpose in the market.
-2. **Business Model**: A clear and concise explanation of how the company generates revenue, its core operations, key strategies, and the channels it uses to deliver its products or services. Focus on specific business sectors, investment areas (such as R&D or technological innovation), and any unique features that set the company apart from competitors. If applicable, mention any sustainability or corporate social responsibility initiatives.
-3. **Products and Brands**: A list of the major products, services, and brands the company offers. Organize them by division or category if possible, highlighting any product lines targeted toward specific customer segments.
-4. **Customers**:A description of the company's target customers, including key customer segments, demographics, and industries or professional groups that primarily use the company's products or services. If available, include specific customer personas or notable key customers.
 
-Strictly follow the below JSON format for the response:
+1. **Business Description**: A concise description of the company, including its history, mission, vision, founding details, key milestones, and purpose in the market.
+
+2. **Business Model**: A clear explanation of how the company generates revenue, its core operations, business segments, key strategies, and distribution channels. Include any notable investments (like R&D or innovation), sustainability efforts, or initiatives that differentiate it from competitors.
+
+3. **Products and Brands**: Return a single Markdown-formatted string with **exactly 5 entries**. Format each entry as follows:
+   - Start with the product/brand name in bold (using **Name**)
+   - Follow with a brief description
+   - Ensure each entry is on its own line with proper markdown line breaks
+   - Group similar offerings under general categories where appropriate
+
+4. **Customers**: Return a single Markdown-formatted string with **exactly 5 entries**. Format each entry as follows:
+   - Start with the customer segment name in bold (using **Segment**)
+   - Follow with a brief description of that segment's demographics, industries, or how they use the company's offerings
+   - Ensure each entry is on its own line with proper markdown line breaks
+
+Strictly follow the JSON structure below, and ensure proper markdown formatting with line breaks:
 
 ```json
 {{
-       {{
-           "business_description": "string", 
-           "business_model": "string", 
-           "products_brands": "["string", "string", ...]", 
-           "customers": ["string", "string", ...]
-       }}
-
+  "business_description": "string",
+  "business_model": "string",
+  "products_brands": "**Product 1** Description for product 1\\n\\n**Product 2** Description for product 2\\n\\n**Product 3** Description for product 3\\n\\n**Product 4** Description for product 4\\n\\n**Product 5** Description for product 5",
+  "customers": "**Segment 1** Description for segment 1\\n\\n**Segment 2** Description for segment 2\\n\\n**Segment 3** Description for segment 3\\n\\n**Segment 4** Description for segment 4\\n\\n**Segment 5** Description for segment 5"
 }}
-Please ensure the descriptions are concise but informative. """
+```
+
+Ensure that markdown line breaks are properly implemented using double newlines (\\n\\n) between entries so they render as separate paragraphs in markdown. The example format above shows how products and customers should be formatted with proper line breaks.
+"""
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",  # You can use 'gpt-4o-mini' if needed
