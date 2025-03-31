@@ -86,8 +86,6 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
     }
   };
 
-  // Removed getTop3Items function
-
   return (
     <SectionLayout
       title="Company Overview"
@@ -185,17 +183,17 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
               )}
             </div>
 
-            <div className="overflow-auto flex-grow">
+            <div>
               <table className="w-full border-collapse text-sm table-fixed">
                 <tbody>
                   {/* Row 1: Business Model */}
                   <tr>
-                    <td className="w-1/4 bg-[#002169] text-white p-3 border-b border-[#1a3573]">
+                    <td className="w-1/5 bg-[#002169] text-white p-3 border-b border-[#1a3573]">
                       <span className="text-sm font-medium">
                         Business Model
                       </span>
                     </td>
-                    <td className="w-3/4 p-3 border-b border-[#e5e7eb]">
+                    <td className="w-4/5 p-3 border-b border-[#e5e7eb]">
                       {isEditing ? (
                         <textarea
                           className="border p-2 w-full rounded-md min-h-24 resize-y"
@@ -205,7 +203,7 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
                           }
                         />
                       ) : (
-                        <div className="text-sm whitespace-pre-wrap max-h-32 overflow-y-auto">
+                        <div className="text-sm whitespace-pre-wrap h-32 overflow-y-auto">
                           {data?.business_model || "N/A"}
                         </div>
                       )}
@@ -214,12 +212,12 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
 
                   {/* Row 2: Products/Brands - Top 3 */}
                   <tr>
-                    <td className="w-1/4 bg-[#002169] text-white p-3 border-b border-[#1a3573]">
+                    <td className="w-1/5 bg-[#002169] text-white p-3 border-b border-[#1a3573]">
                       <span className="text-sm font-medium">
                         Products/Brands
                       </span>
                     </td>
-                    <td className="w-3/4 p-3 border-b border-[#e5e7eb]">
+                    <td className="w-4/5 p-3 border-b border-[#e5e7eb]">
                       {isEditing ? (
                         <div className="space-y-2">
                           <textarea
@@ -236,7 +234,7 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
                           </p>
                         </div>
                       ) : (
-                        <div className="max-h-32 overflow-y-auto">
+                        <div className="h-32 overflow-y-auto">
                           {data?.products_brands ? (
                             <div className="prose prose-sm max-w-none">
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -255,10 +253,10 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
 
                   {/* Row 3: Customers - Top 3 */}
                   <tr>
-                    <td className="w-1/4 bg-[#002169] text-white p-3">
+                    <td className="w-1/5 bg-[#002169] text-white p-3">
                       <span className="text-sm font-medium">Customers</span>
                     </td>
-                    <td className="w-3/4 p-3">
+                    <td className="w-4/5 p-3">
                       {isEditing ? (
                         <div className="space-y-2">
                           <textarea
@@ -275,7 +273,7 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
                           </p>
                         </div>
                       ) : (
-                        <div className="max-h-32 overflow-y-auto">
+                        <div className="h-32 overflow-y-auto">
                           {data?.customers ? (
                             <div className="prose prose-sm max-w-none">
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>

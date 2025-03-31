@@ -1,5 +1,3 @@
-// Replace the current BarChart usage with a custom implementation using Recharts
-
 import { useState, useEffect } from "react";
 import { SectionLayout } from "@/components/ui/section-layout";
 import {
@@ -249,7 +247,7 @@ export default function WebTrafficComponent({ initialData }: WebTrafficProps) {
                       margin={{
                         top: 20,
                         right: 30,
-                        left: 20,
+                        left: 45,
                         bottom: 10,
                       }}
                     >
@@ -268,7 +266,7 @@ export default function WebTrafficComponent({ initialData }: WebTrafficProps) {
                           value: "Visits",
                           angle: -90,
                           position: "insideLeft",
-                          offset: 0,
+                          offset: 15,
                         }}
                       />
                       <Tooltip
