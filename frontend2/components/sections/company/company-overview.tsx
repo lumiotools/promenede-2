@@ -86,6 +86,8 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
     }
   };
 
+  // Removed getTop3Items function
+
   return (
     <SectionLayout
       title="Company Overview"
@@ -142,9 +144,9 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
                   <h3 className="text-sm font-medium text-[#475467] mb-2">
                     Company Description
                   </h3>
-                  <p className="text-sm text-[#445963] whitespace-pre-wrap">
+                  <div className="text-sm text-[#445963] whitespace-pre-wrap max-h-64 overflow-y-auto">
                     {data.description_enriched}
-                  </p>
+                  </div>
                 </div>
               )
             )}
@@ -153,7 +155,7 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
           </div>
 
           {/* Right Column - Overview Table - Wider */}
-          <div className="md:col-span-8 border border-[#e5e7eb] rounded-md overflow-hidden">
+          <div className="md:col-span-8 border border-[#e5e7eb] rounded-md overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-4">
               <h2 className="text-base font-medium text-[#475467]">Overview</h2>
               {isEditing ? (
@@ -183,101 +185,115 @@ export default function CompanyOverview({ initialData }: CompanyOverViewProps) {
               )}
             </div>
 
-            <table className="w-full border-collapse text-sm">
-              <tbody>
-                {/* Row 1: Business Model */}
-                <tr>
-                  <td className="w-1/8 bg-[#002169] text-white p-3 border-b border-[#1a3573]">
-                    <span className="text-sm font-medium">Business Model</span>
-                  </td>
-                  <td className="w-7/8 p-3 border-b border-[#e5e7eb]">
-                    {isEditing ? (
-                      <textarea
-                        className="border p-2 w-full rounded-md min-h-24 resize-y"
-                        value={editData?.business_model || ""}
-                        onChange={(e) =>
-                          updateField("business_model", e.target.value)
-                        }
-                      />
-                    ) : (
-                      <p className="text-sm whitespace-pre-wrap">
-                        {data?.business_model || "N/A"}
-                      </p>
-                    )}
-                  </td>
-                </tr>
-
-                {/* Row 2: Products/Brands - Using ReactMarkdown */}
-                <tr>
-                  <td className="w-1/8 bg-[#002169] text-white p-3 border-b border-[#1a3573]">
-                    <span className="text-sm font-medium">Products/Brands</span>
-                  </td>
-                  <td className="w-7/8 p-3 border-b border-[#e5e7eb]">
-                    {isEditing ? (
-                      <div className="space-y-2">
+            <div className="overflow-auto flex-grow">
+              <table className="w-full border-collapse text-sm table-fixed">
+                <tbody>
+                  {/* Row 1: Business Model */}
+                  <tr>
+                    <td className="w-1/4 bg-[#002169] text-white p-3 border-b border-[#1a3573]">
+                      <span className="text-sm font-medium">
+                        Business Model
+                      </span>
+                    </td>
+                    <td className="w-3/4 p-3 border-b border-[#e5e7eb]">
+                      {isEditing ? (
                         <textarea
                           className="border p-2 w-full rounded-md min-h-24 resize-y"
-                          value={editData?.products_brands || ""}
+                          value={editData?.business_model || ""}
                           onChange={(e) =>
-                            updateField("products_brands", e.target.value)
+                            updateField("business_model", e.target.value)
                           }
-                          placeholder="Enter products/brands using markdown format"
                         />
-                        <p className="text-xs text-gray-500">
-                          Use markdown format for rich text (e.g., **bold**,
-                          *italic*, - bullets)
-                        </p>
-                      </div>
-                    ) : data?.products_brands ? (
-                      <div className="prose prose-sm max-w-none">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {data.products_brands}
-                        </ReactMarkdown>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500">
-                        No products/brands available
-                      </p>
-                    )}
-                  </td>
-                </tr>
+                      ) : (
+                        <div className="text-sm whitespace-pre-wrap max-h-32 overflow-y-auto">
+                          {data?.business_model || "N/A"}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
 
-                {/* Row 3: Customers - Using ReactMarkdown */}
-                <tr>
-                  <td className="w-1/8 bg-[#002169] text-white p-3">
-                    <span className="text-sm font-medium">Customers</span>
-                  </td>
-                  <td className="w-7/8 p-3">
-                    {isEditing ? (
-                      <div className="space-y-2">
-                        <textarea
-                          className="border p-2 w-full rounded-md min-h-24 resize-y"
-                          value={editData?.customers || ""}
-                          placeholder="Enter customers using markdown format"
-                          onChange={(e) =>
-                            updateField("customers", e.target.value)
-                          }
-                        />
-                        <p className="text-xs text-gray-500">
-                          Use markdown format for rich text (e.g., **bold**,
-                          *italic*, - bullets)
-                        </p>
-                      </div>
-                    ) : data?.customers ? (
-                      <div className="prose prose-sm max-w-none">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {data.customers}
-                        </ReactMarkdown>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500">
-                        No customers available
-                      </p>
-                    )}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  {/* Row 2: Products/Brands - Top 3 */}
+                  <tr>
+                    <td className="w-1/4 bg-[#002169] text-white p-3 border-b border-[#1a3573]">
+                      <span className="text-sm font-medium">
+                        Products/Brands
+                      </span>
+                    </td>
+                    <td className="w-3/4 p-3 border-b border-[#e5e7eb]">
+                      {isEditing ? (
+                        <div className="space-y-2">
+                          <textarea
+                            className="border p-2 w-full rounded-md min-h-24 resize-y"
+                            value={editData?.products_brands || ""}
+                            onChange={(e) =>
+                              updateField("products_brands", e.target.value)
+                            }
+                            placeholder="Enter products/brands using markdown format"
+                          />
+                          <p className="text-xs text-gray-500">
+                            Use markdown format for rich text (e.g., **bold**,
+                            *italic*, - bullets)
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="max-h-32 overflow-y-auto">
+                          {data?.products_brands ? (
+                            <div className="prose prose-sm max-w-none">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {data.products_brands}
+                              </ReactMarkdown>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500">
+                              No products/brands available
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+
+                  {/* Row 3: Customers - Top 3 */}
+                  <tr>
+                    <td className="w-1/4 bg-[#002169] text-white p-3">
+                      <span className="text-sm font-medium">Customers</span>
+                    </td>
+                    <td className="w-3/4 p-3">
+                      {isEditing ? (
+                        <div className="space-y-2">
+                          <textarea
+                            className="border p-2 w-full rounded-md min-h-24 resize-y"
+                            value={editData?.customers || ""}
+                            placeholder="Enter customers using markdown format"
+                            onChange={(e) =>
+                              updateField("customers", e.target.value)
+                            }
+                          />
+                          <p className="text-xs text-gray-500">
+                            Use markdown format for rich text (e.g., **bold**,
+                            *italic*, - bullets)
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="max-h-32 overflow-y-auto">
+                          {data?.customers ? (
+                            <div className="prose prose-sm max-w-none">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {data.customers}
+                              </ReactMarkdown>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500">
+                              No customers available
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

@@ -24,17 +24,17 @@ You are given the following company fundamentals and business data for the compa
 
 Please provide a comprehensive summary covering the following areas:
 
-1. **Business Description**: A concise description of the company, including its history, mission, vision, founding details, key milestones, and purpose in the market.
+1. **Business Description**: A concise description of the company, including its history, mission, vision, founding details, key milestones, and purpose in the market in 100 words.
 
 2. **Business Model**: A clear explanation of how the company generates revenue, its core operations, business segments, key strategies, and distribution channels. Include any notable investments (like R&D or innovation), sustainability efforts, or initiatives that differentiate it from competitors.
 
-3. **Products and Brands**: Return a single Markdown-formatted string with **exactly 5 entries**. Format each entry as follows:
+3. **Products and Brands**: Return a single Markdown-formatted string with **exactly 3 entries**. Format each entry as follows:
    - Start with the product/brand name in bold (using **Name**)
    - Follow with a brief description
    - Ensure each entry is on its own line with proper markdown line breaks
    - Group similar offerings under general categories where appropriate
 
-4. **Customers**: Return a single Markdown-formatted string with **exactly 5 entries**. Format each entry as follows:
+4. **Customers**: Return a single Markdown-formatted string with **exactly 3 entries**. Format each entry as follows:
    - Start with the customer segment name in bold (using **Segment**)
    - Follow with a brief description of that segment's demographics, industries, or how they use the company's offerings
    - Ensure each entry is on its own line with proper markdown line breaks
