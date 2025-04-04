@@ -21,223 +21,172 @@ export async function exportToPDF(options: ExportOptions = {}) {
     });
 
     // Set document properties
-    if (options.title) pdf.setProperties({ title: options.title });
-    if (options.author) pdf.setProperties({ author: options.author });
-    if (options.subject) pdf.setProperties({ subject: options.subject });
-
-    // Store original body styles
-    const originalOverflow = document.body.style.overflow;
-    const originalPosition = document.body.style.position;
-    const originalWidth = document.body.style.width;
-    const originalHeight = document.body.style.height;
-    const originalBackground = document.body.style.background;
+    if (options.title) pdf.setProperties({ title: options.title })
+    if (options.author) pdf.setProperties({ author: options.author })
+    if (options.subject) pdf.setProperties({ subject: options.subject })
 
     // Get all sections or only selected sections
-    const allSections = document.querySelectorAll("section[id]");
+    const allSections = document.querySelectorAll("section[id]")
     const sections = options.selectedSections
       ? Array.from(allSections).filter((section) =>
-          options.selectedSections?.includes(section.getAttribute("id") || "")
+          options.selectedSections?.includes(section.getAttribute("id") || ""),
         )
-      : Array.from(allSections);
-
-    // Store all original section styles
-    const originalStyles = new Map();
-    sections.forEach((section) => {
-      const el = section as HTMLElement;
-      originalStyles.set(el, {
-        display: el.style.display,
-        visibility: el.style.visibility,
-        position: el.style.position,
-        width: el.style.width,
-        height: el.style.height,
-        margin: el.style.margin,
-        padding: el.style.padding,
-        background: el.style.background,
-        overflow: el.style.overflow,
-        zIndex: el.style.zIndex,
-      });
-    });
-
-    // Hide all sections initially
-    sections.forEach((section) => {
-      const el = section as HTMLElement;
-      el.style.display = "none";
-    });
+      : allSections
 
     // PDF dimensions
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
 
-    // For monitoring progress
-    let processedCount = 0;
-    const totalSections = sections.length;
+    // Get sidebar and main content elements
+    const sidebar = document.querySelector(".sidebar") as HTMLElement
+    const mainContent = document.querySelector("main") as HTMLElement
 
-    // Set body for capture
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "relative";
-    document.body.style.width = "100vw";
-    document.body.style.height = "100vh";
-    document.body.style.background = "white";
+    // Store original styles to restore later
+    const originalSidebarDisplay = sidebar ? sidebar.style.display : ""
+    const originalMainWidth = mainContent ? mainContent.style.width : ""
+    const originalMainPadding = mainContent ? mainContent.style.padding : ""
 
-    // Process each section sequentially with proper waiting
-    for (let i = 0; i < sections.length; i++) {
-      const section = sections[i] as HTMLElement;
-      const sectionId = section.id || `section-${i}`;
+    // Temporarily hide sidebar and expand main content
+    if (sidebar) sidebar.style.display = "none"
+    if (mainContent) {
+      mainContent.style.width = "100vw"
+      mainContent.style.padding = "0"
+    }
 
+    // For each section, create a page
+    let isFirstPage = true
+
+    for (const section of sections) {
       try {
-        // Add a new page for each section except the first
-        if (i > 0) {
-          pdf.addPage([297, 167], "landscape");
+        // If not the first page, add a new page
+        if (!isFirstPage) {
+          pdf.addPage([297, 167], "landscape")
+        } else {
+          isFirstPage = false
         }
 
-        console.log(
-          `Processing section ${i + 1}/${sections.length}: ${sectionId}`
-        );
+        // Get section title for header
+        const sectionId = section.getAttribute("id") || ""
+        const sectionTitle =
+          section.querySelector("h2")?.textContent || section.querySelector("h1")?.textContent || sectionId
 
-        // Hide all sections and only show current one
-        sections.forEach((s) => {
-          (s as HTMLElement).style.display = "none";
-        });
+        // Store original section styles
+        const originalWidth = (section as HTMLElement).style.width
+        const originalPosition = (section as HTMLElement).style.position
+        const originalOverflow = (section as HTMLElement).style.overflow
+        const originalPadding = (section as HTMLElement).style.padding
 
-        // Prepare the section for capture
-        section.style.display = "block";
-        section.style.visibility = "visible";
-        section.style.position = "absolute";
-        section.style.top = "0";
-        section.style.left = "0";
-        section.style.width = "100vw";
-        section.style.height = "100vh";
-        section.style.margin = "0";
-        section.style.padding = "0";
-        section.style.background = "white";
-        section.style.overflow = "hidden";
-        section.style.zIndex = "9999";
+        // Temporarily modify section for better capture
+        ;(section as HTMLElement).style.width = "100vw"
+        ;(section as HTMLElement).style.position = "relative"
+        ;(section as HTMLElement).style.overflow = "visible"
+        ;(section as HTMLElement).style.padding = "20px"
+        ;(section as HTMLElement).style.backgroundColor = "white"
 
-        // Force layout recalculation
-        void section.offsetHeight;
+        // Expand all card elements to full width
+        const cards = section.querySelectorAll(".card") as NodeListOf<HTMLElement>
+        const originalCardWidths: string[] = []
 
-        // Wait for layout and any potential animations/transitions
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        cards.forEach((card) => {
+          originalCardWidths.push(card.style.width)
+          card.style.width = "100%"
+        })
 
-        // Render all charts and images completely
-        const chartsAndImages = section.querySelectorAll("canvas, img, svg");
-        // Ensure all images are loaded
-        await Promise.all(
-          Array.from(chartsAndImages).map((el) => {
-            if (el.tagName.toLowerCase() === "img") {
-              const img = el as HTMLImageElement;
-              if (img.complete) return Promise.resolve();
-              return new Promise((resolve) => {
-                img.onload = resolve;
-                img.onerror = resolve; // Continue even if image fails
-              });
-            }
-            return Promise.resolve();
-          })
-        );
-
-        // Wait a bit more for any dynamic content
-        await new Promise((resolve) => setTimeout(resolve, 300));
-
-        // Take screenshot
-        const canvas = await html2canvas(section, {
-          scale: 2, // Higher resolution
+        // Capture section as image
+        const canvas = await html2canvas(section as HTMLElement, {
+          scale: 2,
           useCORS: true,
-          allowTaint: true,
-          backgroundColor: "white",
-          windowWidth: window.innerWidth,
-          windowHeight: window.innerHeight,
+          logging: false,
+          backgroundColor: "#f7f9f9",
           width: window.innerWidth,
-          height: window.innerHeight,
-          // Crucial for rendering all elements including charts
-          onclone: (clonedDoc) => {
-            const clonedSection = clonedDoc.getElementById(sectionId);
-            if (clonedSection) {
-              const el = clonedSection as HTMLElement;
-              el.style.display = "block";
-              el.style.visibility = "visible";
-              el.style.position = "absolute";
-              el.style.top = "0";
-              el.style.left = "0";
-              el.style.width = "100vw";
-              el.style.height = "100vh";
-              el.style.margin = "0";
-              el.style.padding = "0";
-              el.style.background = "white";
-              el.style.overflow = "visible"; // Allow overflow during capture
-              el.style.zIndex = "9999";
-              el.style.transform = "none";
+          height: (section as HTMLElement).scrollHeight,
+          windowWidth: window.innerWidth,
+          windowHeight: (section as HTMLElement).scrollHeight,
+        })
 
-              // Make sure all elements inside are visible
-              Array.from(el.querySelectorAll("*")).forEach((child: Element) => {
-                (child as HTMLElement).style.visibility = "visible";
-                (child as HTMLElement).style.opacity = "1";
-              });
+        // Restore original styles
+        ;(section as HTMLElement).style.width = originalWidth
+        ;(section as HTMLElement).style.position = originalPosition
+        ;(section as HTMLElement).style.overflow = originalOverflow
+        ;(section as HTMLElement).style.padding = originalPadding
 
-              // Fix for body
-              clonedDoc.body.style.margin = "0";
-              clonedDoc.body.style.padding = "0";
-              clonedDoc.body.style.overflow = "hidden";
-              clonedDoc.body.style.background = "white";
+        // Restore card widths
+        cards.forEach((card, index) => {
+          card.style.width = originalCardWidths[index]
+        })
+        // Convert canvas to image data
+        const imgData = canvas.toDataURL("image/jpeg", 1.0)
 
-              // Make sure charts and graphs are captured
-              const charts = el.querySelectorAll("canvas, svg");
-              charts.forEach((chart) => {
-                (chart as HTMLElement).style.display = "block";
-                (chart as HTMLElement).style.visibility = "visible";
-                (chart as HTMLElement).style.opacity = "1";
-              });
-            }
-          },
-        });
-
-        // Add to PDF - fill entire page
-        const imgData = canvas.toDataURL("image/jpeg", 1.0);
-        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, pageHeight);
-
-        processedCount++;
-        console.log(`Completed ${processedCount}/${totalSections} sections`);
-      } catch (error) {
-        console.error(`Error processing section ${sectionId}:`, error);
-      } finally {
-        // Restore section to original state
-        if (originalStyles.has(section)) {
-          const origStyle = originalStyles.get(section);
-          Object.keys(origStyle).forEach((key) => {
-            section.style[key as any] = origStyle[key];
-          });
+        // Get dimensions and aspect ratios
+        const canvasAspectRatio = canvas.width / canvas.height
+        const pageAspectRatio = pageWidth / pageHeight
+        
+        // Use a fixed margin percentage that's smaller
+        const marginPercent = 0.02 // 2% margin instead of 5%
+        const margin = Math.min(pageWidth, pageHeight) * marginPercent
+        
+        // Calculate dimensions with minimal scaling
+        let xPos = margin
+        let yPos = margin
+        let finalWidth = pageWidth - (margin * 2)
+        let finalHeight = finalWidth / canvasAspectRatio
+        
+        // Check if the height exceeds the page
+        if (finalHeight > (pageHeight - (margin * 2))) {
+            // Adjust based on height constraints
+            finalHeight = pageHeight - (margin * 2)
+            finalWidth = finalHeight * canvasAspectRatio
+            // Center horizontally
+            xPos = (pageWidth - finalWidth) / 2
         }
+        
+        // Ensure we're using at least 95% of available page space
+        const minScale = 0.95
+        const currentScale = Math.min(
+            finalWidth / (pageWidth - (margin * 2)),
+            finalHeight / (pageHeight - (margin * 2))
+        )
+        
+        if (currentScale < minScale) {
+            // Increase dimensions to use more space
+            const scaleFactor = minScale / currentScale
+            finalWidth *= scaleFactor
+            finalHeight *= scaleFactor
+            // Recenter
+            xPos = (pageWidth - finalWidth) / 2
+            yPos = (pageHeight - finalHeight) / 2
+        }
+        
+        // Add the image with calculated dimensions and position
+        pdf.addImage(imgData, "JPEG", xPos, yPos, finalWidth, finalHeight)
+
+        // Add page number
+        const pageNum = pdf.getCurrentPageInfo().pageNumber
+        pdf.setFontSize(10)
+        pdf.setTextColor(128, 151, 162) // #8097a2
+        pdf.text(`Page ${pageNum}`, pageWidth - 15, pageHeight - 5)
+      } catch (error) {
+        console.error("Error processing section:", error)
+        pdf.setFontSize(12)
+        pdf.setTextColor(211, 82, 48) // #d35230
+        pdf.text("Error capturing this section", 10, 50)
       }
     }
 
-    // Restore all sections to original state
-    sections.forEach((section) => {
-      const el = section as HTMLElement;
-      if (originalStyles.has(el)) {
-        const origStyle = originalStyles.get(el);
-        Object.keys(origStyle).forEach((key) => {
-          el.style[key as any] = origStyle[key];
-        });
-      }
-    });
-
-    // Restore body to original state
-    document.body.style.overflow = originalOverflow;
-    document.body.style.position = originalPosition;
-    document.body.style.width = originalWidth;
-    document.body.style.height = originalHeight;
-    document.body.style.background = originalBackground;
+    // Restore original styles
+    if (sidebar) sidebar.style.display = originalSidebarDisplay
+    if (mainContent) {
+      mainContent.style.width = originalMainWidth
+      mainContent.style.padding = originalMainPadding
+    }
 
     // Save the PDF
-    pdf.save(
-      `Promenade-Report-${options.companyName ?? "Company"}-${
-        new Date().toISOString().split("T")[0]
-      }.pdf`
-    );
+    pdf.save(`Promenade-Report-${options.companyName ?? "Company"}-${new Date().toISOString().split("T")[0]}.pdf`)
 
-    return true;
+    return true
   } catch (error) {
-    console.error("Error generating PDF:", error);
-    return false;
+    console.error("Error generating PDF:", error)
+    return false
   }
 }
+
